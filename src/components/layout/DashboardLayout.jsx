@@ -23,8 +23,9 @@ export default function DashboardLayout() {
       <Box
         sx={{
           display: 'flex',
-          pt: 'var(--navbar-height)',
-          minHeight: '100vh',
+          marginTop: 'var(--navbar-height)',
+          height: 'calc(100vh - var(--navbar-height))',
+          minHeight: 0,
         }}
       >
         <Sidebar />
@@ -33,7 +34,7 @@ export default function DashboardLayout() {
           sx={{
             flex: 1,
             overflow: 'auto',
-            minHeight: 'calc(100vh - var(--navbar-height))',
+            minHeight: 0,
           }}
         >
           <Outlet />

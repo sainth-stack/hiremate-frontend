@@ -5,6 +5,8 @@ import "./index.scss";
 
 const FileUploadCustom = ({
   label,
+  title,
+  buttonText,
   sx = {},
   onFileUpload,
   link = "",
@@ -14,6 +16,8 @@ const FileUploadCustom = ({
   subtitle = "JPG, PNG, PDF, DOC, DOCX, CSV, Excel (Max 50MB)",
   maxSizeMB = 50,
 }) => {
+  const displayTitle = title ?? "Choose a file or drag & drop it here";
+  const displayButtonText = buttonText ?? "Browse File";
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -58,7 +62,7 @@ const FileUploadCustom = ({
 
   return (
     <Box>
-      <label className="upload-label">{label}</label>
+      {label ? <label className="upload-label">{label}</label> : null}
 
       <Box
         className="upload-box"
@@ -76,7 +80,7 @@ const FileUploadCustom = ({
           <CloudUploadIcon sx={{ fontSize: 48, color: "var(--light-blue)", mb: 1 }} />
 
           <Box>
-            <Typography className="upload-title">Choose a file or drag & drop it here</Typography>
+            <Typography className="upload-title">{displayTitle}</Typography>
             <Typography className="upload-subtitle">
               {subtitle}
             </Typography>
@@ -92,7 +96,7 @@ const FileUploadCustom = ({
         />
 
         <Button variant="outlined" onClick={handleBrowseClick} className="browse-btn" sx={{ borderColor: "var(--light-blue)", color: "var(--primary)", "&:hover": { borderColor: "var(--primary-light)", backgroundColor: "var(--light-blue-bg)" } }}>
-          Browse File
+          {displayButtonText}
         </Button>
       </Box>
 

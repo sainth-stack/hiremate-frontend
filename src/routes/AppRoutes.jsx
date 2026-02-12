@@ -5,9 +5,12 @@ import ProtectedRoute from '../components/layout/ProtectedRoute';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import Home from '../pages/dashboard/Home';
-import JobSearch from '../pages/dashboard/JobSearch';
-import Activity from '../pages/dashboard/Activity';
+import ApplicationTracker from '../pages/dashboard/ApplicationTracker';
+import ResumeGenerator from '../pages/dashboard/ResumeGenerator';
+import JobRecommendations from '../pages/dashboard/JobRecommendations';
 import Profile from '../pages/profile/Profile';
+import Pricing from '../pages/pricing/Pricing';
+import Settings from '../pages/Settings';
 import StartPage from '../pages/start/StartPage';
 
 export default function AppRoutes() {
@@ -23,8 +26,11 @@ export default function AppRoutes() {
           <Route element={<DashboardLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/job-search" element={<JobSearch />} />
-            <Route path="/activity" element={<Activity />} />
+            <Route path="/application-tracker" element={<ApplicationTracker />} />
+            <Route path="/resume-generator" element={<ResumeGenerator />} />
+            <Route path="/job-recommendations" element={<JobRecommendations />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/pricing" element={<Pricing />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

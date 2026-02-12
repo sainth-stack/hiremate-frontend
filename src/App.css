@@ -105,15 +105,26 @@
   --font-size-tab: 1.20rem;                 /* 16px - tab labels */
 
   /* ---- Layout (Navbar / Sidebar) ---- */
-  --navbar-height: 64px;
-  --sidebar-width: 260px;
+  --navbar-height: 70px;
+  --sidebar-width: 300px;
   --navbar-bg: var(--bg-paper);
   --navbar-border: var(--border-color);
+  --navbar-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   --sidebar-bg: var(--bg-paper);
   --sidebar-border: var(--border-color);
+  --sidebar-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
   --sidebar-item-active-bg: var(--light-blue-bg);
   --sidebar-item-active-color: var(--primary);
   --sidebar-item-hover-bg: var(--light-blue-bg-02);
+
+  /* ---- Pricing (uses primary blue accent) ---- */
+  --pricing-accent: var(--primary);
+  --pricing-accent-dark: var(--primary-dark);
+  --pricing-accent-light: var(--primary-light);
+  --pricing-badge-bg: var(--primary-dark);
+  --pricing-card-border: var(--border-color);
+  --pricing-card-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --pricing-card-radius: 12px;
 
   /* ---- Misc ---- */
   --grey: #929391;
@@ -123,6 +134,108 @@
   --icon: #d3d0d0;
   --checkbox: #e0e0e0;
   --divider: #e5e7eb;
+}
+
+/* ============================================
+   Dark mode - applied when data-theme="dark" on html
+   ============================================ */
+[data-theme="dark"] {
+  /* Primary (slightly brighter in dark) */
+  --primary: #3b82f6;
+  --primary-light: #60a5fa;
+  --primary-dark: #2563eb;
+  --primary-contrast: #ffffff;
+
+  --light-blue: #60a5fa;
+  --light-blue-2: #38bdf8;
+  --light-blue-3: #7dd3fc;
+  --light-blue-4: #93c5fd;
+  --light-blue-bg: rgba(96, 165, 250, 0.12);
+  --light-blue-bg-08: rgba(96, 165, 250, 0.18);
+  --light-blue-bg-15: rgba(96, 165, 250, 0.22);
+  --light-blue-bg-02: rgba(96, 165, 250, 0.06);
+
+  --secondary: #38bdf8;
+  --secondary-light: #7dd3fc;
+  --secondary-dark: #0ea5e9;
+
+  --success: #4ade80;
+  --success-light: #86efac;
+  --success-dark: #22c55e;
+  --success-bg: rgba(34, 197, 94, 0.15);
+  --success-bk: rgba(34, 197, 94, 0.2);
+
+  --error: #f87171;
+  --error-light: #fca5a5;
+  --error-dark: #ef4444;
+  --error-bg: rgba(220, 38, 38, 0.15);
+  --error-bk: rgba(220, 38, 38, 0.2);
+
+  --warning: #fbbf24;
+  --warning-light: #fcd34d;
+  --warning-bg: rgba(245, 158, 11, 0.15);
+
+  --info: #38bdf8;
+  --info-bg: rgba(14, 165, 233, 0.12);
+
+  --edit: #60a5fa;
+  --edit-hover: #93c5fd;
+
+  --btn-primary: var(--primary);
+  --btn-primary-hover: var(--primary-light);
+  --btn-secondary: var(--secondary);
+  --btn-disabled: #6b7280;
+
+  --black: #ffffff;
+  --black-10: rgba(255, 255, 255, 0.1);
+  --black-50: rgba(255, 255, 255, 0.5);
+  --black-065: rgba(255, 255, 255, 0.65);
+  --white: #0f172a;
+  --white-o-05: rgba(15, 23, 42, 0.5);
+
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-dark: #e2e8f0;
+  --text-label: #cbd5e1;
+
+  --label-color: #e2e8f0;
+  --border-color: #334155;
+  --border-default: var(--border-color);
+  --border-hover: #475569;
+  --border-focus: #60a5fa;
+
+  --bg-default: #0f172a;
+  --bg-paper: #1e293b;
+  --bg-light: #1e293b;
+  --bg-app: #0f172a;
+
+  --placeholder: #64748b;
+
+  --grey: #94a3b8;
+  --grey-light: #475569;
+  --grey-4: #334155;
+  --grey-5: #1e293b;
+  --icon: #64748b;
+  --checkbox: #475569;
+  --divider: #334155;
+
+  --navbar-bg: var(--bg-paper);
+  --navbar-border: var(--border-color);
+  --navbar-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --sidebar-bg: var(--bg-paper);
+  --sidebar-border: var(--border-color);
+  --sidebar-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
+  --sidebar-item-active-bg: var(--light-blue-bg);
+  --sidebar-item-active-color: var(--primary-light);
+  --sidebar-item-hover-bg: var(--light-blue-bg-02);
+
+  --pricing-accent: var(--primary-light);
+  --pricing-accent-dark: var(--primary);
+  --pricing-accent-light: #93c5fd;
+  --pricing-badge-bg: var(--primary);
+  --pricing-card-border: var(--border-color);
+  --pricing-card-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
 #root {
