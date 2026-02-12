@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Tabs, Tab, Link } from '@mui/material';
 import PageContainer from '../../components/common/PageContainer';
 import { getProfile } from '../../store/auth/authSlice';
-import { mergeFromResume } from '../../store/profile/profileSlice';
+import { fetchProfile, mergeFromResume } from '../../store/profile/profileSlice';
 import ProfileTab from './tabs/ProfileTab';
 import ExperienceTab from './tabs/ExperienceTab';
 import EducationTab from './tabs/EducationTab';
@@ -35,6 +35,7 @@ export default function Profile() {
 
   useEffect(() => {
     dispatch(getProfile());
+    dispatch(fetchProfile());
   }, [dispatch]);
 
   useEffect(() => {

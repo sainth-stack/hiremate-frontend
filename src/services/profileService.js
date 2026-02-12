@@ -1,8 +1,13 @@
 import axiosClient from './axiosClient';
 
 /**
+ * GET profile - fetches full profile data from backend.
+ */
+export const getProfileDataAPI = () =>
+  axiosClient.get('/profile');
+
+/**
  * PATCH profile - sends full profile data to backend.
- * Uses baseURL from const (http://127.0.0.1:8000/api), token from localStorage via axiosClient.
  */
 export const patchProfileAPI = (data) =>
   axiosClient.patch('/profile', data);

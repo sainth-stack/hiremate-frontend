@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { patchProfileAPI } from '../../services/profileService';
+import { getProfileDataAPI, patchProfileAPI } from '../../services/profileService';
 import {
   mapParsedProfile,
   mapParsedExperience,
@@ -56,6 +56,18 @@ const initialForm = {
   },
 };
 
+export const fetchProfile = createAsyncThunk(
+  'profile/fetchProfile',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await getProfileDataAPI();
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || 'Failed to load profile');
+    }
+  }
+);
+
 export const updateProfile = createAsyncThunk(
   'profile/updateProfile',
   async (_, { getState, rejectWithValue }) => {
@@ -110,6 +122,7 @@ const profileSlice = createSlice({
     form: initialForm,
     submitLoading: false,
     submitError: null,
+    fetchLoading: false,
   },
   reducers: {
     mergeFromResume(state, { payload: parsedData }) {
@@ -194,6 +207,62 @@ const profileSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchProfile.pending, (state) => {
+        state.fetchLoading = true;
+      })
+      .addCase(fetchProfile.fulfilled, (state, action) => {
+        state.fetchLoading = false;
+        state.submitError = null;
+        const payload = action.payload;
+        if (payload) {
+          state.form.firstName = payload.firstName ?? '';
+          state.form.lastName = payload.lastName ?? '';
+          state.form.email = payload.email ?? '';
+          state.form.phone = payload.phone ?? '';
+          state.form.city = payload.city ?? '';
+          state.form.country = payload.country ?? '';
+          state.form.willingToWorkIn = Array.isArray(payload.willingToWorkIn) ? payload.willingToWorkIn : [];
+          state.form.professionalHeadline = payload.professionalHeadline ?? '';
+          state.form.professionalSummary = payload.professionalSummary ?? '';
+          state.form.experiences = Array.isArray(payload.experiences) && payload.experiences.length > 0
+            ? payload.experiences.map((e) => ({ ...emptyExperience, ...e }))
+            : [{ ...emptyExperience }];
+          state.form.educations = Array.isArray(payload.educations) && payload.educations.length > 0
+            ? payload.educations.map((e) => ({ ...emptyEducation, ...e }))
+            : [{ ...emptyEducation }];
+          state.form.techSkills = Array.isArray(payload.techSkills) && payload.techSkills.length > 0
+            ? payload.techSkills.map((s) => ({ ...emptyTechSkill, ...s }))
+            : [{ ...emptyTechSkill }];
+          state.form.softSkills = Array.isArray(payload.softSkills) && payload.softSkills.length > 0
+            ? payload.softSkills.map((s) => ({ ...emptySoftSkill, ...s }))
+            : [{ ...emptySoftSkill }];
+          state.form.projects = Array.isArray(payload.projects) && payload.projects.length > 0
+            ? payload.projects.map((p) => ({ ...emptyProject, ...p }))
+            : [{ ...emptyProject }];
+          state.form.preferences = payload.preferences && typeof payload.preferences === 'object'
+            ? {
+                desiredRoles: payload.preferences.desiredRoles ?? '',
+                employmentType: Array.isArray(payload.preferences.employmentType) ? payload.preferences.employmentType : [],
+                experienceLevel: payload.preferences.experienceLevel ?? '',
+                openToRemote: payload.preferences.openToRemote ?? '',
+                willingToRelocate: payload.preferences.willingToRelocate ?? '',
+                preferredLocations: Array.isArray(payload.preferences.preferredLocations) ? payload.preferences.preferredLocations : [],
+                expectedSalaryRange: payload.preferences.expectedSalaryRange ?? '',
+              }
+            : { ...initialForm.preferences };
+          const lnks = payload.links && typeof payload.links === 'object' ? payload.links : {};
+          const rawOther = lnks.otherLinks || [];
+          state.form.links = {
+            linkedInUrl: lnks.linkedInUrl ?? '',
+            githubUrl: lnks.githubUrl ?? '',
+            portfolioUrl: lnks.portfolioUrl ?? '',
+            otherLinks: Array.isArray(rawOther) && rawOther.length > 0 ? rawOther.map((o) => ({ ...emptyLink, ...o })) : [{ ...emptyLink }],
+          };
+        }
+      })
+      .addCase(fetchProfile.rejected, (state) => {
+        state.fetchLoading = false;
+      })
       .addCase(updateProfile.pending, (state) => {
         state.submitLoading = true;
         state.submitError = null;
