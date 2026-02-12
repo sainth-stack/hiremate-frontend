@@ -1,0 +1,114 @@
+import React, { useState } from "react";
+import { Box, Button, Link, Typography, useMediaQuery, useTheme } from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import "./index.css";
+
+const FileUploadCustom = ({
+  label,
+  sx = {},
+  onFileUpload,
+  link = "",
+  id,
+  accept = ".jpg,.jpeg,.png,.pdf,.csv,.xls,.xlsx,.doc,.docx",
+  allowedExtensions = [".jpg", ".jpeg", ".png", ".pdf", ".csv", ".xls", ".xlsx", ".doc", ".docx"],
+  subtitle = "JPG, PNG, PDF, DOC, DOCX, CSV, Excel (Max 50MB)",
+  maxSizeMB = 50,
+}) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+
+    const fileName = selectedFile.name.toLowerCase();
+    const fileExtension = fileName.substring(fileName.lastIndexOf("."));
+
+    if (!allowedExtensions.includes(fileExtension) || selectedFile.size > maxSizeMB * 1024 * 1024) {
+      alert(`Invalid file. Please select valid file under ${maxSizeMB}MB.`);
+      return;
+    }
+
+    setFile(selectedFile);
+
+    // send file to parent
+    if (onFileUpload) {
+      onFileUpload(selectedFile);
+    }
+  };
+
+  const handleDragOver = (event) => event.preventDefault();
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    const droppedFile = event.dataTransfer.files[0];
+    handleFileChange({ target: { files: [droppedFile] } });
+  };
+
+  const handleBrowseClick = (event) => {
+    event.stopPropagation();
+    document.getElementById(id)?.click();
+  };
+
+  const handleBoxClick = () => {
+    document.getElementById(id)?.click();
+  };
+
+  return (
+    <Box>
+      <label className="upload-label">{label}</label>
+
+      <Box
+        className="upload-box"
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        onClick={handleBoxClick}
+        sx={{
+          border: isMobile ? "1.5px dashed #99965E" : "1px dashed #99965E",
+          padding: isMobile ? "13px" : "20px",
+          height: isMobile ? "180px" : "170px",
+          ...sx,
+        }}
+      >
+        <Box className="upload-content">
+          <CloudUploadIcon sx={{ fontSize: 48, color: "action.active", mb: 1 }} />
+
+          <Box>
+            <Typography className="upload-title">Choose a file</Typography>
+            <Typography className="upload-subtitle">
+              {subtitle}
+            </Typography>
+          </Box>
+        </Box>
+
+        <input
+          type="file"
+          accept={accept}
+          onChange={handleFileChange}
+          id={id}
+          style={{ display: "none" }}
+        />
+
+        <Button variant="outlined" onClick={handleBrowseClick} className="browse-btn">
+          Browse File
+        </Button>
+      </Box>
+
+      {file && (
+        <Typography className="selected-file">
+          Selected File: {file.name}
+        </Typography>
+      )}
+
+      {link && (
+        <Link href={link} target="_blank" className="upload-link">
+          Click here
+        </Link>
+      )}
+    </Box>
+  );
+};
+
+export default FileUploadCustom;

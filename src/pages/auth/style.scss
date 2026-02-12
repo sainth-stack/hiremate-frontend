@@ -1,0 +1,77 @@
+// Shared styles for Login and Register pages
+
+.auth-page {
+  // Page title (Login to your account / Sign up for an account)
+  .MuiTypography-h4 {
+    margin-bottom: 1.5rem;
+  }
+
+  // Form container
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  // Spacing between inputs (CustomInput wraps MUI TextField)
+  .custom-input {
+    margin-bottom: 1.25rem;
+  }
+
+  // Row layout for first name + last name (Register)
+  .auth-page__row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+
+    .custom-input {
+      margin-bottom: 0;
+      flex: 1;
+    }
+  }
+
+  // Remember me checkbox (Login)
+  .MuiFormControlLabel-root {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  // Submit button
+  .MuiButton-root {
+    margin-bottom: 1rem;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  // Footer text (Don't have an account? / Already have an account?)
+  .auth-page__footer {
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  // Terms/Privacy block (Register)
+  .auth-page__terms {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

@@ -1,0 +1,150 @@
+// ============================================
+// Input styles - all input-related styles
+// ============================================
+
+.custom-input {
+  width: 100%;
+  margin-bottom: 10px;
+
+  // Root TextField wrapper
+  .MuiTextField-root {
+    width: 100%;
+  }
+
+  // Label always outside (above) - no floating into input, no notch in border
+  .MuiInputLabel-outlined {
+    position: absolute;
+    top: 0;
+    transform: none;
+    font-size: var(--label-font-size);
+    font-weight: var(--label-font-weight);
+    color: var(--label-color);
+    background: var(--bg-default);
+    padding: 0 4px;
+    line-height: 1.4;
+
+    &.Mui-focused {
+      color: var(--border-focus);
+    }
+
+    &.Mui-error {
+      color: var(--error);
+    }
+  }
+
+  // Outlined input container - margin-top = spacing between label and input
+  .MuiOutlinedInput-root {
+    margin-top: 25px;
+    border-radius: 8px;
+    background-color: var(--bg-default);
+    font-size: var(--font-size-input);
+
+    // Full rectangle border (no notch for label)
+    .MuiOutlinedInput-notchedOutline legend {
+      max-width: 0.01px;
+      overflow: hidden;
+    }
+
+    fieldset {
+      border-color: var(--border-default);
+      border-width: 1px;
+      transition: border-color 0.2s ease, border-width 0.2s ease;
+    }
+
+    &:hover fieldset {
+      border-color: var(--border-hover);
+    }
+
+    &.Mui-focused fieldset {
+      border-color: var(--border-focus);
+      border-width: 2px;
+    }
+
+    &.Mui-error fieldset {
+      border-color: var(--error);
+    }
+
+    input {
+      padding: 14px 16px;
+
+      &::placeholder {
+        color: var(--placeholder);
+        opacity: 0.9;
+      }
+    }
+  }
+
+  // Helper/error text
+  .MuiFormHelperText-root {
+    font-size: var(--font-size-helper);
+    margin-top: 4px;
+    margin-left: 14px;
+
+    &.Mui-error {
+      color: var(--error);
+    }
+  }
+
+  // Margin between fields (when used in forms)
+  &.custom-input--with-margin {
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+}
+
+// Select - label on top like text input
+.custom-select {
+  width: 100%;
+  margin-bottom: 10px;
+
+  .MuiInputLabel-outlined {
+    position: absolute;
+    top: 0;
+    transform: none;
+    font-size: var(--label-font-size);
+    font-weight: var(--label-font-weight);
+    color: var(--label-color);
+    background: var(--bg-default);
+    padding: 0 4px;
+    line-height: 1.4;
+
+    &.Mui-focused {
+      color: var(--border-focus);
+    }
+
+    &.Mui-error {
+      color: var(--error);
+    }
+  }
+
+  .MuiOutlinedInput-root {
+    margin-top: 25px;
+    border-radius: 8px;
+    background-color: var(--bg-default);
+    font-size: var(--font-size-input);
+
+    .MuiOutlinedInput-notchedOutline legend {
+      max-width: 0.01px;
+      overflow: hidden;
+    }
+
+    fieldset {
+      border-color: var(--border-default);
+      border-width: 1px;
+      transition: border-color 0.2s ease, border-width 0.2s ease;
+    }
+
+    &:hover fieldset {
+      border-color: var(--border-hover);
+    }
+
+    &.Mui-focused fieldset {
+      border-color: var(--border-focus);
+      border-width: 2px;
+    }
+
+    &.Mui-error fieldset {
+      border-color: var(--error);
+    }
+  }
+}
