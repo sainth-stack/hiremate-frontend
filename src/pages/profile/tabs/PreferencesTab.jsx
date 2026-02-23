@@ -28,17 +28,22 @@ export default function PreferencesTab() {
     '& .custom-select': { marginBottom: 0 },
   };
   const sectionHeaderSx = { mb: 1.5, fontSize: 'var(--font-size-section-header)', fontWeight: 600 };
-  const sectionWrapperSx = { mt: 3, '&:first-of-type': { mt: 0 } };
+  const cardSx = {
+    borderRadius: 2,
+    width: '100%',
+    border: '1px solid var(--border-color)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+  };
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Card variant="outlined" sx={{ borderRadius: 2, width: '100%' }}>
-        <CardContent>
-          <Box component="span" sx={{ display: 'block', mb: 1.5, fontSize: 'var(--font-size-helper)', color: 'text.secondary' }}>
+      <Card variant="outlined" sx={cardSx}>
+        <CardContent sx={{ p: { xs: 2, sm: 3 }, '&:last-child': { pb: { xs: 2, sm: 3 } } }}>
+          <Box component="p" sx={{ display: 'block', m: 0, mb: 0, fontSize: 'var(--font-size-helper)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
             Job preferences are critical for matching. Set your expectations clearly.
           </Box>
 
-          <Box sx={sectionWrapperSx}>
+          <Box sx={{ mt: 0, pt: 0 }}>
             <Box component="span" sx={{ display: 'block', ...sectionHeaderSx }}>
               Job Preferences
             </Box>
@@ -89,7 +94,7 @@ export default function PreferencesTab() {
         </CardContent>
       </Card>
 
-      <CustomButton sx={{ mt: 2.5 }}>Save Preferences</CustomButton>
+      <CustomButton sx={{ mt: 2 }}>Save Preferences</CustomButton>
     </Box>
   );
 }

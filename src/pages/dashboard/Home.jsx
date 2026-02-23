@@ -26,7 +26,7 @@ import {
   getCompaniesViewedAPI,
   getSavedJobsAPI,
   getApplicationsByDayAPI,
-} from '../../services/dashboardService';
+} from '../../services';
 import {
   BarChart,
   Bar,
@@ -151,7 +151,6 @@ export default function Home() {
       <Box
         sx={{
           display: 'flex',
-          gap: 2,
           alignItems: 'stretch',
           flexDirection: { xs: 'column', md: 'row' },
         }}

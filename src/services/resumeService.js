@@ -24,9 +24,9 @@ export const generateResumeAPI = ({ job_title, job_description }) =>
 export const updateResumeAPI = (id, { resume_name, resume_text }) =>
   axiosClient.patch(`/resume/${id}`, { resume_name, resume_text });
 
-export function deleteResumeAPI(id) {
+export const deleteResumeAPI = (id) => {
   if (id === 0 || id === '0') {
     return axiosClient.delete('/resume');
   }
   return axiosClient.delete(`/resume/${id}`);
-}
+};

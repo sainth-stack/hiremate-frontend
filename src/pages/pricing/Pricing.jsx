@@ -5,7 +5,7 @@ import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { Link, useNavigate } from 'react-router-dom';
 import PageContainer from '../../components/common/PageContainer';
-import { createOrderAPI, verifyPaymentAPI } from '../../services/paymentService';
+import { createOrderAPI, verifyPaymentAPI } from '../../services';
 
 const PLANS = [
   {

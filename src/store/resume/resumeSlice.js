@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { uploadResumeAPI } from '../../services/resumeService';
+import { uploadResumeAPI } from '../../services';
 
 export const uploadResume = createAsyncThunk(
   'resume/upload',

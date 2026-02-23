@@ -35,7 +35,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import PageContainer from '../../components/common/PageContainer';
 import PdfViewer from '../../components/PdfViewer';
 import JobDescriptionInput from './JobDescriptionInput';
-import { listResumesAPI, generateResumeAPI, updateResumeAPI, deleteResumeAPI, getTailorContextAPI, uploadResumeAPI } from '../../services/resumeService';
+import { listResumesAPI, generateResumeAPI, updateResumeAPI, deleteResumeAPI, getTailorContextAPI, uploadResumeAPI } from '../../services';
 import { BASE_URL } from '../../utilities/const';
 
 const BACKEND_ORIGIN = BASE_URL.replace(/\/api\/?$/, '');
@@ -300,7 +300,7 @@ export default function ResumeGenerator() {
 
   return (
     <Box sx={{ minHeight: '100%', background: 'var(--bg-app)', overflowX: 'hidden', fontFamily: 'var(--font-family)' }}>
-      <Box sx={{ background: HERO_GRADIENT, color: 'white', py: 2.5, px: { xs: 2, sm: 3 } }}>
+      <Box sx={{ background: HERO_GRADIENT, color: 'white', py: 3.5, px: { xs: 2.5, sm: 4 } }}>
         <Box sx={{ maxWidth: 1600, mx: 'auto' }}>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
             <Chip label="Welcome back, gurusai!" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 'var(--label-font-weight)' }} />
@@ -322,11 +322,11 @@ export default function ResumeGenerator() {
         </Box>
       </Box>
 
-      <PageContainer sx={{ pt: 3, pb: 2, width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2, width: '100%', minHeight: { md: 520 }, alignItems: 'stretch' }}>
-          <Box sx={{ flex: { xs: '0 0 auto', md: '0 0 calc((100% - 16px) * 0.55)' }, width: { xs: '100%', md: 'auto' }, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+      <PageContainer sx={{ pt: 4, pb: 4, px: { xs: 2.5, sm: 4 }, width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, width: '100%', minHeight: { md: 520 }, alignItems: 'stretch' }}>
+          <Box sx={{ flex: { xs: '0 0 auto', md: '0 0 calc((100% - 24px) * 0.55)' }, width: { xs: '100%', md: 'auto' }, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
             <Card sx={{ height: '100%', borderRadius: 2, boxShadow: '0 2px 12px rgba(0,0,0,0.08)', overflow: 'visible', display: 'flex', flexDirection: 'column' }}>
-              <CardContent sx={{ p: 2.5, flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <CardContent sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1, mb: 0 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Box sx={{ width: 36, height: 36, borderRadius: 1.5, bgcolor: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -455,9 +455,9 @@ export default function ResumeGenerator() {
             </Card>
           </Box>
 
-          <Box sx={{ flex: { xs: '0 0 auto', md: '0 0 calc((100% - 16px) * 0.45)' }, width: { xs: '100%', md: 'auto' }, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ flex: { xs: '0 0 auto', md: '0 0 calc((100% - 24px) * 0.45)' }, width: { xs: '100%', md: 'auto' }, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Card sx={{ flex: '0 0 auto', borderRadius: 2, boxShadow: '0 2px 12px rgba(0,0,0,0.08)', bgcolor: 'var(--light-blue-bg)', border: '1px solid var(--light-blue-bg-15)' }}>
-              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+              <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
                   <Box sx={{ width: 36, height: 36, borderRadius: 1, bgcolor: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <Typography sx={{ fontFamily: 'var(--font-family)', color: 'white', fontWeight: 700, fontSize: '0.875rem' }}>C</Typography>
@@ -477,7 +477,7 @@ export default function ResumeGenerator() {
             </Card>
 
             <Card sx={{ flex: 1, minHeight: 0, borderRadius: 2, boxShadow: '0 2px 12px rgba(0,0,0,0.08)', display: 'flex', flexDirection: 'column' }}>
-              <CardContent sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, '&:last-child': { pb: 2 } }}>
+              <CardContent sx={{ p: 2.5, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, '&:last-child': { pb: 2.5 } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1.5 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <DescriptionOutlinedIcon sx={{ color: 'var(--text-secondary)' }} />
@@ -562,7 +562,7 @@ export default function ResumeGenerator() {
           </Box>
         </Box>
 
-        <Grid container spacing={3} sx={{ mt: 3 }}>
+        <Grid container spacing={3} sx={{ mt: 4 }}>
           <Grid item xs={12} sm={4}>
             <Card sx={{ borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', height: '100%' }}>
               <CardContent sx={{ p: 2.5, display: 'flex', alignItems: 'flex-start', gap: 2 }}>

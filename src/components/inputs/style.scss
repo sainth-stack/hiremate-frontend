@@ -39,6 +39,12 @@
     background-color: var(--bg-default);
     font-size: var(--font-size-input);
 
+    // Fixed 45px height for single-line inputs only
+    &:not(.MuiInputBase-multiline) {
+      height: 45px;
+      min-height: 45px;
+    }
+
     // Full rectangle border (no notch for label)
     .MuiOutlinedInput-notchedOutline legend {
       max-width: 0.01px;
@@ -65,7 +71,7 @@
     }
 
     input {
-      padding: 14px 16px;
+      padding: 12px 16px;
 
       &::placeholder {
         color: var(--placeholder);
@@ -119,6 +125,8 @@
 
   .MuiOutlinedInput-root {
     margin-top: 25px;
+    min-height: 45px;
+    height: 45px;
     border-radius: 8px;
     background-color: var(--bg-default);
     font-size: var(--font-size-input);
@@ -145,6 +153,11 @@
 
     &.Mui-error fieldset {
       border-color: var(--error);
+    }
+
+    // Select inner padding to fit 45px height
+    .MuiSelect-select {
+      padding: 12px 16px;
     }
   }
 }

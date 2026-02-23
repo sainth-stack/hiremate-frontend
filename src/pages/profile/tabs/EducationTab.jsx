@@ -36,17 +36,22 @@ export default function EducationTab() {
     '& .custom-select': { marginBottom: 0 },
   };
   const sectionHeaderSx = { mb: 1.5, fontSize: 'var(--font-size-section-header)', fontWeight: 600 };
-  const sectionWrapperSx = { mt: 3, '&:first-of-type': { mt: 0 } };
+  const cardSx = {
+    borderRadius: 2,
+    width: '100%',
+    border: '1px solid var(--border-color)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+  };
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Box component="span" sx={{ display: 'block', mb: 1.5, fontSize: 'var(--font-size-helper)', color: 'text.secondary' }}>
+      <Box component="p" sx={{ display: 'block', m: 0, mb: 2.5, fontSize: 'var(--font-size-helper)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
         Add your education history.
       </Box>
 
       {educations.map((edu, idx) => (
-        <Card key={idx} variant="outlined" sx={{ ...sectionWrapperSx, borderRadius: 2, width: '100%' }}>
-          <CardContent sx={{ '&:last-child': { pb: 2 } }}>
+        <Card key={idx} variant="outlined" sx={{ ...cardSx, mt: idx > 0 ? 2 : 0 }}>
+          <CardContent sx={{ p: { xs: 2, sm: 3 }, '&:last-child': { pb: { xs: 2, sm: 3 } } }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0 }}>
               <Box component="span" sx={{ display: 'block', ...sectionHeaderSx, mb: 0 }}>
                 Education #{idx + 1}
@@ -71,7 +76,7 @@ export default function EducationTab() {
         </Card>
       ))}
 
-      <CustomButton variant="outlined" startIcon={<AddIcon />} onClick={addEducation}>
+      <CustomButton variant="outlined" startIcon={<AddIcon />} onClick={addEducation} sx={{ mt: 2 }}>
         Add Education
       </CustomButton>
     </Box>

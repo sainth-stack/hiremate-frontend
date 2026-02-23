@@ -68,7 +68,7 @@ export default function Profile() {
   };
 
   return (
-    <PageContainer>
+    <PageContainer sx={{ py: 4, px: { xs: 2, sm: 3, md: 4 } }}>
       {fromRegister && (
         <Box sx={{ mb: 2 }}>
           <Link
@@ -87,18 +87,23 @@ export default function Profile() {
           </Link>
         </Box>
       )}
-      <Box component="span" sx={{ display: 'block', fontSize: 'var(--font-size-page-title)', fontWeight: 600, mb: 1 }}>
-        Profile Builder
-      </Box>
-      <Box component="span" sx={{ display: 'block', mb: 3, fontSize: 'var(--font-size-page-subtitle)', color: 'text.secondary' }}>
-        Complete your profile across all tabs. Fields marked are used for ATS matching.
+      <Box sx={{ mb: 4 }}>
+        <Box component="h1" sx={{ display: 'block', fontSize: 'var(--font-size-page-title)', fontWeight: 700, color: 'var(--text-primary)', mb: 0.5 }}>
+          Profile Builder
+        </Box>
+        <Box component="p" sx={{ display: 'block', m: 0, fontSize: 'var(--font-size-page-subtitle)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+          Complete your profile across all tabs. Fields marked are used for ATS matching.
+        </Box>
       </Box>
 
       <Box
         sx={{
-          borderBottom: 1,
-          borderColor: 'var(--border-color)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 2,
+          bgcolor: 'var(--bg-paper)',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
           mb: 3,
+          overflow: 'hidden',
         }}
       >
         <Tabs
@@ -108,21 +113,25 @@ export default function Profile() {
           scrollButtons="auto"
           allowScrollButtonsMobile
           sx={{
-            '& .MuiTab-root': { minHeight: 48, textTransform: 'none', fontWeight: 600, fontSize: 'var(--font-size-tab)' },
+            px: { xs: 1, sm: 2 },
+            minHeight: 52,
+            borderBottom: '1px solid var(--border-color)',
+            '& .MuiTab-root': { minHeight: 52, textTransform: 'none', fontWeight: 600, fontSize: 'var(--font-size-tab)' },
           }}
         >
           {TAB_LABELS.map((label, idx) => (
             <Tab key={idx} label={label} id={`profile-tab-${idx}`} aria-controls={`profile-tabpanel-${idx}`} />
           ))}
         </Tabs>
-      </Box>
 
-      <Box
-        role="tabpanel"
-        id={`profile-tabpanel-${activeTab}`}
-        aria-labelledby={`profile-tab-${activeTab}`}
-      >
-        {renderTabPanel(activeTab)}
+        <Box
+          role="tabpanel"
+          id={`profile-tabpanel-${activeTab}`}
+          aria-labelledby={`profile-tab-${activeTab}`}
+          sx={{ p: { xs: 2, sm: 3 } }}
+        >
+          {renderTabPanel(activeTab)}
+        </Box>
       </Box>
     </PageContainer>
   );

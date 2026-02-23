@@ -24,14 +24,21 @@ export default function ProfileTab() {
   const formGridSx = {
     display: 'grid',
     gridTemplateColumns: { xs: '1fr', sm: 'minmax(0, 1fr) minmax(0, 1fr)' },
-    columnGap: 2,
-    rowGap: 1.5,
+    columnGap: 2.5,
+    rowGap: 2,
     width: '100%',
     '& .custom-input': { marginBottom: 0 },
     '& .custom-select': { marginBottom: 0 },
   };
   const sectionHeaderSx = { mb: 1.5, fontSize: 'var(--font-size-section-header)', fontWeight: 600 };
-  const sectionWrapperSx = { mt: 3, '&:first-of-type': { mt: 0 } };
+  const sectionWrapperSx = { mt: 3, pt: 3, borderTop: '1px solid var(--border-color)', '&:first-of-type': { mt: 0, pt: 0, borderTop: 'none' } };
+
+  const cardSx = {
+    borderRadius: 2,
+    width: '100%',
+    border: '1px solid var(--border-color)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+  };
 
   const handleFileUpload = (file) => {
     if (file) dispatch(uploadResume(file));
@@ -39,8 +46,8 @@ export default function ProfileTab() {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Card variant="outlined" sx={{ borderRadius: 2, width: '100%' }}>
-        <CardContent>
+      <Card variant="outlined" sx={cardSx}>
+        <CardContent sx={{ p: { xs: 2, sm: 3 }, '&:last-child': { pb: { xs: 2, sm: 3 } } }}>
           {/* Resume */}
           <Box sx={sectionWrapperSx}>
             <Box component="span" sx={{ display: 'block', ...sectionHeaderSx }}>

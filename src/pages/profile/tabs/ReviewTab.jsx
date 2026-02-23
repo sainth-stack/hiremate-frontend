@@ -31,13 +31,20 @@ export default function ReviewTab() {
   };
 
   const sectionHeaderSx = { mb: 1.5, fontSize: 'var(--font-size-section-header)', fontWeight: 600 };
-  const sectionWrapperSx = { mt: 3, '&:first-of-type': { mt: 0 } };
+  const sectionWrapperSx = { mt: 3, pt: 3, borderTop: '1px solid var(--border-color)', '&:first-of-type': { mt: 0, pt: 0, borderTop: 'none' } };
+  const cardSx = {
+    borderRadius: 2,
+    width: '100%',
+    border: '1px solid var(--border-color)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+  };
+  const innerCardSx = { ...cardSx };
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Card variant="outlined" sx={{ borderRadius: 2, width: '100%' }}>
-        <CardContent>
-          <Box component="span" sx={{ display: 'block', mb: 1.5, fontSize: 'var(--font-size-helper)', color: 'text.secondary' }}>
+      <Card variant="outlined" sx={cardSx}>
+        <CardContent sx={{ p: { xs: 2, sm: 3 }, '&:last-child': { pb: { xs: 2, sm: 3 } } }}>
+          <Box component="p" sx={{ display: 'block', m: 0, mb: 0, fontSize: 'var(--font-size-helper)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
             Review your profile completeness and fix any missing or weak fields before submitting.
           </Box>
 
@@ -46,8 +53,8 @@ export default function ReviewTab() {
             <Box component="span" sx={{ display: 'block', ...sectionHeaderSx }}>
               Profile Completeness
             </Box>
-            <Card variant="outlined" sx={{ borderRadius: 2, width: '100%' }}>
-              <CardContent sx={{ '&:last-child': { pb: 2 } }}>
+            <Card variant="outlined" sx={innerCardSx}>
+              <CardContent sx={{ p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 0 }}>
                   <LinearProgress
                     variant="determinate"
@@ -72,8 +79,8 @@ export default function ReviewTab() {
               Section-wise Completion
             </Box>
             {SECTIONS.map((section, idx) => (
-              <Card key={idx} variant="outlined" sx={{ mt: idx > 0 ? 1 : 0, borderRadius: 2, width: '100%' }}>
-                <CardContent sx={{ '&:last-child': { pb: 2 } }}>
+              <Card key={idx} variant="outlined" sx={{ ...innerCardSx, mt: idx > 0 ? 1.5 : 0 }}>
+                <CardContent sx={{ p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0 }}>
                 {section.complete === 100 ? (
                   <CheckCircleIcon color="success" fontSize="small" />
@@ -106,7 +113,7 @@ export default function ReviewTab() {
         </Typography>
       )}
       {/* Actions */}
-      <Box sx={{ mt: 2.5, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+      <Box sx={{ mt: 3, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
         <CustomButton variant="outlined">Preview auto-filled job form</CustomButton>
         <CustomButton onClick={handleSubmitProfile} disabled={submitLoading}>
           {submitLoading ? (

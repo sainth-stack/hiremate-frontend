@@ -48,13 +48,20 @@ export default function SkillsTab() {
     '& .custom-select': { marginBottom: 0 },
   };
   const sectionHeaderSx = { mb: 1.5, fontSize: 'var(--font-size-section-header)', fontWeight: 600 };
-  const sectionWrapperSx = { mt: 3, '&:first-of-type': { mt: 0 } };
+  const sectionWrapperSx = { mt: 3, pt: 3, borderTop: '1px solid var(--border-color)', '&:first-of-type': { mt: 0, pt: 0, borderTop: 'none' } };
+  const cardSx = {
+    borderRadius: 2,
+    width: '100%',
+    border: '1px solid var(--border-color)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+  };
+  const innerCardSx = { ...cardSx };
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Card variant="outlined" sx={{ borderRadius: 2, width: '100%' }}>
-        <CardContent>
-          <Box component="span" sx={{ display: 'block', mb: 1.5, fontSize: 'var(--font-size-helper)', color: 'text.secondary' }}>
+      <Card variant="outlined" sx={cardSx}>
+        <CardContent sx={{ p: { xs: 2, sm: 3 }, '&:last-child': { pb: { xs: 2, sm: 3 } } }}>
+          <Box component="p" sx={{ display: 'block', m: 0, mb: 0, fontSize: 'var(--font-size-helper)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
             Normalized skills for ATS matching. Technical skills can use autocomplete from skill DB.
           </Box>
 
@@ -64,8 +71,8 @@ export default function SkillsTab() {
               Technical Skills
             </Box>
             {techSkills.map((skill, idx) => (
-              <Card key={idx} variant="outlined" sx={{ mt: idx > 0 ? 1 : 0, borderRadius: 2, width: '100%' }}>
-                <CardContent sx={{ '&:last-child': { pb: 2 } }}>
+              <Card key={idx} variant="outlined" sx={{ ...innerCardSx, mt: idx > 0 ? 1.5 : 0 }}>
+                <CardContent sx={{ p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } }}>
                   <Box sx={{ ...formGridSx, alignItems: 'flex-end' }}>
                     <CustomInput label="Skill Name" placeholder="e.g. React" value={skill.name} onChange={(e) => updateTechAt(idx, 'name', e.target.value)} />
                     <CustomSelect label="Proficiency Level" value={skill.level} onChange={(e) => updateTechAt(idx, 'level', e.target.value)}>
@@ -83,7 +90,7 @@ export default function SkillsTab() {
                 </CardContent>
               </Card>
             ))}
-            <CustomButton variant="outlined" startIcon={<AddIcon />} onClick={addTechSkill}>
+            <CustomButton variant="outlined" startIcon={<AddIcon />} onClick={addTechSkill} sx={{ mt: 1.5 }}>
               Add Technical Skill
             </CustomButton>
           </Box>
@@ -93,11 +100,11 @@ export default function SkillsTab() {
             <Box component="span" sx={{ display: 'block', ...sectionHeaderSx }}>
               Soft Skills
             </Box>
-            <Box component="span" sx={{ display: 'block', mb: 1.5, fontSize: 'var(--font-size-helper)', color: 'text.secondary' }}>
+            <Box component="p" sx={{ display: 'block', m: 0, mb: 1.5, fontSize: 'var(--font-size-helper)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               Free text / suggestions. Stored as flat list for auto-filling checkbox fields.
             </Box>
             {softSkills.map((skill, idx) => (
-              <Box key={idx} sx={{ ...formGridSx, alignItems: 'center', mt: idx > 0 ? 1 : 0 }}>
+              <Box key={idx} sx={{ ...formGridSx, alignItems: 'center', mt: idx > 0 ? 1.5 : 0 }}>
                 <CustomInput label="Skill Name" placeholder="e.g. Communication" value={skill.name} onChange={(e) => updateSoftAt(idx, 'name', e.target.value)} />
                 <Box sx={{ display: 'flex', alignItems: 'center', height: 56 }}>
                   <IconButton size="small" onClick={() => removeSoftSkill(idx)} disabled={softSkills.length <= 1}>
@@ -106,7 +113,7 @@ export default function SkillsTab() {
                 </Box>
               </Box>
             ))}
-            <CustomButton variant="outlined" startIcon={<AddIcon />} onClick={addSoftSkill}>
+            <CustomButton variant="outlined" startIcon={<AddIcon />} onClick={addSoftSkill} sx={{ mt: 1.5 }}>
               Add Soft Skill
             </CustomButton>
           </Box>

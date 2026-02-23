@@ -34,7 +34,7 @@ import {
 } from '@dnd-kit/core';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
 import PageContainer from '../../components/common/PageContainer';
-import { listJobsAPI, updateJobStatusAPI } from '../../services/jobsService';
+import { listJobsAPI, updateJobStatusAPI } from '../../services';
 
 const STATUSES = [
   { id: 'saved', label: 'Saved', icon: BookmarkBorderRoundedIcon, color: 'var(--primary)', bgTint: 'var(--light-blue-bg-08)' },

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getProfileDataAPI, patchProfileAPI } from '../../services/profileService';
+import { getProfileDataAPI, patchProfileAPI } from '../../services';
 import {
   mapParsedProfile,
   mapParsedExperience,

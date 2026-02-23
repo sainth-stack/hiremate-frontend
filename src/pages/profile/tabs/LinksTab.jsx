@@ -37,13 +37,20 @@ export default function LinksTab() {
     '& .custom-select': { marginBottom: 0 },
   };
   const sectionHeaderSx = { mb: 1.5, fontSize: 'var(--font-size-section-header)', fontWeight: 600 };
-  const sectionWrapperSx = { mt: 3, '&:first-of-type': { mt: 0 } };
+  const sectionWrapperSx = { mt: 3, pt: 3, borderTop: '1px solid var(--border-color)', '&:first-of-type': { mt: 0, pt: 0, borderTop: 'none' } };
+  const cardSx = {
+    borderRadius: 2,
+    width: '100%',
+    border: '1px solid var(--border-color)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+  };
+  const innerCardSx = { ...cardSx };
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Card variant="outlined" sx={{ borderRadius: 2, width: '100%' }}>
-        <CardContent>
-          <Box component="span" sx={{ display: 'block', mb: 1.5, fontSize: 'var(--font-size-helper)', color: 'text.secondary' }}>
+      <Card variant="outlined" sx={cardSx}>
+        <CardContent sx={{ p: { xs: 2, sm: 3 }, '&:last-child': { pb: { xs: 2, sm: 3 } } }}>
+          <Box component="p" sx={{ display: 'block', m: 0, mb: 0, fontSize: 'var(--font-size-helper)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
             LinkedIn URL is required for many ATS systems.
           </Box>
 
@@ -66,12 +73,12 @@ export default function LinksTab() {
             <Box component="span" sx={{ display: 'block', ...sectionHeaderSx }}>
               Other Links
             </Box>
-            <Box component="span" sx={{ display: 'block', mb: 1.5, fontSize: 'var(--font-size-helper)', color: 'text.secondary' }}>
+            <Box component="p" sx={{ display: 'block', m: 0, mb: 1.5, fontSize: 'var(--font-size-helper)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               Example: Blog, Behance, Kaggle
             </Box>
             {otherLinks.map((link, idx) => (
-              <Card key={idx} variant="outlined" sx={{ mt: idx > 0 ? 1 : 0, borderRadius: 2, width: '100%' }}>
-                <CardContent>
+              <Card key={idx} variant="outlined" sx={{ ...innerCardSx, mt: idx > 0 ? 1.5 : 0 }}>
+                <CardContent sx={{ p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } }}>
                 <Box sx={{ ...formGridSx, alignItems: 'flex-end' }}>
                   <CustomInput label="Label" placeholder="Blog" value={link.label} onChange={(e) => updateOtherAt(idx, 'label', e.target.value)} />
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, width: '100%' }}>
@@ -88,7 +95,7 @@ export default function LinksTab() {
         </CardContent>
       </Card>
 
-      <CustomButton variant="outlined" startIcon={<AddIcon />} onClick={addLink} sx={{ mt: 2.5 }}>
+      <CustomButton variant="outlined" startIcon={<AddIcon />} onClick={addLink} sx={{ mt: 2 }}>
         Add Link
       </CustomButton>
     </Box>
