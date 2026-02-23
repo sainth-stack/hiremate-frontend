@@ -26,6 +26,7 @@ axiosClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       // Dispatch or redirect can be handled in the app (e.g. via store)
     }
     return Promise.reject(error);

@@ -35,6 +35,8 @@ export default function DashboardLayout() {
             flex: 1,
             overflow: 'auto',
             minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
           <Outlet />

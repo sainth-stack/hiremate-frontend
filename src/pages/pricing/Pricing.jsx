@@ -1,16 +1,18 @@
-import { Box, Typography, Button, Card, CardContent } from '@mui/material';
+import { useState } from 'react';
+import { Box, Typography, Button, Card, CardContent, Alert, CircularProgress } from '@mui/material';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PageContainer from '../../components/common/PageContainer';
+import { createOrderAPI, verifyPaymentAPI } from '../../services/paymentService';
 
 const PLANS = [
   {
     id: 'daily',
     title: 'Daily',
     description: "You've spent more by accident.",
-    price: '199.00',
+    price: '99',
     period: 'day',
     highlight: false,
   },
@@ -18,7 +20,7 @@ const PLANS = [
     id: 'weekly',
     title: 'Weekly',
     description: 'A night out or an interview, your call.',
-    price: '999.00',
+    price: '399',
     period: 'week',
     highlight: true,
     badge: 'BEST DEAL',
@@ -27,7 +29,7 @@ const PLANS = [
     id: 'monthly',
     title: 'Monthly',
     description: "It's cheaper than skipping it, we've done the math.",
-    price: '2499.00',
+    price: '999',
     period: 'month',
     highlight: false,
   },
@@ -41,7 +43,79 @@ const FEATURES = [
   'Application tracker',
 ];
 
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve();
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => resolve(new Error('Failed to load Razorpay'));
+    document.body.appendChild(script);
+  });
+};
+
 export default function Pricing() {
+  const [loadingPlanId, setLoadingPlanId] = useState(null);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const navigate = useNavigate();
+
+  const handleSubscribe = async (plan) => {
+    setError(null);
+    setSuccess(null);
+    setLoadingPlanId(plan.id);
+
+    try {
+      const { data: orderData } = await createOrderAPI(plan.id);
+
+      await loadRazorpayScript();
+      if (window.Razorpay === undefined) {
+        throw new Error('Payment gateway failed to load. Please try again.');
+      }
+
+      const options = {
+        key: orderData.key_id,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        order_id: orderData.order_id,
+        name: 'OpsBrain',
+        description: `${plan.title} Plan - Brain for Jobs`,
+        handler: async (response) => {
+          try {
+            await verifyPaymentAPI({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              plan_id: plan.id,
+            });
+            setSuccess(`Successfully subscribed to ${plan.title} plan!`);
+          } catch (err) {
+            setError(err.response?.data?.detail || 'Payment verification failed');
+          } finally {
+            setLoadingPlanId(null);
+          }
+        },
+        modal: {
+          ondismiss: () => setLoadingPlanId(null),
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      const msg = err.response?.data?.detail || err.message || 'Failed to initiate payment';
+      setError(msg);
+      if (err.response?.status === 401) {
+        navigate('/login', { state: { from: '/pricing' } });
+      }
+      setLoadingPlanId(null);
+    }
+  };
+
   return (
     <PageContainer maxWidth="md" sx={{ py: { xs: 4, sm: 6 } }}>
       <Box sx={{ textAlign: 'center' }}>
@@ -90,6 +164,17 @@ export default function Pricing() {
         >
           91% of our users report getting an interview within 2 weeks of subscribing
         </Typography>
+
+        {error && (
+          <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert severity="success" onClose={() => setSuccess(null)} sx={{ mb: 2 }}>
+            {success}
+          </Alert>
+        )}
 
         {/* Pricing cards */}
         <Box
@@ -175,6 +260,8 @@ export default function Pricing() {
                 <Button
                   fullWidth
                   variant={plan.highlight ? 'contained' : 'outlined'}
+                  disabled={!!loadingPlanId}
+                  onClick={() => handleSubscribe(plan)}
                   sx={{
                     py: 1.25,
                     textTransform: 'none',
@@ -197,7 +284,11 @@ export default function Pricing() {
                         }),
                   }}
                 >
-                  Subscribe Now
+                  {loadingPlanId === plan.id ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : (
+                    'Subscribe Now'
+                  )}
                 </Button>
               </CardContent>
             </Card>

@@ -28,7 +28,7 @@ const PAGES = [
   { label: 'Dashboard', path: '/', icon: DashboardRoundedIcon },
   { label: 'Application Tracker', path: '/application-tracker', icon: PhoneAndroidRoundedIcon },
   { label: 'Resume Generator', path: '/resume-generator', icon: WorkOutlineRoundedIcon },
-  { label: 'Job Recommendations', path: '/job-recommendations', icon: RecommendRoundedIcon },
+  // { label: 'Job Recommendations', path: '/job-recommendations', icon: RecommendRoundedIcon },
 ];
 
 const MORE = [

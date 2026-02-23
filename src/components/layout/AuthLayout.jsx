@@ -1,17 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import profileImg from '../../assets/profile.png';
-
-const companyLogos = [
-  'Airbnb',
-  'Notion',
-  'Spotify',
-  'Stripe',
-  'Slack',
-  'VISA',
-  'NETFLIX',
-  'OpenAI',
-];
+import logoImg from '../../assets/logo.png';
 
 export default function AuthLayout() {
   return (
@@ -34,18 +24,15 @@ export default function AuthLayout() {
           justifyContent: 'space-between',
         }}
       >
-        <Box>
-          <Typography
-            component="span"
-            sx={{
-              fontSize: '1.5rem',
-              fontWeight: 700,
-              color: '#1d4ed8',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            HIREMATEAI
-          </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box
+            component="img"
+            src={logoImg}
+            alt="OpsBrain"
+            sx={{ height: 40, objectFit: 'contain' }}
+          />
+          <Box>
+          </Box>
         </Box>
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', py: 4 }}>
           <Typography

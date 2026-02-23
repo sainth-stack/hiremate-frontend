@@ -6,7 +6,7 @@ import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import Home from '../pages/dashboard/Home';
 import ApplicationTracker from '../pages/dashboard/ApplicationTracker';
-import ResumeGenerator from '../pages/dashboard/ResumeGenerator';
+import ResumeGenerator from '../pages/resume-generator';
 import JobRecommendations from '../pages/dashboard/JobRecommendations';
 import Profile from '../pages/profile/Profile';
 import Pricing from '../pages/pricing/Pricing';

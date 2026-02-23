@@ -2,8 +2,24 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { loginAPI, registerAPI, getProfileAPI } from '../../services/authService';
 
 const TOKEN_KEY = 'token';
+const USER_KEY = 'user';
 
 const getStoredToken = () => localStorage.getItem(TOKEN_KEY);
+
+const getStoredUser = () => {
+  try {
+    const raw = localStorage.getItem(USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+const saveUserToStorage = (user) => {
+  if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
+};
+
+const removeUserFromStorage = () => localStorage.removeItem(USER_KEY);
 
 // API may return access_token or token
 const getTokenFromPayload = (data) => data?.access_token ?? data?.token;
@@ -53,7 +69,7 @@ export const getProfile = createAsyncThunk(
 );
 
 const initialState = {
-  user: null,
+  user: getStoredUser(),
   token: getStoredToken(),
   isAuthenticated: !!getStoredToken(),
   loading: false,
@@ -70,6 +86,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.error = null;
       localStorage.removeItem(TOKEN_KEY);
+      removeUserFromStorage();
     },
     clearError(state) {
       state.error = null;
@@ -86,7 +103,9 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.token = getTokenFromPayload(action.payload) ?? state.token;
-        state.user = action.payload?.user ?? action.payload;
+        const user = action.payload?.user ?? action.payload;
+        state.user = user;
+        saveUserToStorage(user);
         state.isAuthenticated = true;
       })
       .addCase(login.rejected, (state, action) => {
@@ -103,7 +122,9 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.token = getTokenFromPayload(action.payload) ?? state.token;
-        state.user = action.payload?.user ?? action.payload;
+        const user = action.payload?.user ?? action.payload;
+        state.user = user;
+        saveUserToStorage(user);
         state.isAuthenticated = true;
       })
       .addCase(register.rejected, (state, action) => {
@@ -121,7 +142,9 @@ const authSlice = createSlice({
         state.error = null;
         const token = getTokenFromPayload(action.payload);
         if (token) state.token = token;
-        state.user = action.payload?.user ?? action.payload;
+        const user = action.payload?.user ?? action.payload;
+        state.user = user;
+        saveUserToStorage(user);
       })
       .addCase(getProfile.rejected, (state, action) => {
         state.loading = false;

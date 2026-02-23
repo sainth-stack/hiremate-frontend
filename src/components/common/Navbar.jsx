@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   AppBar,
   Toolbar,
@@ -21,10 +21,7 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import { logout } from '../../store/auth/authSlice';
 import SignOutConfirmDialog from './SignOutConfirmDialog';
-
-// Static profile values
-const PROFILE_USER_NAME = 'Basam Gurusai Kumar Reddy';
-const PROFILE_EMAIL = 'basamgurusai123@gmail.com';
+import logoImg from '../../assets/logo.png';
 
 const menuItems = [
   { label: 'Profile', path: '/profile', icon: PersonRoundedIcon },
@@ -33,12 +30,19 @@ const menuItems = [
   { label: 'Help & Support', path: '/help', icon: HelpOutlineRoundedIcon },
 ];
 
-export default function Navbar({ logo = 'HIREMATEAI', showProfile = true }) {
+export default function Navbar({ showProfile = true }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [signOutDialogOpen, setSignOutDialogOpen] = useState(false);
   const open = Boolean(anchorEl);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.user);
+
+  const displayName = user
+    ? [user.first_name, user.last_name].filter(Boolean).join(' ') || user.email
+    : '';
+  const displayEmail = user?.email || '';
+  const avatarLetter = (user?.first_name?.[0] || user?.email?.[0] || '?').toUpperCase();
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -86,17 +90,14 @@ export default function Navbar({ logo = 'HIREMATEAI', showProfile = true }) {
           justifyContent: 'space-between',
         }}
       >
-        <Typography
-          component="span"
-          sx={{
-            fontSize: 'var(--font-size-page-title)',
-            fontWeight: 700,
-            color: 'var(--primary)',
-            letterSpacing: '-0.02em',
-          }}
-        >
-          {logo}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box
+            component="img"
+            src={logoImg}
+            alt="OpsBrain"
+            sx={{ height: 36, objectFit: 'contain' }}
+          />
+        </Box>
         {showProfile && (
           <>
             <Box
@@ -120,7 +121,7 @@ export default function Navbar({ logo = 'HIREMATEAI', showProfile = true }) {
                   fontSize: '0.95rem',
                 }}
               >
-                G
+                {avatarLetter}
               </Avatar>
               <Box sx={{ textAlign: 'left' }}>
                 <Typography
@@ -131,7 +132,7 @@ export default function Navbar({ logo = 'HIREMATEAI', showProfile = true }) {
                     color: 'var(--text-primary)',
                   }}
                 >
-                  {PROFILE_USER_NAME}
+                  {displayName || 'User'}
                 </Typography>
                 <Typography
                   sx={{
@@ -140,7 +141,7 @@ export default function Navbar({ logo = 'HIREMATEAI', showProfile = true }) {
                     lineHeight: 1.2,
                   }}
                 >
-                  {PROFILE_EMAIL}
+                  {displayEmail}
                 </Typography>
               </Box>
               <KeyboardArrowDownRoundedIcon
@@ -172,7 +173,7 @@ export default function Navbar({ logo = 'HIREMATEAI', showProfile = true }) {
             >
               <Box sx={{ px: 2, py: 2 }}>
                 <Typography sx={{ fontWeight: 600, fontSize: '0.9375rem' }}>
-                  {PROFILE_USER_NAME}
+                  {displayName || 'User'}
                 </Typography>
                 <Typography
                   sx={{
@@ -181,7 +182,7 @@ export default function Navbar({ logo = 'HIREMATEAI', showProfile = true }) {
                     mt: 0.25,
                   }}
                 >
-                  {PROFILE_EMAIL}
+                  {displayEmail}
                 </Typography>
               </Box>
               <Divider />

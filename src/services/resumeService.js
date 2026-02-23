@@ -13,3 +13,20 @@ export const uploadResumeAPI = (file) => {
     },
   });
 };
+
+export const listResumesAPI = () => axiosClient.get('/resume');
+
+export const getTailorContextAPI = () => axiosClient.get('/resume/tailor-context');
+
+export const generateResumeAPI = ({ job_title, job_description }) =>
+  axiosClient.post('/resume/generate', { job_title, job_description });
+
+export const updateResumeAPI = (id, { resume_name, resume_text }) =>
+  axiosClient.patch(`/resume/${id}`, { resume_name, resume_text });
+
+export function deleteResumeAPI(id) {
+  if (id === 0 || id === '0') {
+    return axiosClient.delete('/resume');
+  }
+  return axiosClient.delete(`/resume/${id}`);
+}

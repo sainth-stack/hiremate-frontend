@@ -1,94 +1,101 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Card,
   CardContent,
   Typography,
   Button,
-  IconButton,
   Chip,
+  CircularProgress,
+  Link as MuiLink,
 } from '@mui/material';
 import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
-import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
-import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded';
-import EditRoundedIcon from '@mui/icons-material/EditRounded';
-import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
-import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import BookmarkOutlinedIcon from '@mui/icons-material/BookmarkOutlined';
+import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlined';
 import LocationOnRoundedIcon from '@mui/icons-material/LocationOnRounded';
+import BusinessRoundedIcon from '@mui/icons-material/BusinessRounded';
 import ScheduleRoundedIcon from '@mui/icons-material/ScheduleRounded';
 import WorkOutlineRoundedIcon from '@mui/icons-material/WorkOutlineRounded';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import { Link } from 'react-router-dom';
+
 import PageContainer from '../../components/common/PageContainer';
+import {
+  getDashboardStatsAPI,
+  getRecentApplicationsAPI,
+  getCompaniesViewedAPI,
+  getSavedJobsAPI,
+  getApplicationsByDayAPI,
+} from '../../services/dashboardService';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
-// Static data for demo
-const STATS = [
-  {
-    label: 'Overall Applications',
-    value: 2,
-    icon: TrendingUpRoundedIcon,
-    primary: true,
-  },
-  { label: 'Interviewed', value: 0, icon: GroupsRoundedIcon, primary: false },
-  { label: 'Offered', value: 0, icon: SchoolRoundedIcon, primary: false },
-];
+function formatCompanyDisplayName(name) {
+  if (!name) return '';
+  return name
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
-const RECOMMENDED_JOBS = [
-  {
-    title: 'Software Developer',
-    match: 85,
-    description:
-      'Responsible for designing, coding, and maintaining software applications, ensuring functionality and user experience.',
-    skills: ['JavaScript', 'React', 'Node.js'],
-  },
-  {
-    title: 'Frontend Developer',
-    match: 80,
-    description:
-      'Focuses on implementing visual elements that users see and interact with in a web application.',
-    skills: ['HTML', 'CSS', 'React'],
-  },
-  {
-    title: 'Backend Developer',
-    match: 78,
-    description:
-      'Builds and maintains server-side logic, databases, and APIs for scalable applications.',
-    skills: ['Python', 'Node.js', 'PostgreSQL'],
-  },
-  {
-    title: 'Full Stack Developer',
-    match: 82,
-    description:
-      'Works on both frontend and backend to deliver end-to-end features and integrations.',
-    skills: ['React', 'Node.js', 'MongoDB'],
-  },
-  {
-    title: 'UI/UX Engineer',
-    match: 75,
-    description:
-      'Creates user interfaces and experiences with a focus on accessibility and design systems.',
-    skills: ['Figma', 'React', 'CSS'],
-  },
-];
+function formatRelativeTime(isoString) {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
+}
 
-const RECENT_APPLICATIONS = [
-  {
-    id: 1,
-    title: 'Software Engineer',
-    company: 'Technology Company',
-    location: 'Remote',
-    time: '16h ago',
-    initial: 'T',
-  },
-  {
-    id: 2,
-    title: 'Frontend Developer',
-    company: 'Scoutit',
-    location: 'India',
-    time: '1d ago',
-    initial: 'S',
-  },
-];
+// Job recommendations – commented out for now
+// const RECOMMENDED_JOBS = [
+//   {
+//     title: 'Software Developer',
+//     match: 85,
+//     description:
+//       'Responsible for designing, coding, and maintaining software applications, ensuring functionality and user experience.',
+//     skills: ['JavaScript', 'React', 'Node.js'],
+//   },
+//   {
+//     title: 'Frontend Developer',
+//     match: 80,
+//     description:
+//       'Focuses on implementing visual elements that users see and interact with in a web application.',
+//     skills: ['HTML', 'CSS', 'React'],
+//   },
+//   {
+//     title: 'Backend Developer',
+//     match: 78,
+//     description:
+//       'Builds and maintains server-side logic, databases, and APIs for scalable applications.',
+//     skills: ['Python', 'Node.js', 'PostgreSQL'],
+//   },
+//   {
+//     title: 'Full Stack Developer',
+//     match: 82,
+//     description:
+//       'Works on both frontend and backend to deliver end-to-end features and integrations.',
+//     skills: ['React', 'Node.js', 'MongoDB'],
+//   },
+//   {
+//     title: 'UI/UX Engineer',
+//     match: 75,
+//     description:
+//       'Creates user interfaces and experiences with a focus on accessibility and design systems.',
+//     skills: ['Figma', 'React', 'CSS'],
+//   },
+// ];
 
 const cardSx = {
   borderRadius: 2,
@@ -96,32 +103,47 @@ const cardSx = {
   height: '100%',
 };
 
-const JOB_CARDS_GAP = 16;
-
 export default function Home() {
-  const jobScrollRef = useRef(null);
-  const [jobCardWidth, setJobCardWidth] = useState(280);
+  const [stats, setStats] = useState({ jobs_applied: 0, jobs_saved: 0, companies_checked: 0 });
+  const [recentApplications, setRecentApplications] = useState([]);
+  const [companiesViewed, setCompaniesViewed] = useState([]);
+  const [savedJobs, setSavedJobs] = useState([]);
+  const [applicationsByDay, setApplicationsByDay] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Size job cards so exactly two fit in the visible area
   useEffect(() => {
-    const el = jobScrollRef.current;
-    if (!el) return;
-    const updateWidth = () => {
-      const w = el.clientWidth;
-      if (w > 0) setJobCardWidth((w - JOB_CARDS_GAP) / 2);
+    const fetchData = async () => {
+      try {
+        const [statsRes, recentRes, companiesRes, savedRes, byDayRes] = await Promise.all([
+          getDashboardStatsAPI(),
+          getRecentApplicationsAPI(10),
+          getCompaniesViewedAPI(15),
+          getSavedJobsAPI(),
+          getApplicationsByDayAPI(14),
+        ]);
+        setStats(statsRes.data);
+        setRecentApplications(recentRes.data || []);
+        setCompaniesViewed(companiesRes.data || []);
+        setSavedJobs(savedRes.data || []);
+        setApplicationsByDay(byDayRes.data || []);
+      } catch (err) {
+        setStats({ jobs_applied: 0, jobs_saved: 0, companies_checked: 0 });
+        setRecentApplications([]);
+        setCompaniesViewed([]);
+        setSavedJobs([]);
+        setApplicationsByDay([]);
+      } finally {
+        setLoading(false);
+      }
     };
-    updateWidth();
-    const ro = new ResizeObserver(updateWidth);
-    ro.observe(el);
-    return () => ro.disconnect();
+    fetchData();
   }, []);
 
-  const scrollJobs = (direction) => {
-    const el = jobScrollRef.current;
-    if (!el) return;
-    const step = el.clientWidth;
-    el.scrollBy({ left: direction * step, behavior: 'smooth' });
-  };
+  const STATS_CONFIG = [
+    { label: 'Jobs Applied', value: stats.jobs_applied, icon: TrendingUpRoundedIcon, primary: true },
+    { label: 'Jobs Saved', value: stats.jobs_saved, icon: BookmarkOutlinedIcon, primary: false },
+    { label: 'Companies Checked', value: stats.companies_checked, icon: BusinessCenterOutlinedIcon, primary: false },
+  ];
 
   return (
     <PageContainer sx={{ py: 2, bgcolor: 'var(--bg-light)' }}>
@@ -148,7 +170,13 @@ export default function Home() {
         >
           {/* Stats row - inside left column */}
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            {STATS.map((stat) => {
+            {loading ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
+                <CircularProgress size={24} />
+                <Typography variant="body2" color="var(--text-secondary)">Loading stats...</Typography>
+              </Box>
+            ) : (
+            STATS_CONFIG.map((stat) => {
               const Icon = stat.icon;
               return (
                 <Card
@@ -200,206 +228,222 @@ export default function Home() {
                   </CardContent>
                 </Card>
               );
-            })}
+            })
+            )}
           </Box>
 
-          {/* Card 1: Recommended job roles */}
+          {/* Card 1: Recommended job roles – commented out for now
           <Card sx={cardSx}>
             <CardContent>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  mb: 2,
-                }}
-              >
-                <Typography variant="h6" fontWeight={600} color="var(--text-primary)">
-                  Recommended job roles
-                </Typography>
-                <Button
-                  size="small"
-                  startIcon={<EditRoundedIcon />}
-                  sx={{
-                    color: 'var(--text-secondary)',
-                    textTransform: 'none',
-                    '&:hover': { bgcolor: 'var(--light-blue-bg-02)' },
-                  }}
-                >
-                  Edit preference
-                </Button>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'stretch', gap: 1.5 }}>
-                <IconButton
-                  size="small"
-                  onClick={() => scrollJobs(-1)}
-                  sx={{ color: 'var(--text-secondary)', alignSelf: 'center', flexShrink: 0 }}
-                >
-                  <ChevronLeftRoundedIcon />
-                </IconButton>
-                <Box
-                  ref={jobScrollRef}
-                  sx={{
-                    display: 'flex',
-                    gap: 2,
-                    overflowX: 'auto',
-                    overflowY: 'hidden',
-                    flex: 1,
-                    minWidth: '500px',
-                    minHeight: '250px',
-                    maxHeight: '250px',
-                    pb: 0.5,
-                    scrollBehavior: 'smooth',
-                    '&::-webkit-scrollbar': { height: 6 },
-                    '&::-webkit-scrollbar-thumb': { bgcolor: 'var(--grey-light)', borderRadius: 3 },
-                  }}
-                >
-                  {RECOMMENDED_JOBS.map((job) => (
-                    <Card
-                      key={job.title}
-                      variant="outlined"
-                      sx={{
-                        width: jobCardWidth,
-                        minWidth: jobCardWidth,
-                        flexShrink: 0,
-                        borderRadius: 2,
-                        borderColor: 'var(--border-color)',
-                        boxShadow: 'none',
-                        display: 'flex',
-                        flexDirection: 'column',
-                      }}
-                    >
-                      <CardContent
-                        sx={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          flex: 1,
-                          '&:last-child': { pb: 2 },
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'flex-start',
-                            gap: 1,
-                            mb: 1,
-                          }}
-                        >
-                          <Typography variant="subtitle1" fontWeight={600} sx={{ flex: 1, minWidth: 0 }}>
-                            {job.title}
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 0.25,
-                              color: 'var(--primary)',
-                              fontWeight: 600,
-                              fontSize: '0.875rem',
-                              flexShrink: 0,
-                            }}
-                          >
-                            <TrendingUpRoundedIcon sx={{ fontSize: 16 }} />
-                            {job.match}%
-                          </Box>
-                        </Box>
-                        <Typography
-                          variant="body2"
-                          color="var(--text-secondary)"
-                          sx={{
-                            mb: 1.5,
-                            fontSize: '0.875rem',
-                            lineHeight: 1.5,
-                            overflowWrap: 'break-word',
-                            wordBreak: 'break-word',
-                            flex: 1,
-                            minHeight: 0,
-                          }}
-                        >
-                          {job.description}
-                        </Typography>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: 1.5 }}>
-                          {job.skills.map((s) => (
-                            <Chip
-                              key={s}
-                              label={s}
-                              size="small"
-                              sx={{
-                                bgcolor: 'var(--grey-4)',
-                                color: 'var(--primary)',
-                                fontWeight: 500,
-                                '& .MuiChip-label': { px: 1 },
-                              }}
-                            />
-                          ))}
-                        </Box>
-                        <Button
-                          variant="contained"
-                          size="small"
-                          fullWidth
-                          sx={{
-                            bgcolor: 'var(--primary)',
-                            color: 'var(--primary-contrast)',
-                            textTransform: 'none',
-                            whiteSpace: 'nowrap',
-                            mt: 'auto',
-                            '&:hover': { bgcolor: 'var(--primary-light)' },
-                          }}
-                        >
-                          View jobs
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </Box>
-                <IconButton
-                  size="small"
-                  onClick={() => scrollJobs(1)}
-                  sx={{ color: 'var(--text-secondary)', alignSelf: 'center', flexShrink: 0 }}
-                >
-                  <ChevronRightRoundedIcon />
-                </IconButton>
-              </Box>
+              ...
             </CardContent>
           </Card>
+          */}
 
-          {/* Card 2: Upcoming Interviews */}
+          {/* Companies Viewed */}
           <Card sx={cardSx}>
-            <CardContent>
-              <Typography variant="h6" fontWeight={600} color="var(--text-primary)" sx={{ mb: 2 }}>
-                Upcoming Interviews
-              </Typography>
-              <Box
-                sx={{
-                  border: '1px dashed var(--border-color)',
-                  borderRadius: 2,
-                  py: 4,
-                  px: 2,
-                  textAlign: 'center',
-                  bgcolor: 'var(--bg-light)',
-                }}
-              >
+            <CardContent sx={{ pb: '24px !important' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                 <Box
                   sx={{
-                    width: 56,
-                    height: 56,
-                    borderRadius: '50%',
-                    bgcolor: 'var(--grey-4)',
+                    width: 40,
+                    height: 40,
+                    borderRadius: 1.5,
+                    bgcolor: 'var(--light-blue-bg-08)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    mx: 'auto',
-                    mb: 1.5,
                   }}
                 >
-                  <InfoOutlinedIcon sx={{ fontSize: 28, color: 'var(--text-muted)' }} />
+                  <BusinessRoundedIcon sx={{ fontSize: 22, color: 'var(--primary)' }} />
                 </Box>
-                <Typography variant="body2" color="var(--text-secondary)">
-                  You don&apos;t have any upcoming interviews scheduled. Once you get interview
-                  invitations, they&apos;ll show up here.
-                </Typography>
+                <Box>
+                  <Typography variant="h6" fontWeight={600} color="var(--text-primary)">
+                    Companies viewed
+                  </Typography>
+                  <Typography variant="caption" color="var(--text-secondary)">
+                    Career pages you've visited
+                  </Typography>
+                </Box>
               </Box>
+              {loading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+                  <CircularProgress size={24} sx={{ color: 'var(--primary)' }} />
+                </Box>
+              ) : companiesViewed.length === 0 ? (
+                <Box
+                  sx={{
+                    py: 4,
+                    px: 2,
+                    textAlign: 'center',
+                    borderRadius: 2,
+                    bgcolor: 'var(--light-blue-bg-02)',
+                    border: '1px dashed var(--border-color)',
+                  }}
+                >
+                  <BusinessCenterOutlinedIcon sx={{ fontSize: 40, color: 'var(--text-muted)', mb: 1 }} />
+                  <Typography variant="body2" color="var(--text-secondary)">
+                    Use the HireMate extension on career pages to track companies you check.
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {companiesViewed.map((c, idx) => (
+                    <Box
+                      key={idx}
+                      component={MuiLink}
+                      href={c.page_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        py: 1.5,
+                        px: 2,
+                        borderRadius: 1.5,
+                        border: '1px solid var(--border-color)',
+                        bgcolor: 'var(--bg-paper)',
+                        textDecoration: 'none',
+                        color: 'inherit',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          bgcolor: 'var(--light-blue-bg-08)',
+                          borderColor: 'var(--primary)',
+                          boxShadow: '0 2px 8px rgba(37, 99, 235, 0.12)',
+                        },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 36,
+                          height: 36,
+                          borderRadius: 1,
+                          bgcolor: 'var(--primary)',
+                          color: 'white',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 600,
+                          fontSize: '0.875rem',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {(formatCompanyDisplayName(c.company_name) || '?')[0].toUpperCase()}
+                      </Box>
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant="body2" fontWeight={600} color="var(--text-primary)">
+                          {formatCompanyDisplayName(c.company_name)}
+                        </Typography>
+                        <Typography variant="caption" color="var(--text-muted)" sx={{ display: 'block', mt: 0.25 }}>
+                          View career page
+                        </Typography>
+                      </Box>
+                      <OpenInNewRoundedIcon sx={{ fontSize: 18, color: 'var(--primary)', flexShrink: 0 }} />
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Jobs applied by day - chart */}
+          <Card sx={cardSx}>
+            <CardContent sx={{ pb: '24px !important' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <Box
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 1.5,
+                    bgcolor: 'var(--light-blue-bg-08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <TrendingUpRoundedIcon sx={{ fontSize: 22, color: 'var(--primary)' }} />
+                </Box>
+                <Box>
+                  <Typography variant="h6" fontWeight={600} color="var(--text-primary)">
+                    Total jobs applied by day
+                  </Typography>
+                  <Typography variant="caption" color="var(--text-secondary)">
+                    Last 14 days
+                  </Typography>
+                </Box>
+              </Box>
+              {loading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+                  <CircularProgress size={24} sx={{ color: 'var(--primary)' }} />
+                </Box>
+              ) : (
+                <Box sx={{ width: '100%', height: 260 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={(() => {
+                        const byDate = Object.fromEntries(
+                          (applicationsByDay || []).map((d) => [d.date, d.count])
+                        );
+                        const result = [];
+                        for (let i = 13; i >= 0; i--) {
+                          const d = new Date();
+                          d.setDate(d.getDate() - i);
+                          const dateStr = d.toISOString().slice(0, 10);
+                          result.push({
+                            date: dateStr,
+                            count: byDate[dateStr] || 0,
+                            shortDate: d.toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                            }),
+                          });
+                        }
+                        return result;
+                      })()}
+                      margin={{ top: 16, right: 16, left: 8, bottom: 8 }}
+                    >
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="var(--border-color)"
+                        vertical={false}
+                        strokeOpacity={0.5}
+                      />
+                      <XAxis
+                        dataKey="shortDate"
+                        tick={{ fontSize: 12, fill: 'var(--text-secondary)' }}
+                        axisLine={{ stroke: 'var(--border-color)' }}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        allowDecimals={false}
+                        tick={{ fontSize: 12, fill: 'var(--text-secondary)' }}
+                        axisLine={false}
+                        tickLine={false}
+                        width={28}
+                      />
+                      <Tooltip
+                        formatter={(value) => [value, 'Applications']}
+                        labelFormatter={(label) => `Date: ${label}`}
+                        contentStyle={{
+                          borderRadius: 8,
+                          border: '1px solid var(--border-color)',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                          padding: '12px 16px',
+                        }}
+                        itemStyle={{ fontWeight: 600, color: 'var(--primary)' }}
+                      />
+                      <Bar
+                        dataKey="count"
+                        fill="var(--primary)"
+                        radius={[6, 6, 0, 0]}
+                        maxBarSize={40}
+                        name="Applications"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </Box>
+              )}
             </CardContent>
           </Card>
 
@@ -448,7 +492,16 @@ export default function Home() {
                 Recently submitted applications
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, overflow: 'auto' }}>
-                {RECENT_APPLICATIONS.map((app) => (
+                {loading ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+                    <CircularProgress size={24} />
+                  </Box>
+                ) : recentApplications.length === 0 ? (
+                  <Typography variant="body2" color="var(--text-secondary)" sx={{ py: 2, textAlign: 'center' }}>
+                    No applications yet. Use the HireMate extension to save jobs and track applications.
+                  </Typography>
+                ) : (
+                recentApplications.map((app) => (
                   <Card
                     key={app.id}
                     variant="outlined"
@@ -475,11 +528,11 @@ export default function Home() {
                             fontSize: '0.875rem',
                           }}
                         >
-                          {app.initial}
+                          {(app.company || app.title || '?')[0].toUpperCase()}
                         </Box>
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                           <Typography variant="subtitle2" fontWeight={600} fontSize={'1rem'}>
-                            {app.title}
+                            {app.title || 'Untitled'}
                           </Typography>
                           <Typography variant="caption" color="var(--text-secondary)" fontSize={'0.8rem'}>
                             {app.company}
@@ -500,12 +553,12 @@ export default function Home() {
                             </Box>
                             <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
                               <ScheduleRoundedIcon sx={{ fontSize: 16 }} />
-                              {app.time}
+                              {formatRelativeTime(app.created_at)}
                             </Box>
                           </Box>
                         </Box>
                         <Chip
-                          label="Applied"
+                          label={(app.application_status || 'applied').replace(/^\w/, (c) => c.toUpperCase())}
                           size="small"
                           sx={{
                             bgcolor: 'var(--grey-4)',
@@ -517,7 +570,95 @@ export default function Home() {
                       </Box>
                     </CardContent>
                   </Card>
-                ))}
+                ))
+                )}
+              </Box>
+            </CardContent>
+          </Card>
+
+          <Card sx={{ ...cardSx, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', mt: 2 }}>
+            <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <Typography variant="h6" fontWeight={600} color="var(--text-primary)" sx={{ mb: 2 }}>
+                Saved jobs
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, overflow: 'auto' }}>
+                {loading ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+                    <CircularProgress size={24} />
+                  </Box>
+                ) : savedJobs.length === 0 ? (
+                  <Typography variant="body2" color="var(--text-secondary)" sx={{ py: 2, textAlign: 'center' }}>
+                    No saved jobs yet. Save jobs from the HireMate extension to view and apply here.
+                  </Typography>
+                ) : (
+                  savedJobs.map((job) => (
+                    <Card
+                      key={job.id}
+                      variant="outlined"
+                      sx={{
+                        borderRadius: 1.5,
+                        borderColor: 'var(--border-color)',
+                        boxShadow: 'none',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
+                        <Typography variant="body2" fontWeight={600} color="var(--primary)" sx={{ mb: 0.5 }}>
+                          {job.company || 'Unknown company'}
+                        </Typography>
+                        <Typography variant="subtitle2" fontWeight={600} fontSize="0.9rem">
+                          {job.position_title || 'Untitled'}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
+                          {job.job_posting_url && (
+                            <>
+                              <Button
+                                size="small"
+                                component={MuiLink}
+                                href={job.job_posting_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                variant="outlined"
+                                sx={{
+                                  textTransform: 'none',
+                                  py: 0.5,
+                                  fontSize: '0.75rem',
+                                  borderColor: 'var(--primary)',
+                                  color: 'var(--primary)',
+                                  '&:hover': { borderColor: 'var(--primary-light)', bgcolor: 'var(--light-blue-bg-08)' },
+                                }}
+                              >
+                                View
+                              </Button>
+                              <Button
+                                size="small"
+                                component={MuiLink}
+                                href={job.job_posting_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                variant="contained"
+                                sx={{
+                                  textTransform: 'none',
+                                  py: 0.5,
+                                  fontSize: '0.75rem',
+                                  bgcolor: 'var(--primary)',
+                                  '&:hover': { bgcolor: 'var(--primary-light)' },
+                                }}
+                              >
+                                Apply
+                              </Button>
+                            </>
+                          )}
+                          {!job.job_posting_url && (
+                            <Typography variant="caption" color="var(--text-muted)">
+                              No link saved
+                            </Typography>
+                          )}
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </Box>
             </CardContent>
           </Card>
@@ -533,6 +674,7 @@ export default function Home() {
               color: 'var(--text-primary)',
               textTransform: 'none',
               py: 1.25,
+              mt: 2,
               '&:hover': {
                 borderColor: 'var(--primary)',
                 bgcolor: 'var(--light-blue-bg-08)',
