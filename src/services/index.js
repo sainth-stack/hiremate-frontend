@@ -8,11 +8,8 @@ export {
 } from './authService';
 
 export {
-  getDashboardStatsAPI,
-  getRecentApplicationsAPI,
-  getCompaniesViewedAPI,
+  getDashboardSummaryAPI,
   getSavedJobsAPI,
-  getApplicationsByDayAPI,
 } from './dashboardService';
 
 export {
@@ -31,11 +28,10 @@ export {
 } from './profileService';
 
 export {
-  listResumesAPI,
+  getResumeWorkspaceAPI,
   generateResumeAPI,
   updateResumeAPI,
   deleteResumeAPI,
-  getTailorContextAPI,
   uploadResumeAPI,
 } from './resumeService';
 

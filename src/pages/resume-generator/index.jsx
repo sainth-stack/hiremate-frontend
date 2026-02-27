@@ -35,7 +35,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import PageContainer from '../../components/common/PageContainer';
 import PdfViewer from '../../components/PdfViewer';
 import JobDescriptionInput from './JobDescriptionInput';
-import { listResumesAPI, generateResumeAPI, updateResumeAPI, deleteResumeAPI, getTailorContextAPI, uploadResumeAPI } from '../../services';
+import { getResumeWorkspaceAPI, generateResumeAPI, updateResumeAPI, deleteResumeAPI, uploadResumeAPI } from '../../services';
 import { BASE_URL } from '../../utilities/const';
 
 const BACKEND_ORIGIN = BASE_URL.replace(/\/api\/?$/, '');
@@ -84,8 +84,8 @@ const setStoredSelectedId = (id) => {
 };
 
 const fetchResumes = (setResumes) => {
-  listResumesAPI()
-    .then(({ data }) => setResumes(Array.isArray(data) ? data : []))
+  getResumeWorkspaceAPI()
+    .then(({ data }) => setResumes(Array.isArray(data?.resumes) ? data.resumes : []))
     .catch(() => setResumes([]));
 };
 
@@ -119,8 +119,8 @@ export default function ResumeGenerator() {
     setUploading(true);
     uploadResumeAPI(file)
       .then(() => {
-        listResumesAPI().then(({ data }) => {
-          const list = Array.isArray(data) ? data : [];
+        getResumeWorkspaceAPI().then(({ data }) => {
+          const list = Array.isArray(data?.resumes) ? data.resumes : [];
           setResumes(list);
           const defaultResume = list.find((r) => r.is_default) || list[0];
           if (defaultResume) {
@@ -146,22 +146,21 @@ export default function ResumeGenerator() {
   const hasResumeToPreview = selectedResume && previewPdfFile;
 
   useEffect(() => {
-    fetchResumes(setResumes);
-  }, []);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('tailor') === '1') {
-      getTailorContextAPI()
-        .then(({ data }) => {
-          if (data?.job_description) {
-            setJobDescription(data.job_description);
-            if (data.job_title) setJobRole(data.job_title);
+    getResumeWorkspaceAPI()
+      .then(({ data }) => {
+        const list = Array.isArray(data?.resumes) ? data.resumes : [];
+        setResumes(list);
+        const tc = data?.tailor_context;
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('tailor') === '1' && tc) {
+          if (tc.job_description) {
+            setJobDescription(tc.job_description);
+            if (tc.job_title) setJobRole(tc.job_title);
             setShowInputForm(true);
           }
-        })
-        .catch(() => {});
-    }
+        }
+      })
+      .catch(() => setResumes([]));
   }, []);
 
   useEffect(() => {

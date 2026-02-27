@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { BASE_URL } from '../utilities/const';
 
+const _inflight = new Map();
+
 const axiosClient = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -32,5 +34,13 @@ axiosClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export async function dedupGet(url, config = {}) {
+  const key = url + JSON.stringify(config.params || {});
+  if (_inflight.has(key)) return _inflight.get(key);
+  const promise = axiosClient.get(url, config).finally(() => _inflight.delete(key));
+  _inflight.set(key, promise);
+  return promise;
+}
 
 export default axiosClient;

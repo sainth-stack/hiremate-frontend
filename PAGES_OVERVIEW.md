@@ -1,240 +1,265 @@
-# HireMate Frontend — Pages Overview
+# HireMate — Pages, APIs & End-to-End Flows
 
-High-level summary of each page, what users see, how data is stored in the backend, and what user actions trigger.
-
----
-
-## Auth Pages
-
-### Login (`/login`)
-| | |
-|---|---|
-| **Shows** | Email, password fields; "Sign in" button; link to Register |
-| **Backend** | `POST /api/.../auth/login` — stores JWT in `localStorage` |
-| **User actions** | Submit → login API → redirect to Dashboard (`/`) |
-
-### Register (`/register`)
-| | |
-|---|---|
-| **Shows** | First name, last name, email, password; "Register" button; link to Login |
-| **Backend** | `POST /api/.../auth/register` — stores JWT in `localStorage` |
-| **User actions** | Submit → register API → redirect to Profile (`/profile`) for onboarding |
+Overview of pages, backend APIs (what they do internally), and the Chrome extension (what happens, when it calls, how it scrapes, end to end).
 
 ---
 
-## Start Page (`/start`)
-| | |
-|---|---|
-| **Shows** | Two cards: "Get Recommendations" (→ Job Search) and "Start Autofilling" (→ Profile) |
-| **Backend** | None — static navigation |
-| **User actions** | Click card → navigate to `/job-search` or `/profile` |
+## 1. Pages & APIs Used
+
+| Page | Route | APIs Called | Purpose |
+|------|-------|-------------|---------|
+| **Login** | `/login` | `POST /api/auth/login` | Email + password → JWT in localStorage |
+| **Register** | `/register` | `POST /api/auth/register` | Creates user → JWT → redirect to Profile |
+| **Start** | `/start` | None | Two cards: Recommendations (→ `/job-search`), Autofill (→ `/profile`) |
+| **Home (Dashboard)** | `/` | `GET /api/dashboard/summary`, `GET /api/chrome-extension/jobs` | Stats, recent apps, companies viewed, chart, saved jobs sidebar |
+| **Application Tracker** | `/application-tracker` | `GET /api/chrome-extension/jobs`, `PATCH /api/chrome-extension/jobs/:id` | Kanban; list jobs, update status |
+| **Profile** | `/profile` | `GET /api/profile`, `PATCH /api/profile`, `POST /api/resume/upload` | Load/save profile; upload resume → parse → merge |
+| **Resume Generator** | `/resume-generator` | `GET /api/resume/workspace`, `POST /api/resume/generate`, `GET /api/resume/:id/file`, `PATCH`, `DELETE` | List resumes + tailor context; generate; download PDF |
+| **Job Recommendations** | `/job-recommendations` | None | Placeholder |
+| **Pricing** | `/pricing` | `POST /api/payment/create-order`, `POST /api/payment/verify` | Razorpay checkout |
+| **Settings** | `/settings` | None (View Plans → `/pricing`) | Subscription, Delete Account TODO |
+
+**Note:** Start page "Get Recommendations" links to `/job-search`; no such route exists, so it redirects to `/`. The actual page is `/job-recommendations`.
 
 ---
 
-## Dashboard
+## 2. Backend APIs — Internal Behavior (End to End)
 
-### Home (`/`)
-| | |
-|---|---|
-| **Shows** | Stats (jobs applied, saved, companies checked), Companies viewed list, Applications by day chart, Recent applications sidebar, Saved jobs sidebar |
-| **Backend** | `GET /dashboard/stats`, `GET /dashboard/recent-applications`, `GET /dashboard/companies-viewed`, `GET /chrome-extension/jobs`, `GET /dashboard/applications-by-day` |
-| **User actions** | Click company → open career page; Click job View/Apply → open job URL; "Go to Applications" → `/application-tracker` |
+**Base URL:** `http://127.0.0.1:8000/api` (or `BASE_URL`)
 
-### Application Tracker (`/application-tracker`)
-| | |
-|---|---|
-| **Shows** | Kanban: Saved, Applied, Interview, Closed. Search bar. Job cards with drag & drop |
-| **Backend** | `GET /chrome-extension/jobs` (list), `PATCH /chrome-extension/jobs/:id` (update status) |
-| **User actions** | Search (client filter); Drag job between columns → PATCH job status; Click "View job" → open URL; Refresh → refetch |
+### Auth (`/api/auth`)
+| Endpoint | Internal flow |
+|----------|----------------|
+| `POST /auth/register` | Validate input → create User in DB → hash password → return JWT |
+| `POST /auth/login` | Find user by email → verify password → return JWT |
+| `GET /auth/profile` | Decode JWT → load User → return id, name, email |
+| `POST /auth/refresh` | Accept expired token → verify signature → issue new JWT |
 
-### Job Search (`/job-search`)
-| | |
-|---|---|
-| **Shows** | Placeholder — "content coming soon" |
-| **Backend** | None yet |
-| **User actions** | — |
+### Profile (`/api/profile`)
+| Endpoint | Internal flow |
+|----------|----------------|
+| `GET /profile` | Load Profile + related models (experiences, education, skills, projects, preferences, links) → serialize to `ProfilePayload` |
+| `PATCH /profile` | Validate payload → upsert Profile and relations → clear `dashboard_summary:{user_id}` + `autofill_ctx:{user_id}` cache → return payload |
 
-### Job Recommendations (`/job-recommendations`)
-| | |
-|---|---|
-| **Shows** | Placeholder — "add your content here" |
-| **Backend** | None yet |
-| **User actions** | — |
+### Resume (`/api/resume`)
+| Endpoint | Internal flow |
+|----------|----------------|
+| `GET /workspace` | `list_resumes()` (UserResume + profile fallback) + `get_and_clear_tailor_context()` → return `{ resumes, tailor_context }` |
+| `POST /upload` | Save file to S3/local → LLM extract profile → update Profile → add UserResume → clear `autofill_ctx` → return profile |
+| `POST /generate` | Build HTML from template + profile + JD keywords → WeasyPrint PDF → upload to S3/local → create UserResume → return `{ resume_id, resume_url, ... }` |
+| `GET /{id}/file` | Lookup resume (profile id=0 or UserResume) → proxy S3 or serve local file |
+| `PATCH /{id}` | Update name/text → if text changed, regenerate PDF and replace file |
+| `DELETE /{id}` | Delete from storage, remove UserResume record |
 
-### Activity (`/activity`)
-| | |
-|---|---|
-| **Shows** | Placeholder — "content coming soon" |
-| **Backend** | None yet |
-| **User actions** | — |
+### Dashboard (`/api/dashboard`)
+| Endpoint | Internal flow |
+|----------|----------------|
+| `GET /summary` | Check Redis `dashboard_summary:{user_id}` → if miss: query UserJob (stats, recent, by day) + CareerPageVisit (companies viewed) → merge → cache 120s → return |
 
----
+### Activity (`/api/activity`)
+| Endpoint | Internal flow |
+|----------|----------------|
+| `POST /track` | Body: `{ event_type: "career_page_view" | "autofill_used", page_url, metadata }` → insert into `CareerPageVisit` |
 
-## Profile (`/profile`)
-| | |
-|---|---|
-| **Shows** | 8 tabs: Profile, Experience, Education, Skills, Projects, Preferences, Links, Review |
-| **Backend** | `GET /profile` (load), `PATCH /profile` (save). Profile data stored in Redux (profileSlice). Resume parse via `POST /resume/upload` |
-| **User actions** | Edit fields → local state; Save → PATCH profile; Upload resume → parse → `mergeFromResume` into form |
+### Chrome Extension (`/api/chrome-extension`)
+| Endpoint | Internal flow |
+|----------|----------------|
+| `GET /autofill/context` | Check Redis `autofill_ctx:{user_id}` → if miss: load Profile + list_resumes → flatten profile for form fields + resume_text + resume_url (points to `/autofill/resume/{filename}`) → cache 300s → return |
+| `GET /autofill/resume/{file_name}` | Load profile → match filename → proxy S3 or serve local PDF |
+| `POST /form-fields/map` | Receive scraped fields + profile + resume_text → LLM maps each field to profile value or generated answer → return `{ mappings }` |
+| `POST /jobs` | Derive company from URL → insert UserJob + CareerPageVisit (save_job) → clear `dashboard_summary:{user_id}` → return job id |
+| `GET /jobs` | Query UserJob by user_id, optional `?status=applied` filter → return list |
+| `PATCH /jobs/{id}` | Update `application_status` |
+| `POST /keywords/analyze` | Parse JD from page_html or job_description → extract keywords (LLM, cached) → match vs resume text → return match %, high/low keywords |
+| `POST /tailor-context` | Store `{ job_description, job_title, url }` in memory (TTL 300s) for resume-generator to consume |
+| `POST /cover-letter/upsert` | If job_url exists → return stored; else generate from profile + JD via LLM → store → return |
 
-**Tabs store:**
-- **Profile** — name, email, phone, city, country, headline, summary, resume upload
-- **Experience** — job title, company, dates, location, description
-- **Education** — degree, institution, dates, grade
-- **Skills** — tech skills, soft skills
-- **Projects** — name, description, tech stack, links
-- **Preferences** — roles, employment type, remote, locations, salary
-- **Links** — LinkedIn, GitHub, portfolio, other
-- **Review** — summary review before submit
-
----
-
-## Resume Generator (`/resume-generator`)
-| | |
-|---|---|
-| **Shows** | Job role + job description input; Generate button; Recent resumes list; PDF preview; Upload |
-| **Backend** | `GET /resume`, `POST /resume/generate`, `PATCH /resume/:id`, `DELETE /resume/:id`, `POST /resume/upload`, `GET /resume/tailor-context` |
-| **User actions** | Paste JD → Generate → create tailored resume; Upload PDF/DOC → store; Edit → PATCH; Delete → DELETE; Download → fetch PDF file |
+### Payment (`/api/payment`)
+| Endpoint | Internal flow |
+|----------|----------------|
+| `POST /create-order` | Create Razorpay order → return order_id, amount, key_id |
+| `POST /verify` | Verify signature → TODO: persist subscription |
 
 ---
 
-## Pricing (`/pricing`)
-| | |
-|---|---|
-| **Shows** | Plans (Daily, Weekly, Monthly) with prices; Subscribe button; Razorpay modal |
-| **Backend** | `POST /payment/create-order`, `POST /payment/verify` |
-| **User actions** | Subscribe → create Razorpay order → pay → verify → show success |
-
----
-
-## Settings (`/settings`)
-| | |
-|---|---|
-| **Shows** | Subscription & Billing (credits), "View Plans" button; Danger Zone with "Delete Account" |
-| **Backend** | None directly — View Plans → `/pricing`. Delete account not implemented |
-| **User actions** | View Plans → navigate to Pricing; Delete Account → TODO |
-
----
-
-## Data Flow Summary
-
-| Source | Data | Stored where |
-|--------|------|--------------|
-| Chrome extension | Jobs saved, applications, companies viewed | Backend (`/chrome-extension/jobs`, `/dashboard/*`) |
-| User profile | Name, experience, education, skills, etc. | Backend (`/profile`) |
-| Resume generator | Resumes, PDFs | Backend (`/resume`) |
-| Auth | JWT, user | `localStorage` |
-
----
-
-## Routes (Protected)
-
-| Path | Page |
-|------|------|
-| `/` | Home (Dashboard) |
-| `/login` | Login |
-| `/register` | Register |
-| `/start` | Start (onboarding choice) |
-| `/profile` | Profile Builder |
-| `/application-tracker` | Application Tracker |
-| `/resume-generator` | Resume Generator |
-| `/job-recommendations` | Job Recommendations (placeholder) |
-| `/settings` | Settings |
-| `/pricing` | Pricing |
-
----
-
-## Chrome Extension
-
-**Purpose:** Auto-fill job application forms on career/job sites using the user's profile and resume. Saves jobs, tracks applications, and syncs data with the backend when the user is logged in.
+## 3. Chrome Extension — What Happens, When It Calls, How It Scrapes
 
 **Location:** `hiremate-backend/chrome-extension/`
 
-| What it does | How |
-|--------------|-----|
-| **Login / Signup** | Popup has login & register; stores JWT in `chrome.storage.local`; syncs with HireMate tab if open |
-| **Scan & Auto-Fill** | Scrapes form fields from page → calls `POST /chrome-extension/form-fields/map` (LLM maps fields to profile) → fills fields with 300–800ms delay (human-like) |
-| **Autofill data** | Fetches profile + resume from `GET /chrome-extension/autofill/data` |
-| **Resume file** | Fetches PDF from `GET /chrome-extension/autofill/resume` or `.../resume/{filename}` (proxy for S3/local) |
-| **Save job** | `POST /chrome-extension/jobs` — saves job to tracker; extracts company from URL (Greenhouse, Lever, Workday, etc.) |
-| **Track career page view** | `POST /chrome-extension/career-page/view` — records visited career pages for "Companies viewed" on dashboard |
-| **Track autofill used** | `POST /chrome-extension/autofill/track` — records when user used autofill on a page |
-| **Keyword analysis** | `POST /chrome-extension/keywords/analyze` — extracts JD keywords, matches against resume; returns match % and prefill JD for forms |
-| **Tailor Resume** | `POST /chrome-extension/tailor-context` — stores JD + title before opening resume-generator; frontend fetches via `GET /resume/tailor-context` |
-| **Cover letter** | `GET /chrome-extension/cover-letter`, `POST /chrome-extension/cover-letter/generate` — generate & store cover letter for current job |
-| **Resume upload** | Saves PDF to IndexedDB in background script; used for file input mapping during fill |
+### Architecture
+- **Popup** — UI; triggers autofill, loads context, syncs token
+- **Content script** — Injected on career pages; scrapes DOM, fills forms, mounts in-page widget
+- **Background** — Service worker; IndexedDB (resume), message routing, token sync
 
-**Supported sites:** Career pages (Greenhouse, Lever, Workday, Ashby, BambooHR, iCIMS, SmartRecruiters, etc.). Detects job listings vs application forms.
+### Scraping (How It Works)
 
-**Storage (when not logged in):** Profile, custom answers in `chrome.storage.local`; resume PDF in IndexedDB.
+**1. Form field scraping**
+- Content script listens for `SCRAPE_FIELDS`
+- `getFillableFields()` walks DOM + shadow DOM, collects:
+  - `input`, `textarea`, `select`, `[contenteditable]`, `[role="textbox"]`, `.ql-editor`, etc.
+- For each element: label, name, id, placeholder, type, tag, required, options
+- Background sends `SCRAPE_FIELDS` to every frame → merges results with `frameId`, `index`
+
+**2. Page HTML for JD**
+- `GET_ALL_FRAMES_HTML` → `chrome.scripting.executeScript` with `allFrames: true`
+- Each frame returns `document.documentElement.outerHTML` (max ~1.5MB)
+- Frames concatenated with `<!--FRAME_SEP-->` → sent to backend for JD extraction
+
+### Autofill Flow (End to End)
+
+```
+User on application form → Clicks "Process and Fill" (popup or in-page widget)
+       │
+       ├─► 1. SCRAPE_ALL_FRAMES (background → content in each frame)
+       │   • Background: chrome.webNavigation.getAllFrames → for each frameId, send SCRAPE_FIELDS
+       │   • Content: scrapeFields() → getFillableFields() → return { fields }
+       │   • Merge: fields get index, frameId, frameLocalIndex
+       │
+       ├─► 2. Load context (popup or content)
+       │   • Check chrome.storage.local (hm_autofill_ctx, 10min TTL)
+       │   • If miss: GET /chrome-extension/autofill/context
+       │   • Response: profile, resume_text, resume_url (→ /autofill/resume/{filename})
+       │
+       ├─► 3. Load resume PDF
+       │   • getResumeFromBackground() — IndexedDB
+       │   • If empty: fetchResumeFromContext(context)
+       │     - Extract filename from resume_url: resume_url.split('/').pop()
+       │     - GET /chrome-extension/autofill/resume/{filename}
+       │     - Save to IndexedDB via SAVE_RESUME
+       │
+       ├─► 4. Map fields
+       │   • POST /chrome-extension/form-fields/map
+       │   • Body: fields, profile, resume_text
+       │   • Response: mappings per field index
+       │
+       ├─► 5. Fill (background → content per frame)
+       │   • FILL_ALL_FRAMES → FILL_WITH_VALUES per frame
+       │   • Content: fillWithValues() — set value, 300–800ms delay, file inputs get resume from IndexedDB
+       │   • dispatchFrameworkEvents() for React/Vue/Angular
+       │
+       └─► 6. Track
+           • POST /activity/track { event_type: "autofill_used", page_url, metadata }
+```
+
+### Keyword Analysis Flow
+
+```
+User opens Keywords tab (in-page widget)
+       │
+       ├─► fetchResumesFromApi()
+       │   • GET /api/resume/workspace → response.resumes
+       │   • Populate resume dropdown (id, resume_name, is_default)
+       │
+       ├─► getPageHtmlForKeywordsApi()
+       │   • Send GET_ALL_FRAMES_HTML to background
+       │   • Background: executeScript allFrames → outerHTML per frame
+       │   • Return combined HTML
+       │
+       └─► POST /chrome-extension/keywords/analyze
+           • Body: url, page_html, resume_id (optional)
+           • Backend: parse JD from HTML → extract keywords → match vs resume
+           • Display: match %, high/low priority keywords
+```
+
+### Tailor Resume Flow
+
+```
+User on job page → Clicks "Tailor Resume"
+       │
+       ├─► getPageHtmlForKeywordsApi() (same as above)
+       │
+       ├─► POST /chrome-extension/tailor-context
+       │   • Body: page_html, url, job_title
+       │   • Backend stores in memory (TTL 300s)
+       │
+       └─► Open /resume-generator?tailor=1 (new tab)
+           • Frontend: GET /resume/workspace → tailor_context returned and cleared
+           • Prefills JD from tailor_context
+```
+
+### Save Job Flow
+
+```
+User on job page → Clicks "Save job"
+       │
+       └─► POST /chrome-extension/jobs
+           • Body: job_posting_url, position_title, company, location, job_description, ...
+           • Backend: derive company from URL (Greenhouse, Lever, Workday, etc.)
+           • Insert UserJob + CareerPageVisit (action_type: save_job)
+           • Clear dashboard_summary cache
+```
+
+### Page Load / Career Page View
+
+```
+Content script injected on career/job URL
+       │
+       ├─► trackCareerPageView()
+       │   • POST /activity/track { event_type: "career_page_view", page_url, metadata }
+       │   • Deduped by URL (visitedUrls set)
+       │
+       ├─► tryAutoOpenPopup() (if form detected)
+       │   • looksLikeJobApplicationForm() — fillable fields + job keywords
+       │   • Mount in-page widget, optionally run keyword analysis
+       │
+       └─► runKeywordAnalysisAndMaybeShowWidget()
+           • Optional: keyword analysis for match %
+```
+
+### Cover Letter Flow
+
+```
+User opens Cover Letter accordion (in-page)
+       │
+       └─► POST /chrome-extension/cover-letter/upsert
+           • Body: job_url, page_html, job_title
+           • If stored for this job_url → return existing
+           • Else: LLM generate from profile + JD → store → return
+```
 
 ---
 
-## Backend APIs
+## 4. Cache Invalidation
 
-**Base URL:** `http://127.0.0.1:8000/api` (or configured `BASE_URL`)
+| Trigger | Clears |
+|---------|--------|
+| `PATCH /profile` | `dashboard_summary:{user_id}`, `autofill_ctx:{user_id}` |
+| `POST /resume/upload` | `autofill_ctx:{user_id}` |
+| `POST /chrome-extension/jobs` | `dashboard_summary:{user_id}` |
 
-**Purpose:** FastAPI backend for auth, profile, resumes, jobs, dashboard stats, payments, and Chrome extension integration.
+---
 
-### Auth (`/api/auth`)
+## 5. Data Storage Summary
 
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| POST | `/auth/register` | Register user (first_name, last_name, email, password). Returns JWT. |
-| POST | `/auth/login` | Login (email, password). Returns JWT. |
-| GET | `/auth/profile` | Get current user (id, name, email). Used to refresh auth state. |
-| POST | `/auth/refresh` | Refresh access token. Accepts expired token, returns new one. |
+| Source | Data | Stored |
+|--------|------|--------|
+| Chrome extension | Jobs, applications, career page visits | Backend (user_jobs, career_page_visits) |
+| User profile | Name, experience, education, skills, etc. | Backend (profile, related tables) |
+| Resumes | PDFs, resume list | Backend (user_resumes, S3/local) |
+| Auth | JWT | localStorage (web), chrome.storage.local (extension) |
+| Extension resume PDF | For file inputs | IndexedDB (background) |
+| Autofill context | Profile + resume text + URL | chrome.storage.local (10min), Redis (300s) |
 
-### Profile (`/api/profile`)
+---
 
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| GET | `/profile` | Get full profile (experiences, education, skills, projects, preferences, links). |
-| PATCH | `/profile` | Update profile with full schema. |
-
-### Resume (`/api/resume`)
-
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| GET | *(base)* | List user's resumes (id, resume_name, resume_url, is_default, resume_text). |
-| POST | `/upload` | Upload PDF/DOC/DOCX. Extracts data via LLM, updates profile, stores in S3/local. |
-| POST | `/generate` | Generate JD-optimized resume from profile (Jinja2 + WeasyPrint). Returns resume_id, URL. |
-| GET | `/{id}/file` | Proxy resume PDF (S3 or local) to avoid CORS. |
-| GET | `/tailor-context` | Fetch & clear JD + title stored by extension ("Tailor Resume" flow). |
-| PATCH | `/{id}` | Update resume name and/or text. Regenerates PDF when content changes. |
-| DELETE | `/{id}` | Delete resume and file from storage. |
-
-### Dashboard (`/api/dashboard`)
+## 6. API Quick Reference
 
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
-| GET | `/stats` | Dashboard stats: jobs_applied, jobs_saved, companies_checked. |
-| GET | `/recent-applications` | Recent applied jobs (limit param). |
-| GET | `/companies-viewed` | Companies from career page visits (limit param). |
-| GET | `/applications-by-day` | Daily count of applications for chart (days param). |
-
-### Chrome Extension (`/api/chrome-extension`)
-
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| GET | `/autofill/data` | Profile + resume text + resume URL for autofill. |
-| GET | `/autofill/resume` | Serve resume PDF (proxy S3/local for CORS). |
-| GET | `/autofill/resume/{file_name}` | Serve resume by filename. |
-| POST | `/autofill/track` | Track autofill usage on a page. |
-| POST | `/career-page/view` | Track career page view. |
-| POST | `/form-fields/map` | LLM maps form fields to profile values; returns mappings for fill. |
-| GET | `/resumes` | List resumes (alias for resume service). |
-| POST | `/jobs` | Save job (company, title, location, JD, URL, status). |
-| GET | `/jobs` | List saved jobs. Optional ?status=applied. |
-| PATCH | `/jobs/{id}` | Update job status (saved, applied, interview, closed). |
-| POST | `/keywords/analyze` | Extract JD keywords, match vs resume; return match %, high/low priority keywords, JD for prefill. |
-| POST | `/tailor-context` | Store JD + title for resume-generator "Tailor" flow. |
-| GET | `/cover-letter` | Get stored cover letter from profile. |
-| POST | `/cover-letter/generate` | Generate cover letter from profile + JD, store in preferences. |
-
-### Payment (`/api/payment`)
-
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| POST | `/create-order` | Create Razorpay order (plan_id: daily/weekly/monthly). Returns order_id, amount, key_id. |
-| POST | `/verify` | Verify Razorpay payment signature after checkout. TODO: store subscription in DB. |
+| POST | `/auth/register`, `/auth/login` | Auth |
+| GET | `/auth/profile`, `/auth/refresh` | Auth |
+| GET | `/profile`, PATCH `/profile` | Profile |
+| GET | `/resume/workspace` | Resumes + tailor_context |
+| POST | `/resume/upload`, `/resume/generate` | Resume |
+| GET | `/resume/{id}/file` | Resume PDF proxy |
+| PATCH | `/resume/{id}`, DELETE `/resume/{id}` | Resume |
+| GET | `/dashboard/summary` | Dashboard (merged, cached) |
+| POST | `/activity/track` | Career page view / autofill used |
+| GET | `/chrome-extension/autofill/context` | Profile + resume for autofill |
+| GET | `/chrome-extension/autofill/resume/{file_name}` | Resume PDF proxy |
+| POST | `/chrome-extension/form-fields/map` | LLM field mapping |
+| GET | `/chrome-extension/jobs`, POST, PATCH | Jobs |
+| POST | `/chrome-extension/keywords/analyze` | Keyword match |
+| POST | `/chrome-extension/tailor-context` | Tailor resume flow |
+| POST | `/chrome-extension/cover-letter/upsert` | Cover letter |
+| POST | `/payment/create-order`, `/payment/verify` | Razorpay |

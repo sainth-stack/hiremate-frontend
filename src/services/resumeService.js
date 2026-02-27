@@ -1,3 +1,4 @@
+import { dedupGet } from './axiosClient';
 import axiosClient from './axiosClient';
 
 /**
@@ -14,9 +15,7 @@ export const uploadResumeAPI = (file) => {
   });
 };
 
-export const listResumesAPI = () => axiosClient.get('/resume');
-
-export const getTailorContextAPI = () => axiosClient.get('/resume/tailor-context');
+export const getResumeWorkspaceAPI = () => dedupGet('/resume/workspace');
 
 export const generateResumeAPI = ({ job_title, job_description }) =>
   axiosClient.post('/resume/generate', { job_title, job_description });

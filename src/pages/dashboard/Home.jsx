@@ -20,13 +20,7 @@ import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import { Link } from 'react-router-dom';
 
 import PageContainer from '../../components/common/PageContainer';
-import {
-  getDashboardStatsAPI,
-  getRecentApplicationsAPI,
-  getCompaniesViewedAPI,
-  getSavedJobsAPI,
-  getApplicationsByDayAPI,
-} from '../../services';
+import { getDashboardSummaryAPI, getSavedJobsAPI } from '../../services';
 import {
   BarChart,
   Bar,
@@ -110,23 +104,25 @@ export default function Home() {
   const [savedJobs, setSavedJobs] = useState([]);
   const [applicationsByDay, setApplicationsByDay] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const [statsRes, recentRes, companiesRes, savedRes, byDayRes] = await Promise.all([
-          getDashboardStatsAPI(),
-          getRecentApplicationsAPI(10),
-          getCompaniesViewedAPI(15),
+        const [summaryRes, savedRes] = await Promise.all([
+          getDashboardSummaryAPI(5, 7),
           getSavedJobsAPI(),
-          getApplicationsByDayAPI(14),
         ]);
-        setStats(statsRes.data);
-        setRecentApplications(recentRes.data || []);
-        setCompaniesViewed(companiesRes.data || []);
+        const { stats: s, recent_applications, companies_viewed, applications_by_day } = summaryRes.data;
+        setStats(s || { jobs_applied: 0, jobs_saved: 0, companies_checked: 0 });
+        setRecentApplications(recent_applications || []);
+        setCompaniesViewed(companies_viewed || []);
+        setApplicationsByDay(applications_by_day || []);
         setSavedJobs(savedRes.data || []);
-        setApplicationsByDay(byDayRes.data || []);
       } catch (err) {
+        setError(err?.response?.data?.detail || err?.message || 'Failed to load dashboard');
         setStats({ jobs_applied: 0, jobs_saved: 0, companies_checked: 0 });
         setRecentApplications([]);
         setCompaniesViewed([]);
@@ -147,6 +143,11 @@ export default function Home() {
 
   return (
     <PageContainer sx={{ py: 2, bgcolor: 'var(--bg-light)' }}>
+      {error && (
+        <Box sx={{ mb: 2, p: 2, bgcolor: 'error.light', color: 'error.contrastText', borderRadius: 1 }}>
+          <Typography variant="body2">{error}</Typography>
+        </Box>
+      )}
       {/* Main two-column layout */}
       <Box
         sx={{
@@ -368,7 +369,7 @@ export default function Home() {
                     Total jobs applied by day
                   </Typography>
                   <Typography variant="caption" color="var(--text-secondary)">
-                    Last 14 days
+                    Last 7 days
                   </Typography>
                 </Box>
               </Box>
@@ -385,7 +386,7 @@ export default function Home() {
                           (applicationsByDay || []).map((d) => [d.date, d.count])
                         );
                         const result = [];
-                        for (let i = 13; i >= 0; i--) {
+                        for (let i = 6; i >= 0; i--) {
                           const d = new Date();
                           d.setDate(d.getDate() - i);
                           const dateStr = d.toISOString().slice(0, 10);
