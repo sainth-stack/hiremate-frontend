@@ -29,6 +29,7 @@ export {
 
 export {
   getResumeWorkspaceAPI,
+  listResumesAPI,
   generateResumeAPI,
   updateResumeAPI,
   deleteResumeAPI,

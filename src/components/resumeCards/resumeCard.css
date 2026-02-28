@@ -1,0 +1,136 @@
+/* ResumeCard – blue/white theme using App.css variables */
+.rm-card {
+  background: var(--bg-paper);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 26px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  box-shadow: 0 2px 12px var(--black-10);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  min-height: 380px;
+  box-sizing: border-box;
+  font-family: var(--font-family);
+}
+
+.rm-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary-light);
+  box-shadow: 0 12px 32px var(--light-blue-bg-15);
+}
+
+/* Category label */
+.rm-card__category {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 16px 0;
+  color: var(--text-primary);
+}
+
+.rm-card__category--accent {
+  color: var(--primary);
+}
+
+/* Illustration area */
+.rm-card__media {
+  width: 100%;
+  height: 175px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.rm-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.rm-card__media--placeholder {
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.rm-card__placeholder-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Text */
+.rm-card__title {
+  margin: 0 0 8px 0;
+  font-size: var(--font-size-body);
+  line-height: 1.35;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.rm-card__subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+/* Action buttons */
+.rm-card__actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.rm-btn {
+  border: 0;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  font-family: var(--font-family);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+.rm-btn--primary {
+  background: var(--primary);
+  color: var(--primary-contrast);
+  box-shadow: 0 4px 14px var(--light-blue-bg-15);
+}
+
+.rm-btn--primary:hover {
+  background: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px var(--light-blue-bg-15);
+}
+
+.rm-btn--link {
+  background: transparent;
+  color: var(--primary);
+  padding: 9px 10px;
+}
+
+.rm-btn--link:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .rm-card {
+    padding: 18px 16px;
+    min-height: 340px;
+  }
+  .rm-card__media {
+    height: 140px;
+  }
+}

@@ -1,0 +1,5 @@
+Uncaught SyntaxError: The requested module '/src/services/index.js' does not provide an export named 'listResumesAPI' (at ResumeGeneratorStart.jsx:36:3)Understand this error
+content.js:65 [JobAutofill][content] Token synced from website
+chrome-extension://pbanhockgagggenencehbnadejlgchfc/assets/userReportLinkedCandidate.json:1  Failed to load resource: net::ERR_FILE_NOT_FOUNDUnderstand this error
+2content.js:65 [JobAutofill][content] Token synced from website
+client:865 [vite] server connection lost. Polling for restart...
