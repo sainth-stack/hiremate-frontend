@@ -7,7 +7,13 @@ import Register from '../pages/auth/Register';
 import Home from '../pages/dashboard/Home';
 import ApplicationTracker from '../pages/application-tracker';
 import ResumeGenerator from '../pages/resume-generator';
+import ResumeGeneratorStart from '../pages/resume-generator/ResumeGeneratorStart';
 import JobRecommendations from '../pages/dashboard/JobRecommendations';
+import AiResumeStudio from '../pages/ai-resume-studio/AiResumeStudio';
+import JobScan from '../pages/job-scan/JobScan';
+import ScanReport from '../pages/job-scan/ScanReport';
+import ResumeAnalyzer from '../pages/ai-resume-studio/ResumeAnalyzer';
+import ResumeAnalyzeScore from '../pages/ai-resume-studio/ResumeAnalyzeScore';
 import Profile from '../pages/profile/Profile';
 import Pricing from '../pages/pricing/Pricing';
 import Settings from '../pages/Settings';
@@ -27,7 +33,13 @@ export default function AppRoutes() {
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/application-tracker" element={<ApplicationTracker />} />
-            <Route path="/resume-generator" element={<ResumeGenerator />} />
+            <Route path="/resume-generator" element={<ResumeGeneratorStart />} />
+            <Route path="/resume-generator/build" element={<ResumeGenerator />} />
+            <Route path="/ai-resume-studio" element={<AiResumeStudio />} />
+            <Route path="/job-scan" element={<JobScan />} />
+            <Route path="/scan-report" element={<ScanReport />} />
+            <Route path="/resume-analyzer" element={<ResumeAnalyzer />} />
+            <Route path="/resume-analyze-score" element={<ResumeAnalyzeScore />} />
             <Route path="/job-recommendations" element={<JobRecommendations />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/pricing" element={<Pricing />} />
