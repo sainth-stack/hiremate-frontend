@@ -5,7 +5,7 @@ import ProtectedRoute from '../components/layout/ProtectedRoute';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import Home from '../pages/dashboard/Home';
-import ApplicationTracker from '../pages/dashboard/ApplicationTracker';
+import ApplicationTracker from '../pages/application-tracker';
 import ResumeGenerator from '../pages/resume-generator';
 import JobRecommendations from '../pages/dashboard/JobRecommendations';
 import Profile from '../pages/profile/Profile';

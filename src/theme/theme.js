@@ -86,6 +86,26 @@ const getTheme = (mode = 'light') =>
         },
       },
     },
+    // Ensure all outlined inputs (TextField + Select) have visible border from common theme
+    MuiOutlinedInput: {
+      styleOverrides: {
+        notchedOutline: {
+          border: '1px solid var(--border-default, #c5cad1)',
+        },
+        root: {
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'var(--border-hover, #cbd5e1)',
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderWidth: 2,
+            borderColor: 'var(--border-focus, #374151)',
+          },
+          '&.Mui-error .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'var(--error)',
+          },
+        },
+      },
+    },
     MuiLink: {
       styleOverrides: {
         root: {

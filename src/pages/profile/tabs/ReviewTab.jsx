@@ -1,130 +1,119 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Box, LinearProgress, Card, CardContent, Chip, CircularProgress, Typography } from '@mui/material';
+import { Box, Typography, CircularProgress } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import WarningIcon from '@mui/icons-material/Warning';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CustomButton from '../../../components/common/CustomButton';
+import SectionCard from '../components/SectionCard';
+import { getProfileCompletion } from '../utils/profileCompletion';
+import { INPUT_BORDER_RADIUS } from '../constants';
 import { updateProfile } from '../../../store/profile/profileSlice';
-
-const SECTIONS = [
-  { name: 'Profile (Core Identity)', complete: 60, missing: ['Resume upload', 'Phone validation'] },
-  { name: 'Experience', complete: 80, missing: ['Job descriptions'] },
-  { name: 'Education', complete: 100, missing: [] },
-  { name: 'Skills', complete: 40, missing: ['Technical skills', 'Proficiency levels'] },
-  { name: 'Projects', complete: 0, missing: ['Add at least one project'] },
-  { name: 'Preferences', complete: 50, missing: ['Desired roles', 'Employment type'] },
-  { name: 'Links', complete: 30, missing: ['LinkedIn URL required'] },
-];
 
 export default function ReviewTab() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const form = useSelector((state) => state.profile?.form);
   const { submitLoading, submitError } = useSelector((state) => state.profile);
-  const overallComplete = Math.round(SECTIONS.reduce((a, s) => a + s.complete, 0) / SECTIONS.length);
-  const atsScore = 65;
+  const { percent, sections } = getProfileCompletion(form);
 
   const handleSubmitProfile = () => {
-    dispatch(updateProfile())
-      .then((result) => {
-        if (updateProfile.fulfilled.match(result)) navigate('/start', { replace: true });
-      });
+    dispatch(updateProfile()).then((result) => {
+      if (updateProfile.fulfilled.match(result)) navigate('/start', { replace: true });
+    });
   };
-
-  const sectionHeaderSx = { mb: 1.5, fontSize: 'var(--font-size-section-header)', fontWeight: 600 };
-  const sectionWrapperSx = { mt: 3, pt: 3, borderTop: '1px solid var(--border-color)', '&:first-of-type': { mt: 0, pt: 0, borderTop: 'none' } };
-  const cardSx = {
-    borderRadius: 2,
-    width: '100%',
-    border: '1px solid var(--border-color)',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-  };
-  const innerCardSx = { ...cardSx };
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Card variant="outlined" sx={cardSx}>
-        <CardContent sx={{ p: { xs: 2, sm: 3 }, '&:last-child': { pb: { xs: 2, sm: 3 } } }}>
-          <Box component="p" sx={{ display: 'block', m: 0, mb: 0, fontSize: 'var(--font-size-helper)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-            Review your profile completeness and fix any missing or weak fields before submitting.
-          </Box>
+      <Box sx={{ mb: 3 }}>
+        <Typography sx={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+          Review your profile completeness and fix any missing or weak fields before submitting.
+        </Typography>
+      </Box>
 
-          {/* Profile Completeness */}
-          <Box sx={sectionWrapperSx}>
-            <Box component="span" sx={{ display: 'block', ...sectionHeaderSx }}>
-              Profile Completeness
+      {/* Summary preview card */}
+      <SectionCard sx={{ mb: 3 }}>
+        <Typography component="h3" sx={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', mb: 2 }}>
+          Profile Summary
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+          <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+            <CircularProgress
+              variant="determinate"
+              value={percent}
+              size={56}
+              thickness={4}
+              sx={{ color: 'var(--primary)', '& .MuiCircularProgress-circle': { strokeLinecap: 'round' } }}
+            />
+            <Box sx={{ top: 0, left: 0, bottom: 0, right: 0, position: 'absolute', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Typography variant="caption" component="span" sx={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>
+                {percent}%
+              </Typography>
             </Box>
-            <Card variant="outlined" sx={innerCardSx}>
-              <CardContent sx={{ p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 0 }}>
-                  <LinearProgress
-                    variant="determinate"
-                    value={overallComplete}
-                    sx={{ flex: 1, height: 10, borderRadius: 1 }}
-                  />
-                  <Box component="span" sx={{ fontWeight: 600 }}>
-                    {overallComplete}%
-                  </Box>
-                </Box>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
-                  <Chip label={`ATS Readiness: ${atsScore}%`} color="primary" size="small" />
-                  <Chip label="Optional" variant="outlined" size="small" />
-                </Box>
-              </CardContent>
-            </Card>
           </Box>
+          <Box>
+            <Typography sx={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
+              Overall completion
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'var(--text-secondary)', fontSize: 12 }}>
+              Complete all sections for better ATS matching.
+            </Typography>
+          </Box>
+        </Box>
+      </SectionCard>
 
-          {/* Section-wise status */}
-          <Box sx={sectionWrapperSx}>
-            <Box component="span" sx={{ display: 'block', ...sectionHeaderSx }}>
-              Section-wise Completion
+      {/* Section checklist */}
+      <SectionCard sx={{ mb: 3 }}>
+        <Typography component="h3" sx={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', mb: 2 }}>
+          Section Checklist
+        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          {sections.map((section) => (
+            <Box
+              key={section.key}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+                py: 1,
+                px: 1.5,
+                borderRadius: INPUT_BORDER_RADIUS,
+                bgcolor: section.complete ? 'rgba(34, 197, 94, 0.06)' : 'transparent',
+              }}
+            >
+              {section.complete ? (
+                <CheckCircleIcon sx={{ fontSize: 22, color: 'success.main' }} />
+              ) : (
+                <RadioButtonUncheckedIcon sx={{ fontSize: 22, color: 'var(--text-muted)' }} />
+              )}
+              <Typography sx={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', flex: 1 }}>
+                {section.label}
+              </Typography>
+              <Typography variant="caption" sx={{ fontSize: 12, color: section.complete ? 'success.main' : 'var(--text-secondary)' }}>
+                {section.percent}%
+              </Typography>
             </Box>
-            {SECTIONS.map((section, idx) => (
-              <Card key={idx} variant="outlined" sx={{ ...innerCardSx, mt: idx > 0 ? 1.5 : 0 }}>
-                <CardContent sx={{ p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0 }}>
-                {section.complete === 100 ? (
-                  <CheckCircleIcon color="success" fontSize="small" />
-                ) : (
-                  <WarningIcon color="warning" fontSize="small" />
-                )}
-                    <Box component="span" sx={{ fontWeight: 500 }}>
-                      {section.name}
-                    </Box>
-                    <Box component="span" sx={{ ml: 1, fontSize: '0.75rem', color: 'text.secondary' }}>
-                      {section.complete}%
-                    </Box>
-                  </Box>
-                  <LinearProgress variant="determinate" value={section.complete} sx={{ height: 6, borderRadius: 1, mt: 1 }} />
-                  {section.missing?.length > 0 && (
-                    <Box component="span" sx={{ display: 'block', mt: 0.5, fontSize: '0.75rem', color: 'error.main' }}>
-                      Missing / weak: {section.missing.join(', ')}
-                    </Box>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </Box>
-        </CardContent>
-      </Card>
+          ))}
+        </Box>
+      </SectionCard>
 
       {submitError && (
-        <Typography variant="body2" color="error" sx={{ mt: 2 }}>
+        <Typography variant="body2" color="error" sx={{ mb: 2 }}>
           {typeof submitError === 'object' ? (submitError.message || JSON.stringify(submitError)) : submitError}
         </Typography>
       )}
-      {/* Actions */}
-      <Box sx={{ mt: 3, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-        <CustomButton variant="outlined">Preview auto-filled job form</CustomButton>
-        <CustomButton onClick={handleSubmitProfile} disabled={submitLoading}>
+
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+        <CustomButton variant="contained" onClick={handleSubmitProfile} disabled={submitLoading} sx={{ bgcolor: 'var(--primary)', '&:hover': { bgcolor: 'var(--primary-dark)' } }}>
           {submitLoading ? (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <CircularProgress size={20} color="inherit" />
               <span>Submitting…</span>
             </Box>
           ) : (
-            'Submit Profile'
+            'Generate Resume'
           )}
         </CustomButton>
+        <CustomButton variant="outlined">Preview auto-filled job form</CustomButton>
         <CustomButton variant="outlined" color="secondary">
           Lock profile for auto-apply
         </CustomButton>

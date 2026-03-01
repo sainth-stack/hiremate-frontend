@@ -15,6 +15,7 @@ export {
 export {
   listJobsAPI,
   updateJobStatusAPI,
+  createJobAPI,
 } from './jobsService';
 
 export {

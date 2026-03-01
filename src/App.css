@@ -126,6 +126,13 @@
   --pricing-card-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   --pricing-card-radius: 12px;
 
+  /* ---- Dashboard (professional card styling) ---- */
+  --dashboard-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --dashboard-card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --dashboard-card-radius: 12px;
+  --dashboard-section-label: 0.6875rem;
+  --dashboard-section-spacing: 1.5rem;
+
   /* ---- Misc ---- */
   --grey: #929391;
   --grey-light: #e5e5e5;
@@ -236,6 +243,9 @@
   --pricing-badge-bg: var(--primary);
   --pricing-card-border: var(--border-color);
   --pricing-card-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+
+  --dashboard-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --dashboard-card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 #root {
