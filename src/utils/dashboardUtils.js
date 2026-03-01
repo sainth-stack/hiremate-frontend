@@ -105,6 +105,7 @@ export const getScoreColor = (score) => {
 export const getScoreCoachingTip = (breakdown) => {
   if (!breakdown || typeof breakdown !== 'object') return 'Keep up the great work!';
   const factors = Object.values(breakdown);
+  if (factors.length === 0) return 'Keep up the great work!';
   const worst = factors.reduce(
     (a, b) => ((a?.score ?? 0) / (a?.max || 1) < (b?.score ?? 0) / (b?.max || 1) ? a : b)
   );
