@@ -6,6 +6,8 @@ import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import Home from '../pages/dashboard/Home';
 import ApplicationTracker from '../pages/dashboard/ApplicationTracker';
+import InterviewPractice from '../pages/dashboard/InterviewPractice';
+import InterviewQnAGenerator from '../pages/dashboard/InterviewQnAGenerator';
 import ResumeGenerator from '../pages/resume-generator';
 import JobRecommendations from '../pages/dashboard/JobRecommendations';
 import Profile from '../pages/profile/Profile';
@@ -27,6 +29,8 @@ export default function AppRoutes() {
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/application-tracker" element={<ApplicationTracker />} />
+            <Route path="/interview-practice" element={<InterviewPractice />} />
+            <Route path="/interview-practice/:interviewId/questions" element={<InterviewQnAGenerator />} />
             <Route path="/resume-generator" element={<ResumeGenerator />} />
             <Route path="/job-recommendations" element={<JobRecommendations />} />
             <Route path="/settings" element={<Settings />} />
