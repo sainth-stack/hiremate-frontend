@@ -17,6 +17,7 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import PhoneAndroidRoundedIcon from '@mui/icons-material/PhoneAndroidRounded';
 import WorkOutlineRoundedIcon from '@mui/icons-material/WorkOutlineRounded';
 import RecommendRoundedIcon from '@mui/icons-material/RecommendRounded';
+import RecordVoiceOverRoundedIcon from '@mui/icons-material/RecordVoiceOverRounded';
 import WbSunnyRoundedIcon from '@mui/icons-material/WbSunnyRounded';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
@@ -28,8 +29,10 @@ import SignOutConfirmDialog from './SignOutConfirmDialog';
 const PAGES = [
   { label: 'Dashboard', path: '/', icon: DashboardRoundedIcon },
   { label: 'Application Tracker', path: '/application-tracker', icon: PhoneAndroidRoundedIcon },
+
   { label: 'Resume Generator', path: '/resume-generator/build', icon: WorkOutlineRoundedIcon },
-  {label:'AI Resume Studio',path:'/ai-resume-studio',icon:AutoAwesomeIcon}
+  {label:'AI Resume Studio',path:'/ai-resume-studio',icon:AutoAwesomeIcon},
+   { label: 'Interview practice', path: '/interview-practice', icon: RecordVoiceOverRoundedIcon },
   // { label: 'Job Recommendations', path: '/job-recommendations', icon: RecommendRoundedIcon },
 ];
 
