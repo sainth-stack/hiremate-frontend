@@ -15,6 +15,7 @@ export {
 export {
   listJobsAPI,
   updateJobStatusAPI,
+  createJobAPI,
 } from './jobsService';
 
 export {
@@ -29,6 +30,7 @@ export {
 
 export {
   getResumeWorkspaceAPI,
+  listResumesAPI,
   generateResumeAPI,
   updateResumeAPI,
   deleteResumeAPI,

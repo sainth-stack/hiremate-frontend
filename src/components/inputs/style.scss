@@ -16,8 +16,8 @@
     position: absolute;
     top: 0;
     transform: none;
-    font-size: var(--label-font-size);
-    font-weight: var(--label-font-weight);
+    font-size: 12px;
+    font-weight: 500;
     color: var(--label-color);
     background: var(--bg-default);
     padding: 0 4px;
@@ -37,12 +37,12 @@
     margin-top: 25px;
     border-radius: 8px;
     background-color: var(--bg-default);
-    font-size: var(--font-size-input);
+    font-size: 14px;
 
-    // Fixed 45px height for single-line inputs only
+    // Fixed 44px height for single-line inputs only; multiline (textarea) auto height
     &:not(.MuiInputBase-multiline) {
-      height: 45px;
-      min-height: 45px;
+      height: 44px;
+      min-height: 44px;
     }
 
     // Full rectangle border (no notch for label)
@@ -51,23 +51,27 @@
       overflow: hidden;
     }
 
+    // Explicit border so it always shows (common component source of truth)
+    .MuiOutlinedInput-notchedOutline,
     fieldset {
-      border-color: var(--border-default);
-      border-width: 1px;
+      border: 1px solid var(--border-default, #c5cad1) !important;
       transition: border-color 0.2s ease, border-width 0.2s ease;
     }
 
+    &:hover .MuiOutlinedInput-notchedOutline,
     &:hover fieldset {
-      border-color: var(--border-hover);
+      border-color: var(--border-hover, #cbd5e1) !important;
     }
 
+    &.Mui-focused .MuiOutlinedInput-notchedOutline,
     &.Mui-focused fieldset {
-      border-color: var(--border-focus);
-      border-width: 2px;
+      border-width: 2px !important;
+      border-color: var(--border-focus, #374151) !important;
     }
 
+    &.Mui-error .MuiOutlinedInput-notchedOutline,
     &.Mui-error fieldset {
-      border-color: var(--error);
+      border-color: var(--error) !important;
     }
 
     input {
@@ -107,8 +111,8 @@
     position: absolute;
     top: 0;
     transform: none;
-    font-size: var(--label-font-size);
-    font-weight: var(--label-font-weight);
+    font-size: 12px;
+    font-weight: 500;
     color: var(--label-color);
     background: var(--bg-default);
     padding: 0 4px;
@@ -125,37 +129,41 @@
 
   .MuiOutlinedInput-root {
     margin-top: 25px;
-    min-height: 45px;
-    height: 45px;
+    min-height: 44px;
+    height: 44px;
     border-radius: 8px;
     background-color: var(--bg-default);
-    font-size: var(--font-size-input);
+    font-size: 14px;
 
     .MuiOutlinedInput-notchedOutline legend {
       max-width: 0.01px;
       overflow: hidden;
     }
 
+    // Explicit border so it always shows (common component source of truth)
+    .MuiOutlinedInput-notchedOutline,
     fieldset {
-      border-color: var(--border-default);
-      border-width: 1px;
+      border: 1px solid var(--border-default, #c5cad1) !important;
       transition: border-color 0.2s ease, border-width 0.2s ease;
     }
 
+    &:hover .MuiOutlinedInput-notchedOutline,
     &:hover fieldset {
-      border-color: var(--border-hover);
+      border-color: var(--border-hover, #cbd5e1) !important;
     }
 
+    &.Mui-focused .MuiOutlinedInput-notchedOutline,
     &.Mui-focused fieldset {
-      border-color: var(--border-focus);
-      border-width: 2px;
+      border-width: 2px !important;
+      border-color: var(--border-focus, #374151) !important;
     }
 
+    &.Mui-error .MuiOutlinedInput-notchedOutline,
     &.Mui-error fieldset {
-      border-color: var(--error);
+      border-color: var(--error) !important;
     }
 
-    // Select inner padding to fit 45px height
+    // Select inner padding to fit 44px height
     .MuiSelect-select {
       padding: 12px 16px;
     }

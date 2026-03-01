@@ -17,6 +17,8 @@ export const uploadResumeAPI = (file) => {
 
 export const getResumeWorkspaceAPI = () => dedupGet('/resume/workspace');
 
+export const listResumesAPI = () => axiosClient.get('/resume');
+
 export const generateResumeAPI = ({ job_title, job_description }) =>
   axiosClient.post('/resume/generate', { job_title, job_description });
 

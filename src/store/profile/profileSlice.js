@@ -9,6 +9,14 @@ import {
   mapParsedLinks,
   mapParsedPreferences,
 } from '../../utilities/resumeParsedMapper';
+import {
+  toLegacyTechSkill,
+  toLegacySoftSkill,
+  fromLegacyTechSkill,
+  fromLegacySoftSkill,
+  createEmptyTechSkill,
+  createEmptySoftSkill,
+} from '../../pages/profile/skills/normalizers';
 
 const emptyExperience = {
   jobTitle: '', companyName: '', employmentType: '', startDate: '', endDate: '',
@@ -17,8 +25,6 @@ const emptyExperience = {
 const emptyEducation = {
   degree: '', fieldOfStudy: '', institution: '', startYear: '', endYear: '', grade: '', location: '',
 };
-const emptyTechSkill = { name: '', level: '', years: '' };
-const emptySoftSkill = { name: '' };
 const emptyProject = {
   name: '', description: '', role: '', techStack: '', githubUrl: '', liveUrl: '', projectType: '',
 };
@@ -36,8 +42,8 @@ const initialForm = {
   professionalSummary: '',
   experiences: [{ ...emptyExperience }],
   educations: [{ ...emptyEducation }],
-  techSkills: [{ ...emptyTechSkill }],
-  softSkills: [{ ...emptySoftSkill }],
+  techSkills: [createEmptyTechSkill()],
+  softSkills: [createEmptySoftSkill()],
   projects: [{ ...emptyProject }],
   preferences: {
     desiredRoles: '',
@@ -95,8 +101,8 @@ function buildProfilePayload(form) {
     professionalSummary: form.professionalSummary ?? '',
     experiences: Array.isArray(form.experiences) ? form.experiences : [],
     educations: Array.isArray(form.educations) ? form.educations : [],
-    techSkills: Array.isArray(form.techSkills) ? form.techSkills : [],
-    softSkills: Array.isArray(form.softSkills) ? form.softSkills : [],
+    techSkills: Array.isArray(form.techSkills) ? form.techSkills.map(toLegacyTechSkill) : [],
+    softSkills: Array.isArray(form.softSkills) ? form.softSkills.map(toLegacySoftSkill) : [],
     projects: Array.isArray(form.projects) ? form.projects : [],
     preferences: {
       desiredRoles: form.preferences?.desiredRoles ?? '',
@@ -145,8 +151,8 @@ const profileSlice = createSlice({
       state.form.educations = edu.length > 0 ? edu : [{ ...emptyEducation }];
 
       const { techSkills: t, softSkills: s } = mapParsedSkills(parsedData);
-      state.form.techSkills = t.length > 0 ? t : [{ ...emptyTechSkill }];
-      state.form.softSkills = s.length > 0 ? s : [{ ...emptySoftSkill }];
+      state.form.techSkills = t.length > 0 ? t.map((item, i) => fromLegacyTechSkill(item, i)) : [createEmptyTechSkill()];
+      state.form.softSkills = s.length > 0 ? s.map((item, i) => fromLegacySoftSkill(item, i)) : [createEmptySoftSkill()];
 
       const proj = mapParsedProjects(parsedData);
       state.form.projects = proj.length > 0 ? proj : [{ ...emptyProject }];
@@ -231,11 +237,11 @@ const profileSlice = createSlice({
             ? payload.educations.map((e) => ({ ...emptyEducation, ...e }))
             : [{ ...emptyEducation }];
           state.form.techSkills = Array.isArray(payload.techSkills) && payload.techSkills.length > 0
-            ? payload.techSkills.map((s) => ({ ...emptyTechSkill, ...s }))
-            : [{ ...emptyTechSkill }];
+            ? payload.techSkills.map((s, i) => fromLegacyTechSkill(s, i))
+            : [createEmptyTechSkill()];
           state.form.softSkills = Array.isArray(payload.softSkills) && payload.softSkills.length > 0
-            ? payload.softSkills.map((s) => ({ ...emptySoftSkill, ...s }))
-            : [{ ...emptySoftSkill }];
+            ? payload.softSkills.map((s, i) => fromLegacySoftSkill(s, i))
+            : [createEmptySoftSkill()];
           state.form.projects = Array.isArray(payload.projects) && payload.projects.length > 0
             ? payload.projects.map((p) => ({ ...emptyProject, ...p }))
             : [{ ...emptyProject }];
