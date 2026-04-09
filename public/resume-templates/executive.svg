@@ -1,34 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160" width="120" height="160">
-  <rect fill="#fff" stroke="#e0e0e0" stroke-width="1" width="120" height="160" rx="2"/>
-  <!-- Navy header band -->
-  <rect fill="#0f2952" x="0" y="0" width="120" height="28" rx="2"/>
-  <rect fill="#0f2952" x="0" y="22" width="120" height="6"/>
-  <text x="8" y="11" fill="#fff" font-size="8" font-weight="bold" font-family="Calibri,Arial,sans-serif" letter-spacing="1">JOHN DOE</text>
-  <text x="8" y="20" fill="#93c5fd" font-size="3.8" font-family="Calibri,Arial,sans-serif">email@example.com | 555-0100 | linkedin.com/in/john</text>
-  <!-- CORE COMPETENCIES -->
-  <text x="8" y="34" fill="#0f2952" font-size="4.5" font-weight="bold" font-family="Calibri,Arial,sans-serif" letter-spacing="1">CORE COMPETENCIES</text>
-  <line x1="8" y1="36" x2="112" y2="36" stroke="#0f2952" stroke-width="1.2"/>
-  <rect fill="#d1d5db" x="8" y="38" width="48" height="2" rx="0.5"/>
-  <rect fill="#d1d5db" x="62" y="38" width="50" height="2" rx="0.5"/>
-  <rect fill="#d1d5db" x="8" y="42" width="44" height="2" rx="0.5"/>
-  <rect fill="#d1d5db" x="62" y="42" width="46" height="2" rx="0.5"/>
-  <!-- PROFESSIONAL EXPERIENCE -->
-  <text x="8" y="51" fill="#0f2952" font-size="4.5" font-weight="bold" font-family="Calibri,Arial,sans-serif" letter-spacing="1">PROFESSIONAL EXPERIENCE</text>
-  <line x1="8" y1="53" x2="112" y2="53" stroke="#0f2952" stroke-width="1.2"/>
-  <rect fill="#333" x="8" y="55" width="62" height="2.5" rx="0.5"/>
-  <rect fill="#777" x="8" y="59" width="40" height="1.8" rx="0.5"/>
-  <rect fill="#bbb" x="8" y="63" width="104" height="1.8" rx="0.5"/>
-  <rect fill="#bbb" x="12" y="67" width="96" height="1.8" rx="0.5"/>
-  <rect fill="#bbb" x="12" y="71" width="88" height="1.8" rx="0.5"/>
-  <!-- EDUCATION -->
-  <text x="8" y="80" fill="#0f2952" font-size="4.5" font-weight="bold" font-family="Calibri,Arial,sans-serif" letter-spacing="1">EDUCATION</text>
-  <line x1="8" y1="82" x2="112" y2="82" stroke="#0f2952" stroke-width="1.2"/>
-  <rect fill="#333" x="8" y="84" width="70" height="2.5" rx="0.5"/>
-  <rect fill="#bbb" x="8" y="89" width="55" height="1.8" rx="0.5"/>
-  <!-- PROJECTS -->
-  <text x="8" y="98" fill="#0f2952" font-size="4.5" font-weight="bold" font-family="Calibri,Arial,sans-serif" letter-spacing="1">PROJECTS</text>
-  <line x1="8" y1="100" x2="112" y2="100" stroke="#0f2952" stroke-width="1.2"/>
-  <rect fill="#333" x="8" y="102" width="64" height="2.5" rx="0.5"/>
-  <rect fill="#bbb" x="8" y="107" width="104" height="1.8" rx="0.5"/>
-  <rect fill="#bbb" x="8" y="111" width="90" height="1.8" rx="0.5"/>
+<svg width="120" height="160" viewBox="0 0 210 280" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer; border:1px solid #ddd; background:#fff; border-radius:1px;">
+  <rect width="210" height="280" fill="white"/>
+  
+  <rect width="210" height="35" fill="#1A3355"/>
+  <text x="105" y="22" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">JOHN DOE</text>
+  <text x="105" y="31" font-family="Arial, sans-serif" font-size="4.5" text-anchor="middle" fill="#ddd">john.doe@email.com | 0000000000 | linkedin.com/in/jdoe | github.com/jdoe</text>
+  
+  <text x="15" y="48" font-family="Arial, sans-serif" font-size="7" font-weight="bold" fill="#1A3355">EXECUTIVE SUMMARY</text>
+  <line x1="15" y1="51" x2="195" y2="51" stroke="#1A3355" stroke-width="0.3"/>
+  <text x="15" y="60" font-family="Arial, sans-serif" font-size="4" fill="#333">Full Stack Developer with experience in developing scalable web applications.</text>
+  <text x="15" y="65" font-family="Arial, sans-serif" font-size="4" fill="#333">Proven ability to build responsive UI and reliable backend systems.</text>
+
+  <text x="15" y="78" font-family="Arial, sans-serif" font-size="7" font-weight="bold" fill="#1A3355">CORE COMPETENCIES</text>
+  <line x1="15" y1="81" x2="195" y2="81" stroke="#1A3355" stroke-width="0.3"/>
+  
+  <text x="15" y="90" font-family="Arial, sans-serif" font-size="4.5" font-weight="bold" fill="#000">Languages: <tspan font-weight="normal">JavaScript, TypeScript, Python</tspan></text>
+  <text x="15" y="96" font-family="Arial, sans-serif" font-size="4.5" font-weight="bold" fill="#000">Frontend: <tspan font-weight="normal">React, Next.js, HTML/CSS</tspan></text>
+  <text x="15" y="102" font-family="Arial, sans-serif" font-size="4.5" font-weight="bold" fill="#000">Backend: <tspan font-weight="normal">Node.js, Express, REST APIs</tspan></text>
+  <text x="15" y="108" font-family="Arial, sans-serif" font-size="4.5" font-weight="bold" fill="#000">Tools: <tspan font-weight="normal">Git, Docker, VS Code</tspan></text>
+
+  <text x="15" y="122" font-family="Arial, sans-serif" font-size="7" font-weight="bold" fill="#1A3355">PROFESSIONAL EXPERIENCE</text>
+  <line x1="15" y1="125" x2="195" y2="125" stroke="#1A3355" stroke-width="0.3"/>
+  
+  <text x="15" y="134" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#000">Company Name, City, Country</text>
+  <text x="195" y="134" font-family="Arial, sans-serif" font-size="4.5" text-anchor="end" fill="#000">Date Range</text>
+  <text x="15" y="140" font-family="Arial, sans-serif" font-size="4.5" font-style="italic" fill="#333">Job Title</text>
+  <circle cx="18" cy="146" r="0.8" fill="#000"/>
+  <text x="22" y="147" font-family="Arial, sans-serif" font-size="4.5" fill="#333">Led development of core features using modern stacks.</text>
+  <circle cx="18" cy="152" r="0.8" fill="#000"/>
+  <text x="22" y="153" font-family="Arial, sans-serif" font-size="4.5" fill="#333">Collaborated with product teams to define technical requirements.</text>
+
+  <text x="15" y="168" font-family="Arial, sans-serif" font-size="7" font-weight="bold" fill="#1A3355">EDUCATION</text>
+  <line x1="15" y1="171" x2="195" y2="171" stroke="#1A3355" stroke-width="0.3"/>
+  
+  <text x="15" y="180" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#000">University Name, Location</text>
+  <text x="195" y="180" font-family="Arial, sans-serif" font-size="4.5" text-anchor="end" fill="#000">Graduation Year</text>
+  <text x="15" y="186" font-family="Arial, sans-serif" font-size="4.5" fill="#333">Degree in Field of Study</text>
+
+  <text x="15" y="200" font-family="Arial, sans-serif" font-size="7" font-weight="bold" fill="#1A3355">KEY PROJECTS</text>
+  <line x1="15" y1="203" x2="195" y2="203" stroke="#1A3355" stroke-width="0.3"/>
+  <text x="15" y="212" font-family="Arial, sans-serif" font-size="5.5" font-weight="bold" fill="#000">Project Title One</text>
+  <text x="15" y="217" font-family="Arial, sans-serif" font-size="3.5" font-style="italic" fill="#555">Stack: React, Node.js, MongoDB</text>
+  <rect x="15" y="223" width="180" height="20" fill="#fafafa"/>
 </svg>
