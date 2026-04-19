@@ -1,0 +1,41 @@
+<svg width="120" height="160" viewBox="0 0 210 280" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer; border:1px solid #ddd; background:#fff; border-radius:2px;">
+  <rect width="210" height="15" fill="#1A6375"/>
+  
+  <rect y="15" width="210" height="265" fill="white"/>
+
+  <text x="15" y="40" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#000">JOHN DOE</text>
+  <line x1="15" y1="46" x2="135" y2="46" stroke="#888" stroke-width="0.5"/>
+
+  <rect x="15" y="55" width="22" height="4" fill="#E0E8EB"/>
+  <text x="15" y="59" font-family="Arial, sans-serif" font-size="6" font-weight="bold" fill="#000">SUMMARY</text>
+  <text x="15" y="68" font-family="Arial, sans-serif" font-size="3.5" fill="#555">Experienced professional with a proven track record</text>
+  <text x="15" y="73" font-family="Arial, sans-serif" font-size="3.5" fill="#555">in managing complex operations and teams.</text>
+
+  <rect x="15" y="100" width="28" height="4" fill="#E0E8EB"/>
+  <text x="15" y="104" font-family="Arial, sans-serif" font-size="6" font-weight="bold" fill="#000">EXPERIENCE</text>
+  <text x="15" y="113" font-family="Arial, sans-serif" font-size="4.5" font-weight="bold" fill="#000">Senior Role | 2020 - Present</text>
+  <text x="15" y="119" font-family="Arial, sans-serif" font-size="4" font-weight="bold" fill="#333">Global Solutions - City, Country</text>
+  <circle cx="18" cy="126" r="0.7" fill="#000"/>
+  <text x="22" y="127" font-family="Arial, sans-serif" font-size="3.5" fill="#555">Increased operational output by 15% annually.</text>
+  <circle cx="18" cy="132" r="0.7" fill="#000"/>
+  <text x="22" y="133" font-family="Arial, sans-serif" font-size="3.5" fill="#555">Streamlined communication across departments.</text>
+
+  <rect x="145" y="30" width="55" height="55" fill="#f0f0f0" stroke="#ddd" stroke-width="0.5"/>
+  <circle cx="172.5" cy="52" r="12" fill="#ccc"/>
+  <path d="M172.5 65c-10 0-15 5-15 8v2h30v-2c0-3-5-8-15-8z" fill="#ccc"/>
+
+  <rect x="166" y="98" width="22" height="4" fill="#E0E8EB"/>
+  <text x="145" y="102" font-family="Arial, sans-serif" font-size="6" font-weight="bold" fill="#000">CONTACT</text>
+  <text x="145" y="110" font-family="Arial, sans-serif" font-size="3.5" fill="#555">Address: 123 Street, City</text>
+  <text x="145" y="116" font-family="Arial, sans-serif" font-size="3.5" fill="#555">Phone: +00 123 456 789</text>
+  <text x="145" y="122" font-family="Arial, sans-serif" font-size="3.5" fill="#555">Email: john.doe@email.com</text>
+
+  <rect x="164" y="135" width="18" height="4" fill="#E0E8EB"/>
+  <text x="145" y="139" font-family="Arial, sans-serif" font-size="6" font-weight="bold" fill="#000">SKILLS</text>
+  <circle cx="148" cy="148" r="0.7" fill="#000"/>
+  <text x="152" y="149" font-family="Arial, sans-serif" font-size="3.5" fill="#555">Strategic Planning</text>
+  <circle cx="148" cy="154" r="0.7" fill="#000"/>
+  <text x="152" y="155" font-family="Arial, sans-serif" font-size="3.5" fill="#555">Team Leadership</text>
+  <circle cx="148" cy="160" r="0.7" fill="#000"/>
+  <text x="152" y="161" font-family="Arial, sans-serif" font-size="3.5" fill="#555">Data Analysis</text>
+</svg>

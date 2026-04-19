@@ -3,7 +3,7 @@
  * All functionality is identical to the previous version.
  * Structure: Template grid → 5 collapsible sections (Appearance, Layout, Spacing, Content, Sections)
  */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -28,6 +28,51 @@ import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import DiamondRoundedIcon from '@mui/icons-material/DiamondRounded';
 import SectionReorder from './SectionReorder';
 import { RESUME_STUDIO_THEME as T } from '../../../utilities/resumeStudioTheme';
+
+const TEMPLATE_ICON_BY_NAME = {
+  classic: 'classic',
+  professional: 'professional',
+  minimalist: 'minimalist',
+  modern: 'modern',
+  executive: 'executive',
+  harvard: 'harvard',
+  elegant: 'elegant',
+  impact: 'impact',
+  'modern sidebar': 'modern-sidebar',
+  accent: 'accent',
+  'classic professional': 'classic_professional',
+  'elegant traditional': 'elegant_traditional',
+  'modern two column': 'Modern_Two_Column',
+  modren: 'modren',
+  modrens: 'modrens',
+  modren3: 'modren3',
+  'modren 3': 'modren3',
+  modren4: 'modren4',
+  'modren 4': 'modren4',
+  modren5: 'modren5',
+  'modren 5': 'modren5',
+  modren6: 'modren6',
+  'modren 6': 'modren6',
+  modren7: 'modren7',
+  'modren 7': 'modren7',
+  modren8: 'modren8',
+  'modren 8': 'modren8',
+};
+
+function normalizeTemplateKey(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getTemplateImageSrc(template) {
+  const byName = TEMPLATE_ICON_BY_NAME[normalizeTemplateKey(template?.name)];
+  const byId = TEMPLATE_ICON_BY_NAME[normalizeTemplateKey(template?.id)];
+  const file = byName || byId || normalizeTemplateKey(template?.id).replace(/\s+/g, '-');
+  return `/resume-templates/${file}.svg`;
+}
 
 function atsScoreColor(score) {
   if (score >= 90) return '#059669';
@@ -123,7 +168,7 @@ function ColorPickerRow({ id, label, value, fallbackHex, onChange, onClear }) {
 
 function TemplateTile({ template, selected, onSelect }) {
   const [imgErr, setImgErr] = useState(false);
-  const img = `/resume-templates/${template.id}.svg`;
+  const img = getTemplateImageSrc(template);
   const paletteColor = template.color_schemes?.[0]?.primary ?? '#374151';
   const ats = typeof template.ats_score === 'number' ? template.ats_score : 0;
 
@@ -177,8 +222,9 @@ function TemplateTile({ template, selected, onSelect }) {
               sx={{
                 width: '100%',
                 height: '100%',
-                objectFit: 'contain',
-                objectPosition: 'top center',
+                // Normalize template thumbnails that come from SVGs with different internal padding/artboards.
+                objectFit: 'cover',
+                objectPosition: 'center top',
                 display: 'block',
               }}
             />
@@ -423,6 +469,7 @@ function ToggleRow({ label, checked, onChange }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ALL_SECTIONS = ['summary', 'experience', 'skills', 'education', 'projects', 'certifications'];
+const TEMPLATE_PAGE_SIZE = 6;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Main component
@@ -434,6 +481,7 @@ export default function CustomizationPanel({
   templates = [],
   onSectionsOrderChange,
 }) {
+  const [visibleTemplateCount, setVisibleTemplateCount] = useState(TEMPLATE_PAGE_SIZE);
   const currentTemplate = templates.find((t) => t.id === designConfig.template_id) ?? null;
   const colorSchemes = currentTemplate?.color_schemes ?? [];
   const fontOptions = currentTemplate?.fonts ?? [
@@ -453,6 +501,20 @@ export default function CustomizationPanel({
 
   const activeColorScheme =
     colorSchemes.find((s) => s.id === designConfig.color_scheme_id) || colorSchemes[0] || null;
+  const visibleTemplates = templates.slice(0, visibleTemplateCount);
+  const hasMoreTemplates = templates.length > visibleTemplateCount;
+
+  useEffect(() => {
+    setVisibleTemplateCount((prev) => {
+      const safePrev = prev < TEMPLATE_PAGE_SIZE ? TEMPLATE_PAGE_SIZE : prev;
+      if (templates.length === 0) return TEMPLATE_PAGE_SIZE;
+      return Math.min(safePrev, templates.length);
+    });
+  }, [templates.length]);
+
+  const handleLoadMoreTemplates = () => {
+    setVisibleTemplateCount((prev) => Math.min(prev + TEMPLATE_PAGE_SIZE, templates.length));
+  };
   const hasCustomPrimary = Boolean(designConfig.custom_primary_color);
   const colorPickerValue = normalizeHexForColorInput(
     designConfig.custom_primary_color || activeColorScheme?.primary || '#000000'
@@ -486,17 +548,37 @@ export default function CustomizationPanel({
       >
         <TopLabel>Template</TopLabel>
         {templates.length > 0 ? (
-          <Grid container spacing={1.5}>
-            {templates.map((tmpl) => (
-              <Grid item xs={6} sm={4} key={tmpl.id}>
-                <TemplateTile
-                  template={tmpl}
-                  selected={designConfig.template_id === tmpl.id}
-                  onSelect={() => onDesignChange({ template_id: tmpl.id })}
-                />
-              </Grid>
-            ))}
-          </Grid>
+          <>
+            <Grid container spacing={1.5}>
+              {visibleTemplates.map((tmpl) => (
+                <Grid item xs={6} sm={4} key={tmpl.id}>
+                  <TemplateTile
+                    template={tmpl}
+                    selected={designConfig.template_id === tmpl.id}
+                    onSelect={() => onDesignChange({ template_id: tmpl.id })}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1.25 }}>
+              <Button
+                size="small"
+                variant="text"
+                onClick={handleLoadMoreTemplates}
+                disabled={!hasMoreTemplates}
+                sx={{
+                  textTransform: 'none',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  color: hasMoreTemplates ? T.primary : T.textSecondary,
+                  minWidth: 0,
+                  px: 0.75,
+                }}
+              >
+                {hasMoreTemplates ? 'More' : 'No more templates'}
+              </Button>
+            </Box>
+          </>
         ) : (
           <Typography variant="caption" sx={{ color: T.textSecondary, fontFamily: 'var(--font-family)' }}>
             Loading templates…

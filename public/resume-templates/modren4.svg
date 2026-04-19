@@ -1,0 +1,41 @@
+<svg width="120" height="160" viewBox="0 0 210 280" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer; border:1px solid #ddd; background:#fff; border-radius:1px;">
+  <rect width="15" height="280" fill="#E8F1F2"/>
+  <path d="M0 0 Q 7.5 20 0 40 Q 7.5 60 0 80 Q 7.5 100 0 120 Q 7.5 140 0 160 Q 7.5 180 0 200 Q 7.5 220 0 240 Q 7.5 260 0 280" stroke="#4A6741" stroke-width="0.5" fill="none" opacity="0.3"/>
+  
+  <circle cx="112" cy="35" r="18" fill="#f0f0f0" stroke="#ddd" stroke-width="0.5"/>
+  <circle cx="112" cy="32" r="5" fill="#ccc"/>
+  <path d="M112 42c-5 0-8 2.5-8 5v1h16v-1c0-2.5-3-5-8-5z" fill="#ccc"/>
+
+  <text x="112" y="75" font-family="Verdana, sans-serif" font-size="10" font-weight="bold" fill="#1A3355" text-anchor="middle" letter-spacing="4">JOHN DOE</text>
+  
+  <line x1="30" y1="90" x2="195" y2="90" stroke="#ddd" stroke-width="0.5"/>
+
+  <text x="30" y="105" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#1A3355">SUMMARY</text>
+  <text x="30" y="115" font-family="Arial, sans-serif" font-size="3.5" fill="#666">Professional with a track record of delivering high-quality</text>
+  <text x="30" y="120" font-family="Arial, sans-serif" font-size="3.5" fill="#666">results in fast-paced environments.</text>
+  
+  <line x1="30" y1="135" x2="125" y2="135" stroke="#ddd" stroke-width="0.3"/>
+  
+  <text x="30" y="150" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#1A3355">EXPERIENCE</text>
+  <text x="30" y="160" font-family="Arial, sans-serif" font-size="3.5" font-weight="bold" fill="#333">Lead Specialist</text>
+  <text x="30" y="166" font-family="Arial, sans-serif" font-size="3" fill="#888">2020 - Current | City, Country</text>
+  
+  <circle cx="33" cy="175" r="0.6" fill="#1A3355"/>
+  <text x="38" y="176" font-family="Arial, sans-serif" font-size="3" fill="#666">Managed cross-functional team projects.</text>
+  <circle cx="33" cy="182" r="0.6" fill="#1A3355"/>
+  <text x="38" y="183" font-family="Arial, sans-serif" font-size="3" fill="#666">Streamlined operational workflows for efficiency.</text>
+
+  <text x="140" y="105" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#1A3355">CONTACT</text>
+  <text x="140" y="115" font-family="Arial, sans-serif" font-size="3" fill="#666">john.doe@email.com</text>
+  <text x="140" y="121" font-family="Arial, sans-serif" font-size="3" fill="#666">+00 123 456 789</text>
+  
+  <line x1="140" y1="135" x2="200" y2="135" stroke="#ddd" stroke-width="0.3"/>
+
+  <text x="140" y="150" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#1A3355">SKILLS</text>
+  <circle cx="143" cy="160" r="0.6" fill="#1A3355"/>
+  <text x="148" y="161" font-family="Arial, sans-serif" font-size="3" fill="#666">Project Management</text>
+  <circle cx="143" cy="167" r="0.6" fill="#1A3355"/>
+  <text x="148" y="168" font-family="Arial, sans-serif" font-size="3" fill="#666">Data Analysis</text>
+  <circle cx="143" cy="174" r="0.6" fill="#1A3355"/>
+  <text x="148" y="175" font-family="Arial, sans-serif" font-size="3" fill="#666">Team Leadership</text>
+</svg>

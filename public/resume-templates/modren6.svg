@@ -1,0 +1,36 @@
+<svg width="120" height="160" viewBox="0 0 210 280" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer; border:1px solid #ddd; background:#fff; border-radius:1px;">
+  <path d="M0 0 H210 V25 C210 25 105 35 0 25 V0Z" fill="#1A365D"/>
+  
+  <text x="105" y="70" font-family="Verdana, sans-serif" font-size="12" font-weight="bold" fill="#1A365D" text-anchor="middle">John Doe</text>
+  
+  <line x1="10" y1="80" x2="200" y2="80" stroke="#CBD5E0" stroke-width="0.5"/>
+  <text x="105" y="88" font-family="Arial, sans-serif" font-size="4" fill="#4A5568" text-anchor="middle">City, Country  •  +00 123 456 789  •  john.doe@email.com</text>
+  <line x1="10" y1="95" x2="200" y2="95" stroke="#CBD5E0" stroke-width="0.5"/>
+
+  <text x="15" y="115" font-family="Arial, sans-serif" font-size="7" font-weight="bold" fill="#1A365D">SUMMARY</text>
+  <text x="15" y="125" font-family="Arial, sans-serif" font-size="3.5" fill="#2D3748">Experienced professional with a strong focus on</text>
+  <text x="15" y="131" font-family="Arial, sans-serif" font-size="3.5" fill="#2D3748">efficiency and customer satisfaction.</text>
+
+  <text x="15" y="150" font-family="Arial, sans-serif" font-size="7" font-weight="bold" fill="#1A365D">EXPERIENCE</text>
+  <text x="15" y="160" font-family="Arial, sans-serif" font-size="4" font-weight="bold" fill="#000">Senior Role | 2020 - Present</text>
+  <text x="15" y="166" font-family="Arial, sans-serif" font-size="3.5" font-weight="bold" fill="#4A5568">Company Name - Location</text>
+  
+  <circle cx="18" cy="174" r="0.7" fill="#1A365D"/>
+  <text x="23" y="175" font-family="Arial, sans-serif" font-size="3.5" fill="#2D3748">Increased productivity by 15% through workflows.</text>
+  <circle cx="18" cy="182" r="0.7" fill="#1A365D"/>
+  <text x="23" y="183" font-family="Arial, sans-serif" font-size="3.5" fill="#2D3748">Managed a team of 10 employees daily.</text>
+
+  <line x1="135" y1="105" x2="135" y2="260" stroke="#1A365D" stroke-width="0.3"/>
+
+  <text x="142" y="115" font-family="Arial, sans-serif" font-size="7" font-weight="bold" fill="#1A365D">SKILLS</text>
+  <circle cx="145" cy="125" r="0.6" fill="#000"/>
+  <text x="150" y="126" font-family="Arial, sans-serif" font-size="3.5" fill="#2D3748">Team Leadership</text>
+  <circle cx="145" cy="133" r="0.6" fill="#000"/>
+  <text x="150" y="134" font-family="Arial, sans-serif" font-size="3.5" fill="#2D3748">Conflict Resolution</text>
+  <circle cx="145" cy="141" r="0.6" fill="#000"/>
+  <text x="150" y="142" font-family="Arial, sans-serif" font-size="3.5" fill="#2D3748">Data Reporting</text>
+
+  <text x="142" y="170" font-family="Arial, sans-serif" font-size="7" font-weight="bold" fill="#1A365D">EDUCATION</text>
+  <text x="142" y="180" font-family="Arial, sans-serif" font-size="4" font-weight="bold" fill="#000">Diploma Name</text>
+  <text x="142" y="185" font-family="Arial, sans-serif" font-size="3.5" fill="#4A5568">University, 2018</text>
+</svg>

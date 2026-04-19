@@ -89,6 +89,52 @@ const setStoredPanelWidth = (pct) => {
   }
 };
 
+const toReadableTemplateName = (id = '') =>
+  String(id)
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
+function normalizeTemplatesResponse(payload) {
+  const raw =
+    (Array.isArray(payload?.templates) && payload.templates) ||
+    (Array.isArray(payload) && payload) ||
+    null;
+
+  if (raw) {
+    const unique = new Map();
+    raw.forEach((t) => {
+      if (!t) return;
+      const id = String(t.id || '').trim();
+      if (!id) return;
+      unique.set(id, {
+        id,
+        name: t.name || toReadableTemplateName(id),
+        ats_score: typeof t.ats_score === 'number' ? t.ats_score : 0,
+        premium: Boolean(t.premium),
+        fonts: Array.isArray(t.fonts) ? t.fonts : undefined,
+        color_schemes: Array.isArray(t.color_schemes) ? t.color_schemes : undefined,
+      });
+    });
+    return [...unique.values()];
+  }
+
+  const templateMap = payload?.template_map || payload?.TEMPLATE_MAP;
+  if (templateMap && typeof templateMap === 'object') {
+    return Object.keys(templateMap).map((id) => ({
+      id,
+      name: toReadableTemplateName(id),
+      ats_score: 0,
+      premium: false,
+      fonts: [],
+      color_schemes: [],
+    }));
+  }
+
+  return [];
+}
+
 const fetchResumes = (setResumes) => {
   getResumeWorkspaceAPI()
     .then(({ data }) => setResumes(Array.isArray(data?.resumes) ? data.resumes : []))
@@ -417,9 +463,15 @@ export default function ResumeGenerator() {
 
   useEffect(() => {
     getResumeTemplatesAPI()
-      .then(({ data }) => setTemplates(Array.isArray(data?.templates) ? data.templates : []))
+      .then(({ data }) => {
+        const normalized = normalizeTemplatesResponse(data);
+        console.log('templates response:', data);
+        console.log('templates rendered:', normalized.map((t) => t.id));
+        setTemplates(normalized);
+      })
       .catch(() => setTemplates([]));
   }, []);
+  
 
   // Sync editable title when selected resume changes
   useEffect(() => {
