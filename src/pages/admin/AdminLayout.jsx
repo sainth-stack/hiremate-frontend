@@ -31,7 +31,7 @@ export default function AdminLayout() {
   const location = useLocation();
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'var(--bg-light)' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'var(--bg-light)', overflow: 'hidden' }}>
       <Navbar />
       <Box
         sx={{
