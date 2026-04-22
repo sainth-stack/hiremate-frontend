@@ -142,7 +142,7 @@ const fetchResumes = (setResumes) => {
 };
 
 const EMPTY_EDUCATION = { degree: '', fieldOfStudy: '', institution: '', startYear: '', endYear: '', grade: '', location: '' };
-const EMPTY_EXPERIENCE = { jobTitle: '', companyName: '', employmentType: '', startDate: '', endDate: '', location: '', workMode: '', description: '', techStack: '' };
+const EMPTY_EXPERIENCE = { jobTitle: '', companyName: '', payrollCompany: '', employmentType: '', startDate: '', endDate: '', location: '', workMode: '', description: '', techStack: '' };
 const EMPTY_TECH_SKILL = { name: '', level: '', years: '' };
 const EMPTY_SOFT_SKILL = { name: '' };
 const EMPTY_PROJECT = { name: '', description: '', role: '', techStack: '', githubUrl: '', liveUrl: '', projectType: '' };

@@ -32,6 +32,7 @@ export const mapParsedExperience = (parsed) => {
   return raw.map((e) => ({
     jobTitle: toStr(e.job_title ?? e.jobTitle),
     companyName: toStr(e.company_name ?? e.companyName),
+    payrollCompany: toStr(e.payroll_company ?? e.payrollCompany),
     employmentType: toStr(e.employment_type ?? e.employmentType),
     startDate: toStr(e.start_date ?? e.startDate),
     endDate: toStr(e.end_date ?? e.endDate),

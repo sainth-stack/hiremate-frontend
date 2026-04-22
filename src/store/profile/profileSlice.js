@@ -19,7 +19,7 @@ import {
 } from '../../pages/profile/skills/normalizers';
 
 const emptyExperience = {
-  jobTitle: '', companyName: '', employmentType: '', startDate: '', endDate: '',
+  jobTitle: '', companyName: '', payrollCompany: '', employmentType: '', startDate: '', endDate: '',
   location: '', workMode: '', description: '', techStack: '',
 };
 const emptyEducation = {

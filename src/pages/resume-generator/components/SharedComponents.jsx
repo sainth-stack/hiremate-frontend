@@ -7,7 +7,7 @@ import ExpandLessRoundedIcon from '@mui/icons-material/ExpandLessRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 
 export const EMPTY_EDUCATION = { degree: '', fieldOfStudy: '', institution: '', startYear: '', endYear: '', grade: '', location: '' };
-export const EMPTY_EXPERIENCE = { jobTitle: '', companyName: '', employmentType: '', startDate: '', endDate: '', location: '', workMode: '', description: '', techStack: '' };
+export const EMPTY_EXPERIENCE = { jobTitle: '', companyName: '', payrollCompany: '', employmentType: '', startDate: '', endDate: '', location: '', workMode: '', description: '', techStack: '' };
 export const EMPTY_TECH_SKILL = { name: '', level: '', years: '' };
 export const EMPTY_SOFT_SKILL = { name: '' };
 export const EMPTY_PROJECT = { name: '', description: '', role: '', techStack: '', githubUrl: '', liveUrl: '', projectType: '' };

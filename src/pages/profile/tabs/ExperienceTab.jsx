@@ -14,7 +14,7 @@ const EMPLOYMENT_TYPES = ['Full-time', 'Part-time', 'Contract', 'Internship', 'F
 const WORK_MODES = ['Remote', 'Hybrid', 'On-site'];
 
 const defaultExperience = {
-  jobTitle: '', companyName: '', employmentType: '', startDate: '', endDate: '',
+  jobTitle: '', companyName: '', payrollCompany: '', employmentType: '', startDate: '', endDate: '',
   location: '', workMode: '', description: '', techStack: '', noticePeriod: '',
 };
 
@@ -69,6 +69,15 @@ export default function ExperienceTab() {
             </Box>
             <Box sx={{ gridColumn: '1 / -1' }}>
               <CustomInput label="Company Name *" fullWidth value={exp.companyName} onChange={(e) => updateAt(idx, 'companyName', e.target.value)} />
+            </Box>
+            <Box sx={{ gridColumn: '1 / -1' }}>
+              <CustomInput
+                label="Payroll company (optional)"
+                fullWidth
+                placeholder="If different from company — e.g. employer of record"
+                value={exp.payrollCompany ?? ''}
+                onChange={(e) => updateAt(idx, 'payrollCompany', e.target.value)}
+              />
             </Box>
             <Box sx={{ gridColumn: '1 / -1' }}>
               <CustomSelect label="Employment Type" value={exp.employmentType} onChange={(e) => updateAt(idx, 'employmentType', e.target.value)}>
