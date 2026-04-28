@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import BarChartRoundedIcon from '@mui/icons-material/BarChartRounded';
@@ -177,14 +177,51 @@ export default function AuthLayout() {
           flex: { md: '0 0 52%' },
           bgcolor: 'var(--bg-default)',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'space-between',
           py: { xs: 5, md: 4 },
           px: { xs: 2, sm: 5 },
         }}
       >
-        <Box sx={{ width: '100%', maxWidth: 420 }}>
+        <Box sx={{ width: '100%', maxWidth: 420, flex: 1, display: 'flex', alignItems: 'center' }}>
           <Outlet />
+        </Box>
+        
+        {/* Footer with Privacy Policy and Terms */}
+        <Box sx={{ width: '100%', maxWidth: 420, mt: 4, pt: 3, borderTop: '1px solid var(--divider)' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 3, mb: 2 }}>
+            <Typography
+              component={Link}
+              to="/privacy-policy"
+              sx={{ 
+                fontSize: 13, 
+                color: 'var(--text-muted)', 
+                textDecoration: 'none',
+                fontWeight: 500,
+                '&:hover': { color: '#1E3A8A', textDecoration: 'underline' } 
+              }}
+            >
+              Privacy Policy
+            </Typography>
+            <Typography sx={{ color: 'var(--text-muted)', fontSize: 13 }}>•</Typography>
+            <Typography
+              component={Link}
+              to="/terms-of-service"
+              sx={{ 
+                fontSize: 13, 
+                color: 'var(--text-muted)', 
+                textDecoration: 'none',
+                fontWeight: 500,
+                '&:hover': { color: '#1E3A8A', textDecoration: 'underline' } 
+              }}
+            >
+              Terms of Service
+            </Typography>
+          </Box>
+          <Typography sx={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center' }}>
+            © 2026 OpsBrain. All rights reserved.
+          </Typography>
         </Box>
       </Box>
     </Box>

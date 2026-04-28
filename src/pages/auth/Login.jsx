@@ -95,9 +95,9 @@ export default function Login() {
   };
 
   return (
-    <Box>
+    <Box sx={{ width: '100%' }}>
       {/* Logo + heading */}
-      <Box sx={{ mb: 4 }}>
+      <Box sx={{ mb: 4, width: '100%' }}>
         <Box sx={{ mb: 4, display: { md: 'none' } }}>
           <OpsBrainLogo variant="full" height={38} darkMode={false} />
         </Box>
@@ -142,10 +142,10 @@ export default function Login() {
       )}
 
       {/* Form */}
-      <Box component="form" noValidate onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box component="form" noValidate onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2,width: '100%' }}>
 
         {/* Email */}
-        <Box>
+        <Box sx={{ width: '100%' }}>
           <FieldLabel>Email address</FieldLabel>
           <InputField
             icon={EmailOutlinedIcon}
@@ -161,7 +161,7 @@ export default function Login() {
         </Box>
 
         {/* Password */}
-        <Box>
+        <Box sx={{ width: '100%' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.75 }}>
             <FieldLabel>Password</FieldLabel>
             <Typography
@@ -308,7 +308,7 @@ export default function Login() {
       </Typography>
 
       {/* Legal Links */}
-      <Typography sx={{ mt: 2.5, fontSize: 12, color: 'var(--text-muted)', textAlign: 'center' }}>
+      {/* <Typography sx={{ mt: 2.5, fontSize: 12, color: 'var(--text-muted)', textAlign: 'center' }}>
         By continuing, you agree to our{' '}
         <Typography
           component={Link}
@@ -325,7 +325,7 @@ export default function Login() {
         >
           Privacy Policy
         </Typography>
-      </Typography>
+      </Typography> */}
 
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </Box>
