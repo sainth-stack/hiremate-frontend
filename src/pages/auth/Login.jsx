@@ -307,26 +307,6 @@ export default function Login() {
         </Typography>
       </Typography>
 
-      {/* Legal Links */}
-      {/* <Typography sx={{ mt: 2.5, fontSize: 12, color: 'var(--text-muted)', textAlign: 'center' }}>
-        By continuing, you agree to our{' '}
-        <Typography
-          component={Link}
-          to="/terms-of-service"
-          sx={{ color: '#1E3A8A', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
-        >
-          Terms of Service
-        </Typography>
-        {' '}and{' '}
-        <Typography
-          component={Link}
-          to="/privacy-policy"
-          sx={{ color: '#1E3A8A', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
-        >
-          Privacy Policy
-        </Typography>
-      </Typography> */}
-
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </Box>
   );

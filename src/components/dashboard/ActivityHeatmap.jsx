@@ -11,10 +11,10 @@ const CELL_GAP = 4;
 
 function getColor(count) {
   if (!count || count === 0) return 'var(--grey-5)';
-  if (count <= 1) return 'var(--heat-1, #ede9fe)';
-  if (count <= 2) return 'var(--heat-2, #ddd6fe)';
-  if (count <= 4) return 'var(--heat-3, #a78bfa)';
-  return 'var(--heat-4, #6d28d9)';
+  if (count <= 1) return 'var(--heat-1, #dbeafe)';
+  if (count <= 2) return 'var(--heat-2, #bfdbfe)';
+  if (count <= 4) return 'var(--heat-3, #60a5fa)';
+  return 'var(--heat-4, #1E3A8A)';
 }
 
 /** Get Monday of the week containing `d` (ISO week) */
@@ -62,10 +62,10 @@ export default function ActivityHeatmap({ applicationsByDay, loading }) {
 
   const heatColors = [
     'var(--heat-0, var(--grey-5))',
-    'var(--heat-1, #ede9fe)',
-    'var(--heat-2, #ddd6fe)',
-    'var(--heat-3, #a78bfa)',
-    'var(--heat-4, #6d28d9)',
+    'var(--heat-1, #dbeafe)',
+    'var(--heat-2, #bfdbfe)',
+    'var(--heat-3, #60a5fa)',
+    'var(--heat-4, #1E3A8A)',
   ];
 
   return (
@@ -129,9 +129,9 @@ export default function ActivityHeatmap({ applicationsByDay, loading }) {
                 px: 1.25,
                 py: 0.5,
                 borderRadius: '999px',
-                bgcolor: 'rgba(245, 158, 11, 0.12)',
-                border: '1px solid rgba(245, 158, 11, 0.22)',
-                color: 'var(--warning)',
+                bgcolor: 'rgba(6, 182, 212, 0.12)',
+                border: '1px solid rgba(6, 182, 212, 0.22)',
+                color: '#06B6D4',
                 fontSize: '12px',
                 fontWeight: 700,
                 lineHeight: 1,
@@ -141,7 +141,7 @@ export default function ActivityHeatmap({ applicationsByDay, loading }) {
                 gap: 0.5,
               }}
             >
-              <WhatshotRoundedIcon sx={{ fontSize: 16, color: 'var(--warning)' }} />
+              <WhatshotRoundedIcon sx={{ fontSize: 16, color: '#06B6D4' }} />
               {streak}-day streak
             </Box>
           )}
@@ -258,12 +258,12 @@ export default function ActivityHeatmap({ applicationsByDay, loading }) {
                         flexShrink: 0,
                         '&:hover': {
                           transform: 'scale(1.15)',
-                          boxShadow: '0 0 0 2px rgba(109, 40, 217, 0.25)',
+                          boxShadow: '0 0 0 2px rgba(30, 58, 138, 0.25)',
                           zIndex: 1,
                         },
                         '&:focus-visible': {
                           outline: 'none',
-                          boxShadow: '0 0 0 2px rgba(109, 40, 217, 0.4)',
+                          boxShadow: '0 0 0 2px rgba(30, 58, 138, 0.4)',
                           zIndex: 1,
                         },
                       }}

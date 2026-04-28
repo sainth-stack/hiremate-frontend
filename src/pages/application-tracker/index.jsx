@@ -21,11 +21,14 @@ import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import DateFilter from '../../components/dashboard/DateFilter';
 import AddApplicationModal from './AddApplicationModal';
+import ApplicationDrawer from './ApplicationDrawer';
+import SyncModal from './SyncModal';
 import {
   listApplicationsAPI,
   triggerSyncAPI,
   getSyncStatusAPI,
   stopSyncAPI,
+  updateApplicationAPI,
 } from '../../services/applicationsService';
 import ChatWidget from './ChatWidget';
 import PermissionGuard from '../../components/application-tracker/PermissionGuard';
@@ -117,6 +120,8 @@ export default function ApplicationTrackerPage() {
   const [dateRange, setDateRange] = useState({ preset: 7, from: null, to: null });
   const [lastSyncTime, setLastSyncTime] = useState(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [syncModalOpen, setSyncModalOpen] = useState(false);
+  const [selectedAppId, setSelectedAppId] = useState(null);
   const [hiddenCols, setHiddenCols] = useState(new Set());
   const [jobTypeFilter, setJobTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -161,11 +166,13 @@ export default function ApplicationTrackerPage() {
   };
 
   const syncMutation = useMutation({
-    mutationFn: () => {
-      const { from, to } = getSyncDates();
-      return triggerSyncAPI(from, to);
+    mutationFn: ({ from_date, to_date }) => {
+      return triggerSyncAPI(from_date, to_date);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['sync-status'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['sync-status'] });
+      setSyncModalOpen(false);
+    },
   });
 
   const stopMutation = useMutation({
@@ -519,7 +526,7 @@ export default function ApplicationTrackerPage() {
         <Button
           variant="outlined"
           startIcon={<SyncRoundedIcon sx={{ fontSize: 15, animation: isSyncing ? 'spin 1s linear infinite' : 'none' }} />}
-          onClick={() => syncMutation.mutate()}
+          onClick={() => setSyncModalOpen(true)}
           disabled={isSyncing}
           sx={{
             height: 38, px: 2, borderRadius: '10px', whiteSpace: 'nowrap',
@@ -701,7 +708,7 @@ export default function ApplicationTrackerPage() {
                         animate={{ opacity: 1, y: 0, transition: { delay: idx * 0.04 } }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         whileHover={{ y: -2, transition: { duration: 0.15 } }}
-                        onClick={() => navigate(`/application-tracker/${app.id}`)}
+                        onClick={() => setSelectedAppId(app.id)}
                         style={{ cursor: 'pointer' }}
                       >
                         <Box
@@ -935,6 +942,26 @@ export default function ApplicationTrackerPage() {
         open={addModalOpen}
         onClose={() => setAddModalOpen(false)}
         onSuccess={() => qc.invalidateQueries({ queryKey: ['applications'] })}
+      />
+
+      {/* ── Application Drawer ── */}
+      <ApplicationDrawer
+        applicationId={selectedAppId}
+        onClose={() => setSelectedAppId(null)}
+        onStatusChange={(id, newStatus) => {
+          updateApplicationAPI(id, { current_status: newStatus }).then(() => {
+            qc.invalidateQueries({ queryKey: ['applications'] });
+            qc.invalidateQueries({ queryKey: ['application', id] });
+          });
+        }}
+      />
+
+      {/* ── Sync Modal ── */}
+      <SyncModal
+        open={syncModalOpen}
+        onClose={() => setSyncModalOpen(false)}
+        onSync={(dates) => syncMutation.mutate(dates)}
+        isLoading={syncMutation.isPending}
       />
 
       <style>{`

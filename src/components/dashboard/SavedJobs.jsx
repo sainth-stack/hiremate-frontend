@@ -3,9 +3,9 @@ import { getAgeBadge } from '../../utils/dashboardUtils';
 import SkeletonCard from './SkeletonCard';
 
 const badgeStyle = {
-  green: { bg: 'rgba(34, 197, 94, 0.10)', text: 'var(--success)', border: 'rgba(34, 197, 94, 0.18)' },
-  amber: { bg: 'rgba(245, 158, 11, 0.10)', text: 'var(--warning)', border: 'rgba(245, 158, 11, 0.18)' },
-  red: { bg: 'rgba(37, 99, 235, 0.10)', text: 'var(--primary)', border: 'rgba(37, 99, 235, 0.18)' },
+  green: { bg: 'rgba(16, 185, 129, 0.10)', text: '#10B981', border: 'rgba(16, 185, 129, 0.18)' },
+  amber: { bg: 'rgba(6, 182, 212, 0.10)', text: '#06B6D4', border: 'rgba(6, 182, 212, 0.18)' },
+  red: { bg: 'rgba(30, 58, 138, 0.10)', text: 'var(--primary)', border: 'rgba(30, 58, 138, 0.18)' },
 };
 
 const cardBaseSx = {
@@ -180,8 +180,8 @@ export default function SavedJobs({ jobs, loading }) {
             px: 2,
             py: 1.25,
             borderRadius: '12px',
-            bgcolor: 'rgba(245, 158, 11, 0.08)',
-            border: '1px solid rgba(245, 158, 11, 0.16)',
+            bgcolor: 'rgba(6, 182, 212, 0.08)',
+            border: '1px solid rgba(6, 182, 212, 0.16)',
             color: 'var(--text-primary)',
             textAlign: 'center',
           }}

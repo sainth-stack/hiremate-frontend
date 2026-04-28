@@ -28,11 +28,11 @@
   --secondary-dark: #0284c7;
 
   /* ---- Success ---- */
-  --success: #22c55e;
+  --success: #10B981;
   --success-light: #4ade80;
-  --success-dark: #16a34a;
-  --success-bg: #dcfce7;
-  --success-bk: #daf0e3;
+  --success-dark: #10B981;
+  --success-bg: rgba(16, 185, 129, 0.08);
+  --success-bk: rgba(16, 185, 129, 0.12);
 
   /* ---- Error ---- */
   --error: #dc2626;

@@ -103,9 +103,11 @@ function StatCard({ config, value, index }) {
 function StatsRow({ jobs }) {
   const total = jobs.length;
   const interviews = jobs.filter((j) => j.application_status === 'interview').length;
-  const applied = jobs.filter((j) => ['applied', 'interview', 'closed'].includes(j.application_status)).length;
+  const applied = jobs.filter((j) => j.application_status === 'applied').length;
   const closed = jobs.filter((j) => j.application_status === 'closed').length;
-  const responseRate = applied > 0 ? Math.round((interviews / applied) * 100) : 0;
+  
+  const totalSubmitted = applied + interviews + closed;
+  const responseRate = totalSubmitted > 0 ? Math.round((interviews / totalSubmitted) * 100) : 0;
 
   const values = {
     total: String(total),

@@ -22,9 +22,9 @@ function formatCompanyName(name) {
 
 const signalColorMap = {
   green: { bg: 'var(--success-bg)', text: 'var(--success)', border: 'var(--success)' },
-  red: { bg: 'rgba(109, 40, 217, 0.10)', text: 'var(--primary)', border: 'rgba(109, 40, 217, 0.22)' },
-  purple: { bg: 'rgba(37, 99, 235, 0.10)', text: 'var(--primary)', border: 'rgba(37, 99, 235, 0.22)' },
-  amber: { bg: 'var(--warning-bg)', text: 'var(--warning)', border: 'var(--warning)' },
+  red: { bg: 'rgba(30, 58, 138, 0.10)', text: 'var(--primary)', border: 'rgba(30, 58, 138, 0.22)' },
+  purple: { bg: 'rgba(30, 58, 138, 0.10)', text: 'var(--primary)', border: 'rgba(30, 58, 138, 0.22)' },
+  amber: { bg: 'rgba(6, 182, 212, 0.10)', text: '#06B6D4', border: 'rgba(6, 182, 212, 0.22)' },
   gray: { bg: 'var(--grey-5)', text: 'var(--text-muted)', border: 'var(--border-color)' },
 };
 

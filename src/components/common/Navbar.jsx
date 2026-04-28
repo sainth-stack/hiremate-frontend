@@ -117,7 +117,7 @@ export default function Navbar({ showProfile = true }) {
                 sx={{
                   width: 36,
                   height: 36,
-                  bgcolor: '#f97316',
+                  background: 'linear-gradient(135deg, #1E3A8A 0%, #06B6D4 100%)',
                   fontSize: '0.95rem',
                 }}
               >

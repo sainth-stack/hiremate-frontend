@@ -9,11 +9,11 @@ import { generateInsights } from '../../utils/dashboardUtils';
 import SkeletonCard from './SkeletonCard';
 
 const TYPE_STYLE = {
-  streak: { accent: 'rgba(245, 158, 11, 0.55)', iconBg: 'rgba(245, 158, 11, 0.10)', text: 'var(--warning)' },
-  pattern: { accent: 'rgba(37, 99, 235, 0.55)', iconBg: 'rgba(37, 99, 235, 0.10)', text: 'var(--primary)' },
-  coaching: { accent: 'rgba(109, 40, 217, 0.55)', iconBg: 'rgba(109, 40, 217, 0.10)', text: 'var(--primary)' },
-  warning: { accent: 'rgba(245, 158, 11, 0.55)', iconBg: 'rgba(245, 158, 11, 0.10)', text: 'var(--warning)' },
-  positive: { accent: 'rgba(34, 197, 94, 0.55)', iconBg: 'rgba(34, 197, 94, 0.10)', text: 'var(--success)' },
+  streak: { accent: 'rgba(6, 182, 212, 0.55)', iconBg: 'rgba(6, 182, 212, 0.10)', text: '#06B6D4' },
+  pattern: { accent: 'rgba(30, 58, 138, 0.55)', iconBg: 'rgba(30, 58, 138, 0.10)', text: 'var(--primary)' },
+  coaching: { accent: 'rgba(30, 58, 138, 0.55)', iconBg: 'rgba(30, 58, 138, 0.10)', text: 'var(--primary)' },
+  warning: { accent: 'rgba(6, 182, 212, 0.55)', iconBg: 'rgba(6, 182, 212, 0.10)', text: '#06B6D4' },
+  positive: { accent: 'rgba(16, 185, 129, 0.55)', iconBg: 'rgba(16, 185, 129, 0.10)', text: 'var(--success)' },
 };
 
 const TYPE_ICON = {
@@ -36,7 +36,7 @@ const cardBaseSx = {
 };
 
 export default function SmartInsights({ summary, jobs, loading }) {
-  if (loading) return <SkeletonCard height={160} />;
+  if (loading) return <SkeletonCard height={140} />;
 
   const insights = generateInsights(summary, jobs);
 
@@ -54,40 +54,38 @@ export default function SmartInsights({ summary, jobs, loading }) {
             fontWeight: 600,
           }}
         >
-          Smart Insights
+          Insights & Recommendations
         </Typography>
         <Box
           sx={{
             borderRadius: '12px',
             border: '1px solid var(--dashboard-border-subtle, var(--border-color))',
             bgcolor: 'rgba(16, 24, 40, 0.01)',
-            px: 2,
-            py: 3,
+            px: 2.5,
+            py: 2.5,
             textAlign: 'center',
           }}
         >
           <Box
             sx={{
-              width: 44,
-              height: 44,
-              borderRadius: '14px',
+              width: 40,
+              height: 40,
+              borderRadius: '12px',
               mx: 'auto',
-              mb: 1.5,
+              mb: 1.25,
               bgcolor: 'rgba(37, 99, 235, 0.08)',
               border: '1px solid rgba(37, 99, 235, 0.12)',
               display: 'grid',
               placeItems: 'center',
-              color: 'var(--primary)',
-              fontWeight: 800,
             }}
           >
-            <AutoAwesomeRoundedIcon sx={{ fontSize: 20, color: 'var(--primary)' }} />
+            <AutoAwesomeRoundedIcon sx={{ fontSize: 18, color: 'var(--primary)' }} />
           </Box>
-          <Typography sx={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
-            Insights will appear here
+          <Typography sx={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-primary)' }}>
+            Start tracking to get personalized insights
           </Typography>
-          <Typography sx={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6, mt: 0.75 }}>
-            Keep applying and tracking activity to unlock personalized coaching.
+          <Typography sx={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.55, mt: 0.5 }}>
+            Apply to jobs and track activity to see coaching tips here
           </Typography>
         </Box>
       </Box>
@@ -96,7 +94,7 @@ export default function SmartInsights({ summary, jobs, loading }) {
 
   return (
     <Box sx={cardBaseSx}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, gap: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.75, gap: 2 }}>
         <Typography
           sx={{
             color: 'var(--text-secondary)',
@@ -107,14 +105,28 @@ export default function SmartInsights({ summary, jobs, loading }) {
             fontWeight: 600,
           }}
         >
-          Smart Insights
+          Insights & Recommendations
         </Typography>
-        <Typography sx={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600 }}>
-          {insights.length} insight{insights.length > 1 ? 's' : ''}
-        </Typography>
+        <Box
+          sx={{
+            px: 1.25,
+            py: 0.5,
+            borderRadius: '999px',
+            bgcolor: 'rgba(37, 99, 235, 0.08)',
+            border: '1px solid rgba(37, 99, 235, 0.12)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.75,
+          }}
+        >
+          <AutoAwesomeRoundedIcon sx={{ fontSize: 14, color: 'var(--primary)' }} />
+          <Typography sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 700, lineHeight: 1 }}>
+            {insights.length}
+          </Typography>
+        </Box>
       </Box>
 
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 'var(--dashboard-block-gap)' }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(auto-fit, minmax(280px, 1fr))' }, gap: 2 }}>
         {insights.map((insight, i) => {
           const style = TYPE_STYLE[insight.type] || TYPE_STYLE.coaching;
           const Icon = TYPE_ICON[insight.type] || LightbulbRoundedIcon;
@@ -123,14 +135,14 @@ export default function SmartInsights({ summary, jobs, loading }) {
               key={i}
               sx={{
                 borderRadius: '12px',
-                p: 2.25,
+                p: 2,
                 border: '1px solid var(--dashboard-border-subtle, var(--border-color))',
                 bgcolor: 'rgba(16, 24, 40, 0.01)',
                 boxShadow: '0 1px 2px rgba(16, 24, 40, 0.04)',
                 transition: 'all 0.2s ease',
                 position: 'relative',
                 overflow: 'hidden',
-                '&:hover': { boxShadow: '0 10px 26px rgba(16, 24, 40, 0.10)', transform: 'translateY(-2px)' },
+                '&:hover': { boxShadow: '0 8px 20px rgba(16, 24, 40, 0.08)', transform: 'translateY(-2px)' },
                 '&::before': {
                   content: '""',
                   position: 'absolute',
@@ -145,44 +157,44 @@ export default function SmartInsights({ summary, jobs, loading }) {
               <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25 }}>
                 <Box
                   sx={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: '12px',
+                    width: 32,
+                    height: 32,
+                    borderRadius: '10px',
                     display: 'grid',
                     placeItems: 'center',
                     bgcolor: style.iconBg,
                     border: '1px solid var(--dashboard-border-subtle, var(--border-color))',
                     flexShrink: 0,
-                    mt: 0.25,
+                    mt: 0.125,
                   }}
                 >
-                  <Icon sx={{ fontSize: 18, color: style.text }} />
+                  <Icon sx={{ fontSize: 17, color: style.text }} />
                 </Box>
-                <Box sx={{ minWidth: 0 }}>
-                  <Typography sx={{ color: 'var(--text-primary)', mb: 0.5, fontSize: '14px', fontWeight: 700, lineHeight: 1.25 }}>
-                {insight.title}
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography sx={{ color: 'var(--text-primary)', mb: 0.5, fontSize: '13.5px', fontWeight: 700, lineHeight: 1.3 }}>
+                    {insight.title}
                   </Typography>
-                  <Typography sx={{ color: 'var(--text-secondary)', lineHeight: 1.55, fontSize: '13px' }}>
-                {insight.body}
+                  <Typography sx={{ color: 'var(--text-secondary)', lineHeight: 1.5, fontSize: '13px' }}>
+                    {insight.body}
                   </Typography>
-              {insight.cta && (
-                <Typography
-                  component="a"
-                  href={insight.cta.anchor}
-                  sx={{
-                    color: 'var(--primary)',
-                    mt: 1,
-                    display: 'inline-block',
-                    textDecoration: 'none',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    transition: 'all 0.15s ease',
-                    '&:hover': { color: 'var(--primary-dark)', textDecoration: 'underline' },
-                  }}
-                >
-                  {insight.cta.label} →
-                </Typography>
-              )}
+                  {insight.cta && (
+                    <Typography
+                      component="a"
+                      href={insight.cta.anchor}
+                      sx={{
+                        color: 'var(--primary)',
+                        mt: 0.75,
+                        display: 'inline-block',
+                        textDecoration: 'none',
+                        fontSize: '12.5px',
+                        fontWeight: 700,
+                        transition: 'all 0.15s ease',
+                        '&:hover': { color: 'var(--primary-dark)', textDecoration: 'underline' },
+                      }}
+                    >
+                      {insight.cta.label} →
+                    </Typography>
+                  )}
                 </Box>
               </Box>
             </Box>

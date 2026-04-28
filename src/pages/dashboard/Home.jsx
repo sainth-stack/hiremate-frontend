@@ -81,10 +81,10 @@ export default function Home() {
         '--dashboard-label-gap': '4px',
         '--dashboard-row-min-height': '48px',
         '--heat-0': 'var(--grey-5)',
-        '--heat-1': '#ede9fe',
-        '--heat-2': '#ddd6fe',
-        '--heat-3': '#a78bfa',
-        '--heat-4': '#6d28d9',
+        '--heat-1': '#dbeafe',
+        '--heat-2': '#bfdbfe',
+        '--heat-3': '#60a5fa',
+        '--heat-4': '#1E3A8A',
       }}
     >
       {error && (
@@ -126,7 +126,7 @@ export default function Home() {
               Dashboard
             </Typography>
             <Typography variant="body2" sx={{ color: 'var(--text-secondary)', fontSize: '0.875rem', mt: 0.5 }}>
-              Track your pipeline performance and keep momentum.
+              Your job search progress at a glance
             </Typography>
           </Box>
           <Box sx={{ flexShrink: 0, marginLeft: { sm: 'auto' } }}>
@@ -134,13 +134,16 @@ export default function Home() {
           </Box>
         </Box>
 
-        {/* Career Health Score — full width */}
+        {/* Career Health Score */}
         <CareerHealthScore summary={summary} jobs={jobs} loading={loading} />
 
-        {/* Stat Cards — compact (replaced with unified StatsRow) */}
+        {/* Quick Stats */}
         <StatsRow jobs={jobs || []} />
 
-        {/* Funnel + Heatmap — 2 columns side by side */}
+        {/* Smart Insights - Move up for visibility */}
+        <SmartInsights summary={summary} jobs={jobs} loading={loading} />
+
+        {/* Funnel + Heatmap */}
         <Box
           sx={{
             display: 'grid',
@@ -153,10 +156,7 @@ export default function Home() {
           <ActivityHeatmap applicationsByDay={summary?.applications_by_day} loading={loading} />
         </Box>
 
-        {/* Company Tracker — full width */}
-        <CompanyTracker companiesViewed={summary?.companies_viewed} jobs={jobs} loading={loading} />
-
-        {/* Recent Apps + Saved Jobs — 2 columns */}
+        {/* Recent Apps + Saved Jobs */}
         <Box
           sx={{
             display: 'grid',
@@ -169,11 +169,11 @@ export default function Home() {
           <SavedJobs jobs={jobs} loading={loading} />
         </Box>
 
-        {/* Smart Insights — full width */}
-        <SmartInsights summary={summary} jobs={jobs} loading={loading} />
+        {/* Company Tracker */}
+        <CompanyTracker companiesViewed={summary?.companies_viewed} jobs={jobs} loading={loading} />
 
         {/* Go to Applications */}
-        <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
           <Button
             component={Link}
             to="/application-tracker"
@@ -183,12 +183,14 @@ export default function Home() {
               borderColor: 'var(--dashboard-border-subtle)',
               color: 'var(--text-primary)',
               textTransform: 'none',
-              py: 1.15,
-              px: 2,
+              py: 1.25,
+              px: 3,
               borderRadius: '12px',
+              fontSize: '0.9375rem',
+              fontWeight: 600,
               transition: 'all 0.2s ease',
               '&:hover': {
-                borderColor: 'rgba(37, 99, 235, 0.22)',
+                borderColor: 'rgba(37, 99, 235, 0.3)',
                 bgcolor: 'var(--light-blue-bg-08)',
                 color: 'var(--primary)',
                 transform: 'translateY(-1px)',
@@ -196,7 +198,7 @@ export default function Home() {
               '&:active': { transform: 'scale(0.98)' },
             }}
           >
-            Go to Applications
+            View All Applications
           </Button>
         </Box>
       </Box>

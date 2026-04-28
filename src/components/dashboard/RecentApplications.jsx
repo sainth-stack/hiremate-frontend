@@ -2,11 +2,11 @@ import { Box, Typography, Link as MuiLink } from '@mui/material';
 import SkeletonCard from './SkeletonCard';
 
 const STATUS_BADGE = {
-  applied: { label: 'Applied', bg: 'rgba(37, 99, 235, 0.10)', text: 'var(--primary)', border: 'rgba(37, 99, 235, 0.18)' },
-  interview: { label: 'Interview', bg: 'rgba(34, 197, 94, 0.10)', text: 'var(--success)', border: 'rgba(34, 197, 94, 0.18)' },
-  offer: { label: 'Offer', bg: 'rgba(245, 158, 11, 0.10)', text: 'var(--warning)', border: 'rgba(245, 158, 11, 0.18)' },
+  applied: { label: 'Applied', bg: 'rgba(30, 58, 138, 0.10)', text: 'var(--primary)', border: 'rgba(30, 58, 138, 0.18)' },
+  interview: { label: 'Interview', bg: 'rgba(16, 185, 129, 0.10)', text: '#10B981', border: 'rgba(16, 185, 129, 0.18)' },
+  offer: { label: 'Offer', bg: 'rgba(6, 182, 212, 0.10)', text: '#06B6D4', border: 'rgba(6, 182, 212, 0.18)' },
   closed: { label: 'Closed', bg: 'rgba(16, 24, 40, 0.04)', text: 'var(--text-muted)', border: 'rgba(16, 24, 40, 0.10)' },
-  saved: { label: 'Saved', bg: 'rgba(109, 40, 217, 0.10)', text: 'var(--primary)', border: 'rgba(109, 40, 217, 0.18)' },
+  saved: { label: 'Saved', bg: 'rgba(30, 58, 138, 0.10)', text: 'var(--primary)', border: 'rgba(30, 58, 138, 0.18)' },
 };
 
 const cardBaseSx = {

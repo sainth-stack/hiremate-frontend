@@ -36,14 +36,16 @@ export const getAgeBadge = (createdAt) => {
 export const computeCareerScore = (summary, jobs) => {
   if (!summary || !jobs) return { score: 0, breakdown: {}, streak: 0, conversionRate: 0, responseRate: 0 };
 
-  const totalSaved = (jobs || []).filter((j) => j.application_status === 'saved').length;
-  const totalApplied = (jobs || []).filter((j) =>
-    APPLIED_STATUSES.includes(j.application_status)
-  ).length;
-  const totalInterview = (jobs || []).filter((j) => j.application_status === 'interview').length;
+  const savedJobs = (jobs || []).filter((j) => j.application_status === 'saved');
+  const appliedJobs = (jobs || []).filter((j) => j.application_status === 'applied');
+  const interviewJobs = (jobs || []).filter((j) => j.application_status === 'interview');
+  const offerJobs = (jobs || []).filter((j) => j.application_status === 'offer');
+  const closedJobs = (jobs || []).filter((j) => j.application_status === 'closed');
+  
+  const totalSubmitted = appliedJobs.length + interviewJobs.length + offerJobs.length + closedJobs.length;
 
-  // Factor 1: Application volume (20%) — max at 30 apps
-  const volumeScore = Math.min(totalApplied / 30, 1) * 20;
+  // Factor 1: Application volume (20%) — max at 30 submitted apps
+  const volumeScore = Math.min(totalSubmitted / 30, 1) * 20;
 
   // Factor 2: Application streak (15%) — max at 7-day streak
   const streak = computeStreak(summary.applications_by_day || []);
@@ -52,20 +54,20 @@ export const computeCareerScore = (summary, jobs) => {
   // Factor 3: Company diversity (15%) — unique companies applied to, max at 10
   const uniqueCompanies = new Set(
     (jobs || [])
-      .filter((j) => APPLIED_STATUSES.includes(j.application_status))
+      .filter((j) => j.application_status !== 'saved')
       .map((j) => (j.company || '').toLowerCase())
       .filter(Boolean)
   ).size;
   const diversityScore = Math.min(uniqueCompanies / 10, 1) * 15;
 
   // Factor 4: Saved→Applied conversion (25%) — target 70%
-  const savedTotal = totalSaved + totalApplied;
-  const conversionRate = savedTotal > 0 ? totalApplied / savedTotal : 0;
+  const totalJobs = savedJobs.length + totalSubmitted;
+  const conversionRate = totalJobs > 0 ? totalSubmitted / totalJobs : 0;
   const conversionScore = Math.min(conversionRate / 0.7, 1) * 25;
 
-  // Factor 5: Response rate (25%) — target 20%
-  const responseRate = totalApplied > 0 ? totalInterview / totalApplied : 0;
-  const responseScore = Math.min(responseRate / 0.2, 1) * 25;
+  // Factor 5: Response rate (25%) — target 15%
+  const responseRate = totalSubmitted > 0 ? interviewJobs.length / totalSubmitted : 0;
+  const responseScore = Math.min(responseRate / 0.15, 1) * 25;
 
   const total = Math.round(
     volumeScore + streakScore + diversityScore + conversionScore + responseScore
@@ -74,19 +76,19 @@ export const computeCareerScore = (summary, jobs) => {
   return {
     score: Math.min(100, total),
     breakdown: {
-      volume: { score: Math.round(volumeScore), max: 20, label: 'Application Volume' },
-      streak: { score: Math.round(streakScore), max: 15, label: 'Consistency Streak' },
-      diversity: { score: Math.round(diversityScore), max: 15, label: 'Company Diversity' },
+      volume: { score: Math.round(volumeScore), max: 20, label: 'Applications Submitted', value: `${totalSubmitted} apps` },
+      streak: { score: Math.round(streakScore), max: 15, label: 'Consistency Streak', value: `${streak} days` },
+      diversity: { score: Math.round(diversityScore), max: 15, label: 'Company Diversity', value: `${uniqueCompanies} companies` },
       conversion: {
         score: Math.round(conversionScore),
         max: 25,
-        label: 'Saved → Applied Rate',
+        label: 'Conversion Rate',
         value: `${Math.round(conversionRate * 100)}%`,
       },
       response: {
         score: Math.round(responseScore),
         max: 25,
-        label: 'Response Rate',
+        label: 'Interview Rate',
         value: `${Math.round(responseRate * 100)}%`,
       },
     },
@@ -97,9 +99,9 @@ export const computeCareerScore = (summary, jobs) => {
 };
 
 export const getScoreColor = (score) => {
-  if (score >= 70) return { text: 'var(--success)', bg: 'var(--success-bg)', ring: 'var(--success)', hex: '#22c55e' };
-  if (score >= 40) return { text: 'var(--warning)', bg: 'rgba(245, 158, 11, 0.08)', ring: 'var(--warning)', hex: '#f59e0b' };
-  return { text: 'var(--primary)', bg: 'var(--light-blue-bg-08)', ring: 'var(--primary)', hex: '#2563eb' };
+  if (score >= 70) return { text: '#10B981', bg: 'rgba(16, 185, 129, 0.08)', ring: '#10B981', hex: '#10B981' };
+  if (score >= 40) return { text: '#06B6D4', bg: 'rgba(6, 182, 212, 0.08)', ring: '#06B6D4', hex: '#06B6D4' };
+  return { text: 'var(--primary)', bg: 'var(--light-blue-bg-08)', ring: 'var(--primary)', hex: '#1E3A8A' };
 };
 
 export const getScoreCoachingTip = (breakdown) => {
@@ -111,11 +113,11 @@ export const getScoreCoachingTip = (breakdown) => {
   );
 
   const tips = {
-    'Application Volume': 'Apply to 5 more jobs this week to boost your volume score.',
-    'Consistency Streak': 'Apply at least once daily to build your streak.',
-    'Company Diversity': 'Try applying to companies in new industries.',
-    'Saved → Applied Rate': "You have saved jobs not applied to — work through your saved list.",
-    'Response Rate': 'Consider tailoring your resume for each application.',
+    'Applications Submitted': 'Submit 3-5 more applications this week to build momentum.',
+    'Consistency Streak': 'Apply to at least 1 job daily to build a strong streak.',
+    'Company Diversity': 'Expand your search to companies in adjacent industries.',
+    'Conversion Rate': "Work through your saved jobs list - apply to 3 this week.",
+    'Interview Rate': 'Tailor your resume to match job descriptions and use keywords.',
   };
   return tips[worst?.label] || 'Keep up the great work!';
 };
@@ -193,50 +195,33 @@ export const generateInsights = (summary, jobs) => {
   ];
   const jobList = jobs || [];
   const savedJobs = jobList.filter((j) => j.application_status === 'saved');
-  const appliedJobs = jobList.filter((j) => APPLIED_STATUSES.includes(j.application_status));
+  const appliedJobs = jobList.filter((j) => j.application_status === 'applied');
   const interviewJobs = jobList.filter((j) => j.application_status === 'interview');
+  const offerJobs = jobList.filter((j) => j.application_status === 'offer');
+  const closedJobs = jobList.filter((j) => j.application_status === 'closed');
+  
+  const totalSubmitted = appliedJobs.length + interviewJobs.length + offerJobs.length + closedJobs.length;
   const staleJobs = savedJobs.filter((j) => getJobAge(j.created_at) > 21);
-  const conversionRate =
-    savedJobs.length + appliedJobs.length > 0
-      ? appliedJobs.length / (savedJobs.length + appliedJobs.length)
-      : 0;
-  const responseRate = appliedJobs.length > 0 ? interviewJobs.length / appliedJobs.length : 0;
+  const conversionRate = savedJobs.length + totalSubmitted > 0 ? totalSubmitted / (savedJobs.length + totalSubmitted) : 0;
+  const responseRate = totalSubmitted > 0 ? interviewJobs.length / totalSubmitted : 0;
+
+  if (offerJobs.length > 0) {
+    insights.push({
+      type: 'positive',
+      icon: '🎉',
+      title: `${offerJobs.length} offer${offerJobs.length > 1 ? 's' : ''} received!`,
+      body: `Congratulations! Review your offers carefully and consider negotiating if needed.`,
+      cta: null,
+    });
+  }
 
   if (streak >= 3) {
     insights.push({
       type: 'streak',
       icon: '🔥',
-      title: `${streak}-day streak!`,
-      body: `You've applied consistently for ${streak} days. Consistent applicants get 2x more interview callbacks.`,
+      title: `${streak}-day application streak!`,
+      body: `You're on fire! Consistent applicants see 2-3x better response rates.`,
       cta: null,
-    });
-  }
-
-  if (peakDay && peakDay === today) {
-    insights.push({
-      type: 'pattern',
-      icon: '📅',
-      title: "Today is your best day to apply",
-      body: `You apply 3x more on ${peakDay}s than any other day. Strike while the iron's hot.`,
-      cta: null,
-    });
-  } else if (peakDay) {
-    insights.push({
-      type: 'pattern',
-      icon: '📅',
-      title: `You apply most on ${peakDay}s`,
-      body: `Based on your history, ${peakDay} is your most productive application day.`,
-      cta: null,
-    });
-  }
-
-  if (conversionRate < 0.5 && savedJobs.length >= 3) {
-    insights.push({
-      type: 'coaching',
-      icon: '💡',
-      title: `${savedJobs.length} saved jobs waiting`,
-      body: `Your saved→applied rate is ${Math.round(conversionRate * 100)}%. Try applying to 2 saved jobs today.`,
-      cta: { label: 'View saved jobs', anchor: '#saved-jobs' },
     });
   }
 
@@ -244,28 +229,58 @@ export const generateInsights = (summary, jobs) => {
     insights.push({
       type: 'warning',
       icon: '⏰',
-      title: `${staleJobs.length} jobs may be closing`,
-      body: `You have ${staleJobs.length} saved job${staleJobs.length > 1 ? 's' : ''} over 21 days old. Review them before they close.`,
-      cta: { label: 'Review stale jobs', anchor: '#saved-jobs' },
+      title: `${staleJobs.length} stale saved job${staleJobs.length > 1 ? 's' : ''}`,
+      body: `These jobs are over 21 days old and may close soon. Apply or archive them.`,
+      cta: { label: 'Review saved jobs', anchor: '#saved-jobs' },
     });
   }
 
-  if (appliedJobs.length >= 5 && responseRate < 0.1) {
+  if (totalSubmitted >= 10 && responseRate < 0.08) {
     insights.push({
       type: 'coaching',
       icon: '📝',
       title: `Low response rate (${Math.round(responseRate * 100)}%)`,
-      body: `You've applied to ${appliedJobs.length} jobs but gotten few responses. Consider tailoring your resume for each role.`,
+      body: `Tailor your resume to match job keywords. Use action verbs and quantify achievements.`,
       cta: null,
     });
   }
 
-  if (responseRate >= 0.2 && appliedJobs.length >= 3) {
+  if (conversionRate < 0.4 && savedJobs.length >= 5) {
+    insights.push({
+      type: 'coaching',
+      icon: '💡',
+      title: `${savedJobs.length} jobs in your saved list`,
+      body: `Set a goal to apply to 3 saved jobs this week to boost your pipeline.`,
+      cta: { label: 'View saved jobs', anchor: '#saved-jobs' },
+    });
+  }
+
+  if (responseRate >= 0.15 && totalSubmitted >= 5) {
     insights.push({
       type: 'positive',
       icon: '🎯',
-      title: 'Strong response rate!',
-      body: `${Math.round(responseRate * 100)}% of your applications led to interviews — well above average.`,
+      title: `Strong ${Math.round(responseRate * 100)}% response rate`,
+      body: `Your applications are resonating! Keep tailoring each one to the job description.`,
+      cta: null,
+    });
+  }
+
+  if (peakDay && peakDay === today && insights.length < 3) {
+    insights.push({
+      type: 'pattern',
+      icon: '📅',
+      title: "Today's your peak application day",
+      body: `You're most productive on ${peakDay}s. Make the most of it!`,
+      cta: null,
+    });
+  }
+
+  if (interviewJobs.length > 0 && offerJobs.length === 0 && insights.length < 3) {
+    insights.push({
+      type: 'coaching',
+      icon: '🎤',
+      title: `${interviewJobs.length} interview${interviewJobs.length > 1 ? 's' : ''} coming up`,
+      body: `Prepare thoroughly: research the company, practice STAR method, and prepare questions.`,
       cta: null,
     });
   }

@@ -58,11 +58,20 @@ export default function StatCards({ summary, jobs, loading }) {
     );
   }
 
-  const appliedJobs = (jobs || []).filter((j) => APPLIED_STATUSES.includes(j.application_status));
   const savedJobs = (jobs || []).filter((j) => j.application_status === 'saved');
+  const appliedJobs = (jobs || []).filter((j) => j.application_status === 'applied');
   const interviewJobs = (jobs || []).filter((j) => j.application_status === 'interview');
-  const responseRate =
-    appliedJobs.length > 0 ? Math.round((interviewJobs.length / appliedJobs.length) * 100) : 0;
+  const closedJobs = (jobs || []).filter((j) => j.application_status === 'closed');
+  
+  const totalSubmitted = appliedJobs.length + interviewJobs.length + closedJobs.length;
+  const responseRate = totalSubmitted > 0 ? Math.round((interviewJobs.length / totalSubmitted) * 100) : 0;
+  
+  const uniqueCompanies = new Set(
+    (jobs || [])
+      .filter((j) => APPLIED_STATUSES.includes(j.application_status))
+      .map((j) => (j.company || '').toLowerCase())
+      .filter(Boolean)
+  ).size;
 
   const applicationsByDay = (summary?.applications_by_day || []).slice(-7);
   const sparkData = applicationsByDay.map((d) => d.count || 0);
@@ -73,8 +82,9 @@ export default function StatCards({ summary, jobs, loading }) {
     {
       icon: SendRoundedIcon,
       label: 'Applied',
-      value: summary?.stats?.jobs_applied ?? 0,
-      sub: null,
+      value: totalSubmitted,
+      sub: totalSubmitted > 0 ? `${appliedJobs.length} pending response` : null,
+      subColor: 'text.secondary',
       sparkline: sparkData,
       tone: 'primary',
       trend: sparkData.length ? sparkTrend : 0,
@@ -82,8 +92,8 @@ export default function StatCards({ summary, jobs, loading }) {
     {
       icon: BookmarkRoundedIcon,
       label: 'Saved',
-      value: summary?.stats?.jobs_saved ?? 0,
-      sub: savedJobs.length > 5 ? `${savedJobs.length} not yet applied` : null,
+      value: savedJobs.length,
+      sub: savedJobs.length > 5 ? `${savedJobs.length} ready to apply` : null,
       subColor: 'warning',
       sparkline: null,
       tone: 'warning',
@@ -92,8 +102,8 @@ export default function StatCards({ summary, jobs, loading }) {
     {
       icon: DomainRoundedIcon,
       label: 'Companies',
-      value: summary?.stats?.companies_checked ?? 0,
-      sub: null,
+      value: uniqueCompanies,
+      sub: uniqueCompanies > 0 ? `${uniqueCompanies} unique` : null,
       sparkline: null,
       tone: 'neutral',
       trend: null,
@@ -105,7 +115,7 @@ export default function StatCards({ summary, jobs, loading }) {
       sub:
         interviewJobs.length > 0
           ? `${interviewJobs.length} interview${interviewJobs.length > 1 ? 's' : ''}`
-          : 'No interviews yet',
+          : totalSubmitted > 0 ? 'Keep applying' : 'No data yet',
       subColor: interviewJobs.length > 0 ? 'success' : 'text.secondary',
       sparkline: null,
       tone: interviewJobs.length > 0 ? 'success' : 'neutral',

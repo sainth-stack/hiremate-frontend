@@ -2,11 +2,11 @@ import { Box, Typography } from '@mui/material';
 import SkeletonCard from './SkeletonCard';
 
 const STAGES = [
-  { key: 'saved', label: 'Saved', color: '#6D28D9' },
-  { key: 'applied', label: 'Applied', color: '#2563EB' },
-  { key: 'interview', label: 'Interview', color: '#16A34A' },
-  { key: 'offer', label: 'Offer', color: '#D97706' },
-  { key: 'closed', label: 'Closed', color: '#64748B' },
+  { key: 'saved', label: 'Saved', color: '#64748B' },
+  { key: 'applied', label: 'Applied', color: '#06B6D4' },
+  { key: 'interview', label: 'Interview', color: '#10B981' },
+  { key: 'offer', label: 'Offer', color: '#F59E0B' },
+  { key: 'closed', label: 'Closed', color: '#1E3A8A' },
 ];
 
 export default function ApplicationFunnel({ jobs, loading }) {
@@ -17,24 +17,29 @@ export default function ApplicationFunnel({ jobs, loading }) {
     return acc;
   }, {});
 
-  const rates = STAGES.slice(1).map((stage, i) => {
-    const prev = counts[STAGES[i].key] || 0;
-    const curr = counts[stage.key] || 0;
-    return prev > 0 ? Math.round((curr / prev) * 100) : 0;
-  });
+  const savedCount = counts.saved || 0;
+  const appliedCount = counts.applied || 0;
+  const interviewCount = counts.interview || 0;
+  const offerCount = counts.offer || 0;
+  
+  const totalSubmitted = appliedCount + interviewCount + offerCount + (counts.closed || 0);
+  
+  const savedToAppliedRate = savedCount > 0 ? Math.round((totalSubmitted / (savedCount + totalSubmitted)) * 100) : 0;
+  const appliedToInterviewRate = totalSubmitted > 0 ? Math.round((interviewCount / totalSubmitted) * 100) : 0;
+  const interviewToOfferRate = interviewCount > 0 ? Math.round((offerCount / interviewCount) * 100) : 0;
+  
+  const rates = [savedToAppliedRate, appliedToInterviewRate, interviewToOfferRate, 100];
 
-  const coachingTips = [
-    `Your saved→applied rate is ${rates[0] || 0}%. Work through your saved jobs list.`,
-    `Your applied→interview rate is ${rates[1] || 0}%. Consider tailoring your resume per job.`,
-    `Your interview→offer rate is ${rates[2] || 0}%. Focus on interview prep.`,
-    "You've received offers — great work!",
-  ];
-  const nonzeroRates = rates.filter((r) => r > 0);
-  const lowestIdx = nonzeroRates.length > 0 ? rates.indexOf(Math.min(...nonzeroRates)) : 0;
-  const tip =
-    rates.every((r) => r === 0)
-      ? 'Start applying to see your funnel fill up!'
-      : coachingTips[lowestIdx] || coachingTips[0];
+  const getTip = () => {
+    if (totalSubmitted === 0) return 'Start applying to jobs to build your pipeline!';
+    if (offerCount > 0) return `Great job! You have ${offerCount} offer${offerCount > 1 ? 's' : ''}. Focus on negotiation.`;
+    if (interviewCount === 0 && totalSubmitted >= 5) return `Applied to ${totalSubmitted} jobs with no interviews yet. Tailor your resume to each job description.`;
+    if (interviewCount > 0 && offerCount === 0) return `${interviewCount} interview${interviewCount > 1 ? 's' : ''} scheduled. Practice common questions and research the companies.`;
+    if (savedCount > 5) return `You have ${savedCount} saved jobs. Set a goal to apply to 3 of them this week.`;
+    return 'Keep applying consistently to increase your chances!';
+  };
+  
+  const tip = getTip();
 
   return (
     <Box
@@ -76,7 +81,7 @@ export default function ApplicationFunnel({ jobs, loading }) {
         >
           {STAGES.map((stage, i) => {
             const count = counts[stage.key] ?? 0;
-            const rate = i > 0 ? rates[i - 1] || 0 : null;
+            const rate = i > 0 && i < rates.length ? rates[i - 1] || 0 : null;
             return (
               <Box key={stage.key} sx={{ display: 'flex', alignItems: 'center', gap: 3, flex: 1, minWidth: 100 }}>
                 <Box
@@ -172,8 +177,8 @@ export default function ApplicationFunnel({ jobs, loading }) {
         sx={{
           mt: 2.5,
           bgcolor: 'transparent',
-          background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.10) 0%, rgba(109, 40, 217, 0.06) 60%, rgba(16, 24, 40, 0.02) 100%)',
-          border: '1px solid rgba(37, 99, 235, 0.14)',
+          background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.10) 0%, rgba(6, 182, 212, 0.06) 60%, rgba(16, 24, 40, 0.02) 100%)',
+          border: '1px solid rgba(30, 58, 138, 0.14)',
           borderRadius: '12px',
           px: 2.5,
           py: 1.75,

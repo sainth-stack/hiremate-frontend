@@ -19,7 +19,7 @@ const getTheme = (mode = 'light') =>
       success: {
         main: '#10B981',
         light: '#4ade80',
-        dark: '#16a34a',
+        dark: '#10B981',
       },
       error: {
         main: '#dc2626',

@@ -137,9 +137,9 @@ export default function CareerHealthScore({ summary, jobs, loading }) {
                     px: 1.25,
                     py: 0.5,
                     borderRadius: '999px',
-                    bgcolor: 'rgba(245, 158, 11, 0.10)',
-                    border: '1px solid rgba(245, 158, 11, 0.18)',
-                    color: 'var(--warning)',
+                    bgcolor: 'rgba(6, 182, 212, 0.10)',
+                    border: '1px solid rgba(6, 182, 212, 0.18)',
+                    color: '#06B6D4',
                     fontSize: '12px',
                     fontWeight: 600,
                     lineHeight: 1,
@@ -149,7 +149,7 @@ export default function CareerHealthScore({ summary, jobs, loading }) {
                     gap: 0.75,
                   }}
                 >
-                  <WhatshotRoundedIcon sx={{ fontSize: 16, color: 'var(--warning)' }} />
+                  <WhatshotRoundedIcon sx={{ fontSize: 16, color: '#06B6D4' }} />
                   {streak}-day streak
                 </Box>
               )}
@@ -159,7 +159,7 @@ export default function CareerHealthScore({ summary, jobs, loading }) {
                   py: 0.5,
                   borderRadius: '999px',
                   bgcolor: color.bg,
-                  border: '1px solid rgba(37, 99, 235, 0.14)',
+                  border: '1px solid rgba(30, 58, 138, 0.14)',
                   color: color.text,
                   fontSize: '12px',
                   fontWeight: 600,
@@ -237,8 +237,8 @@ export default function CareerHealthScore({ summary, jobs, loading }) {
             justifySelf: { lg: 'end' },
             maxWidth: { xs: '100%', lg: 280 },
             borderRadius: '10px',
-            bgcolor: 'rgba(37, 99, 235, 0.06)',
-            border: '1px solid rgba(37, 99, 235, 0.12)',
+            bgcolor: 'rgba(30, 58, 138, 0.06)',
+            border: '1px solid rgba(30, 58, 138, 0.12)',
             px: 2,
             py: 1.5,
           }}
