@@ -480,6 +480,7 @@ export default function CustomizationPanel({
   onDesignChange,
   templates = [],
   onSectionsOrderChange,
+  customSections = [],
 }) {
   const [visibleTemplateCount, setVisibleTemplateCount] = useState(TEMPLATE_PAGE_SIZE);
   const currentTemplate = templates.find((t) => t.id === designConfig.template_id) ?? null;
@@ -1084,6 +1085,7 @@ export default function CustomizationPanel({
         <SectionReorder
           sectionsOrder={designConfig.sections_order ?? []}
           onReorder={onSectionsOrderChange}
+          customSections={customSections}
         />
 
       </PanelSection>

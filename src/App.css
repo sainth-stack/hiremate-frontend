@@ -4,11 +4,13 @@
    ============================================ */
 
 :root {
-  /* ---- Primary Blues ---- */
-  --primary: #2563eb;
+  /* ---- OpsBrain Brand Colors ---- */
+  --primary: #1E3A8A;
   --primary-light: #3b82f6;
-  --primary-dark: #1d4ed8;
+  --primary-dark: #0F1E35;
   --primary-contrast: #ffffff;
+  --accent-cyan: #06B6D4;
+  --accent-green: #10B981;
 
   /* ---- Light Blues ---- */
   --light-blue: #60a5fa;
@@ -87,7 +89,7 @@
   /* ---- Backgrounds ---- */
   --bg-default: #ffffff;
   --bg-paper: #ffffff;
-  --bg-light: #f8fafc;
+  --bg-light: #F3F4F6;
   --bg-app: #fdfdfc;
 
   /* ---- Placeholder ---- */

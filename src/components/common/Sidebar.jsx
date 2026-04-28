@@ -33,7 +33,7 @@ import { logout } from '../../store/auth/authSlice';
 import { toggleTheme } from '../../store/theme/themeSlice';
 import { getProfileCompletion } from '../../pages/profile/utils/profileCompletion';
 import SignOutConfirmDialog from './SignOutConfirmDialog';
-import logoImg from '../../assets/logo.png';
+import OpsBrainLogo from '../ui/OpsBrainLogo';
 
 const MAIN_NAV = [
   { label: 'Dashboard', path: '/', icon: SpaceDashboardRoundedIcon },
@@ -252,12 +252,7 @@ export default function Sidebar() {
           borderBottom: '1px solid var(--border-color)',
         }}
       >
-        <Box
-          component="img"
-          src={logoImg}
-          alt="OpsBrain"
-          sx={{ height: 32, objectFit: 'contain' }}
-        />
+        <OpsBrainLogo variant="full" height={34} darkMode={mode === 'dark'} />
       </Box>
 
       {/* ── Scrollable Nav ── */}

@@ -15,7 +15,7 @@ import {
   useTheme,
 } from '@mui/material';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import { getPrivacyPolicyAPI } from '../../services';
+import { getTermsOfServiceAPI } from '../../services';
 
 const SIDEBAR_W = 240;
 
@@ -49,10 +49,10 @@ function formatContent(text) {
   });
 }
 
-export default function PrivacyPolicy() {
+export default function TermsOfService() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [policy, setPolicy] = useState(null);
+  const [terms, setTerms] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeId, setActiveId] = useState('');
@@ -61,18 +61,18 @@ export default function PrivacyPolicy() {
   const observerRef = useRef(null);
 
   useEffect(() => {
-    getPrivacyPolicyAPI()
+    getTermsOfServiceAPI()
       .then((res) => {
-        setPolicy(res.data);
+        setTerms(res.data);
         setActiveId(res.data?.content?.sections?.[0]?.id ?? '');
       })
-      .catch(() => setError('Failed to load privacy policy. Please try again later.'))
+      .catch(() => setError('Failed to load terms of service. Please try again later.'))
       .finally(() => setLoading(false));
   }, []);
 
   // IntersectionObserver — highlight sidebar item as section scrolls into view
   useEffect(() => {
-    if (!policy) return;
+    if (!terms) return;
     const options = { rootMargin: '-20% 0px -70% 0px', threshold: 0 };
     observerRef.current = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -83,14 +83,14 @@ export default function PrivacyPolicy() {
       if (el) observerRef.current.observe(el);
     });
     return () => observerRef.current?.disconnect();
-  }, [policy]);
+  }, [terms]);
 
   const scrollTo = (id) => {
     sectionRefs.current[id]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setDrawerOpen(false);
   };
 
-  const sections = policy?.content?.sections ?? [];
+  const sections = terms?.content?.sections ?? [];
 
   const navList = (
     <List disablePadding sx={{ px: 1 }}>
@@ -156,11 +156,11 @@ export default function PrivacyPolicy() {
           OpsBrain
         </Typography>
         <Typography sx={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-          / Privacy Policy
+          / Terms of Service
         </Typography>
-        {policy && (
+        {terms && (
           <Chip
-            label={`v${policy.version}`}
+            label={`v${terms.version}`}
             size="small"
             sx={{ ml: 'auto', fontSize: '0.75rem' }}
           />
@@ -261,22 +261,22 @@ export default function PrivacyPolicy() {
                 <SectionSkeleton key={i} />
               ))}
             </>
-          ) : policy ? (
+          ) : terms ? (
             <>
               <Typography
                 variant="h4"
                 sx={{ fontWeight: 700, mb: 0.5, color: 'var(--text-primary)' }}
               >
-                {policy.title}
+                {terms.title}
               </Typography>
               <Typography sx={{ color: 'var(--text-muted)', fontSize: '0.875rem', mb: 0.5 }}>
                 Effective date:{' '}
-                <strong>{policy.content?.effective_date ?? '—'}</strong>
+                <strong>{terms.content?.effective_date ?? '—'}</strong>
               </Typography>
               <Typography sx={{ color: 'var(--text-muted)', fontSize: '0.875rem', mb: 4 }}>
                 Last updated:{' '}
                 <strong>
-                  {new Date(policy.updated_at).toLocaleDateString('en-US', {
+                  {new Date(terms.updated_at).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
@@ -317,10 +317,10 @@ export default function PrivacyPolicy() {
                 <Typography sx={{ color: 'var(--text-muted)', fontSize: '0.8125rem' }}>
                   For questions contact{' '}
                   <a
-                    href={`mailto:${policy.content?.contact_email}`}
+                    href={`mailto:${terms.content?.contact_email}`}
                     style={{ color: 'var(--primary)' }}
                   >
-                    {policy.content?.contact_email}
+                    {terms.content?.contact_email}
                   </a>
                 </Typography>
               </Box>

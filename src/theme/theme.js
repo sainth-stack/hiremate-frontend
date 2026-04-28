@@ -1,23 +1,23 @@
 import { createTheme } from '@mui/material/styles';
 
-// Blue / light blue palette - sync with CSS variables in App.css
+// OpsBrain color palette - sync with CSS variables in App.css
 const getTheme = (mode = 'light') =>
   createTheme({
     palette: {
       mode,
       primary: {
-        main: mode === 'dark' ? '#3b82f6' : '#2563eb',
+        main: mode === 'dark' ? '#3b82f6' : '#1E3A8A',
         light: mode === 'dark' ? '#60a5fa' : '#3b82f6',
-        dark: mode === 'dark' ? '#2563eb' : '#1d4ed8',
+        dark: mode === 'dark' ? '#1E3A8A' : '#0F1E35',
         contrastText: '#ffffff',
       },
       secondary: {
-        main: mode === 'dark' ? '#38bdf8' : '#0ea5e9',
+        main: mode === 'dark' ? '#38bdf8' : '#06B6D4',
         light: mode === 'dark' ? '#7dd3fc' : '#38bdf8',
         dark: mode === 'dark' ? '#0ea5e9' : '#0284c7',
       },
       success: {
-        main: '#22c55e',
+        main: '#10B981',
         light: '#4ade80',
         dark: '#16a34a',
       },

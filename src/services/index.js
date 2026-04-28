@@ -68,6 +68,9 @@ export {
   getPrivacyPolicyAPI,
   getPrivacyPolicyHistoryAPI,
   updatePrivacyPolicyAPI,
+  getTermsOfServiceAPI,
+  getTermsOfServiceHistoryAPI,
+  updateTermsOfServiceAPI,
 } from './legalService';
 
 export {

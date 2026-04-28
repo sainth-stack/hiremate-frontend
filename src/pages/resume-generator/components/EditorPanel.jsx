@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Button, IconButton, InputBase, TextField, Chip, Tabs, Tab, Tooltip, FormControlLabel, Switch } from '@mui/material';
+import { Box, Typography, Button, IconButton, InputBase, TextField, Chip, Tabs, Tab, Tooltip, FormControlLabel, Switch, FormControl, ToggleButtonGroup, ToggleButton, Card } from '@mui/material';
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import DriveFileRenameOutlineRoundedIcon from '@mui/icons-material/DriveFileRenameOutlineRounded';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
@@ -16,6 +16,8 @@ import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import PaletteRoundedIcon from '@mui/icons-material/PaletteRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import AutoFixHighRoundedIcon from '@mui/icons-material/AutoFixHighRounded';
+import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
+import SubjectRoundedIcon from '@mui/icons-material/SubjectRounded';
 import CircularProgress from '@mui/material/CircularProgress';
 import CustomInput from '../../../components/inputs/CustomInput';
 import CustomizationPanel from './CustomizationPanel';
@@ -23,11 +25,14 @@ import SectionEditor from './SectionEditor';
 import {
   ResumeSectionCard,
   BulletEditor,
+  SkillCategoryEditor,
   getBulletChar,
   EMPTY_EDUCATION,
   EMPTY_EXPERIENCE,
   EMPTY_TECH_SKILL,
   EMPTY_SOFT_SKILL,
+  EMPTY_SKILL_CATEGORY,
+  EMPTY_CUSTOM_SECTION,
   EMPTY_PROJECT,
 } from './SharedComponents';
 import { RESUME_STUDIO_THEME as T } from '../../../utilities/resumeStudioTheme';
@@ -595,105 +600,61 @@ export default function EditorPanel({
             <ResumeSectionCard
               title="Skills"
               badge={
-                ((profile.techSkills?.filter((s) => s.name?.trim()).length || 0) + (profile.softSkills?.filter((s) => s.name?.trim()).length || 0) > 0)
-                  ? `${profile.techSkills?.filter((s) => s.name?.trim()).length || 0} technical, ${profile.softSkills?.filter((s) => s.name?.trim()).length || 0} soft`
+                profile.skillCategories?.length
+                  ? `${profile.skillCategories.length} ${profile.skillCategories.length === 1 ? 'category' : 'categories'}`
                   : null
               }
             >
-              <SectionEditor
-                section="skills"
-                resumeId={selectedResumeId}
-                onChange={(content) => {
-                  const lines = content.split('\n').filter(Boolean);
-                  const newSkills = [];
-                  for (const line of lines) {
-                    const colonIdx = line.indexOf(':');
-                    if (colonIdx === -1) continue;
-                    const items = line.slice(colonIdx + 1).split(',').map((s) => s.trim()).filter(Boolean);
-                    items.forEach((name) => newSkills.push({ name, level: '', years: '' }));
-                  }
-                  if (newSkills.length > 0) {
-                    setProfile((p) => ({ ...p, techSkills: newSkills }));
-                    scheduleProfilePatch();
-                  }
-                }}
-              />
-              <Box sx={{ '& > * + *': { mt: 2.5 } }}>
-                <Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-                    <Typography variant="caption" sx={{ fontWeight: 600, fontFamily: 'var(--font-family)', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Technical Skills
-                    </Typography>
-                    <Button
-                      size="small"
-                      variant="text"
-                      startIcon={<AddRoundedIcon sx={{ fontSize: 16 }} />}
-                      onClick={() => setProfile((p) => ({ ...p, techSkills: [...(p.techSkills || []), { ...EMPTY_TECH_SKILL }] }))}
-                      sx={{ fontFamily: 'var(--font-family)', textTransform: 'none', fontSize: '0.75rem', color: 'var(--primary)', minWidth: 0, py: 0.25 }}
-                    >
-                      Add
-                    </Button>
-                  </Box>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                    {(profile.techSkills || []).map((skill, idx) => (
-                      <Box
-                        key={idx}
-                        sx={{
-                          display: 'grid',
-                          gridTemplateColumns: '1fr auto auto',
-                          gap: 1,
-                          alignItems: 'flex-start',
-                          p: 1.5,
-                          borderRadius: 1,
-                          bgcolor: 'var(--bg-light)',
-                          border: '1px solid var(--border-color)',
-                        }}
-                      >
-                        <CustomInput label="Skill" placeholder="e.g. React, Python" value={skill.name || ''} onChange={(e) => { const next = [...(profile.techSkills || [])]; next[idx] = { ...next[idx], name: e.target.value }; setProfile((p) => ({ ...p, techSkills: next })); scheduleProfilePatch(); }} />
-                        <CustomInput label="Level" placeholder="Expert" value={skill.level || ''} onChange={(e) => { const next = [...(profile.techSkills || [])]; next[idx] = { ...next[idx], level: e.target.value }; setProfile((p) => ({ ...p, techSkills: next })); scheduleProfilePatch(); }} sx={{ minWidth: 90 }} />
-                        <IconButton size="small" onClick={() => { setProfile((p) => ({ ...p, techSkills: p.techSkills.filter((_, i) => i !== idx).length ? p.techSkills.filter((_, i) => i !== idx) : [{ ...EMPTY_TECH_SKILL }] })); scheduleProfilePatch(); }} disabled={(profile.techSkills || []).length <= 1} sx={{ color: 'var(--text-muted)', mt: 0.5 }}>
-                          <DeleteOutlinedIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    ))}
-                  </Box>
-                </Box>
-                <Box sx={{ pt: 1.5, borderTop: '1px solid var(--border-color)' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-                    <Typography variant="caption" sx={{ fontWeight: 600, fontFamily: 'var(--font-family)', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Soft Skills
-                    </Typography>
-                    <Button
-                      size="small"
-                      variant="text"
-                      startIcon={<AddRoundedIcon sx={{ fontSize: 16 }} />}
-                      onClick={() => setProfile((p) => ({ ...p, softSkills: [...(p.softSkills || []), { ...EMPTY_SOFT_SKILL }] }))}
-                      sx={{ fontFamily: 'var(--font-family)', textTransform: 'none', fontSize: '0.75rem', color: 'var(--primary)', minWidth: 0, py: 0.25 }}
-                    >
-                      Add
-                    </Button>
-                  </Box>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                    {(profile.softSkills || []).map((skill, idx) => (
-                      <Box
-                        key={idx}
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          flex: '1 1 100%',
-                          minWidth: 0,
-                        }}
-                      >
-                        <CustomInput label="Skill" placeholder="e.g. Leadership, Communication" value={skill.name || ''} onChange={(e) => { const next = [...(profile.softSkills || [])]; next[idx] = { ...next[idx], name: e.target.value }; setProfile((p) => ({ ...p, softSkills: next })); scheduleProfilePatch(); }} sx={{ flex: 1, minWidth: 0 }} />
-                        <IconButton size="small" onClick={() => { setProfile((p) => ({ ...p, softSkills: p.softSkills.filter((_, i) => i !== idx).length ? p.softSkills.filter((_, i) => i !== idx) : [{ ...EMPTY_SOFT_SKILL }] })); scheduleProfilePatch(); }} disabled={(profile.softSkills || []).length <= 1} sx={{ color: 'var(--text-muted)', flexShrink: 0 }}>
-                          <DeleteOutlinedIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    ))}
-                  </Box>
-                </Box>
+              <Typography variant="caption" color="var(--text-muted)" sx={{ display: 'block', mb: 2, fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
+                Organize your skills into categories. Click category names to rename, add skills by typing and pressing Enter.
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {(profile.skillCategories || []).map((category, idx) => (
+                  <SkillCategoryEditor
+                    key={idx}
+                    categoryName={category.categoryName || ''}
+                    skills={category.skills || []}
+                    onChange={(newCategoryName, newSkills) => {
+                      const next = [...(profile.skillCategories || [])];
+                      next[idx] = { ...next[idx], categoryName: newCategoryName, skills: newSkills };
+                      setProfile((p) => ({ ...p, skillCategories: next }));
+                      scheduleProfilePatch();
+                    }}
+                    onRemove={() => {
+                      const next = profile.skillCategories.filter((_, i) => i !== idx);
+                      setProfile((p) => ({
+                        ...p,
+                        skillCategories: next.length ? next : [{ ...EMPTY_SKILL_CATEGORY, categoryName: 'Skills', order: 0 }]
+                      }));
+                      scheduleProfilePatch();
+                    }}
+                    canRemove={(profile.skillCategories || []).length > 1}
+                  />
+                ))}
               </Box>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<AddRoundedIcon />}
+                onClick={() => {
+                  const order = (profile.skillCategories || []).length;
+                  setProfile((p) => ({
+                    ...p,
+                    skillCategories: [...(p.skillCategories || []), { ...EMPTY_SKILL_CATEGORY, categoryName: `New Category`, order }]
+                  }));
+                  scheduleProfilePatch();
+                }}
+                sx={{ 
+                  fontFamily: 'var(--font-family)', 
+                  textTransform: 'none', 
+                  mt: 2,
+                  borderColor: T.border,
+                  color: T.textPrimary,
+                  '&:hover': { borderColor: T.primary, bgcolor: T.primarySoft }
+                }}
+              >
+                Add Skill Category
+              </Button>
             </ResumeSectionCard>
             <ResumeSectionCard title="Projects" badge={profile.projects?.length ? `${profile.projects.length} projects` : null}>
               {(profile.projects || []).map((proj, idx) => (
@@ -723,6 +684,212 @@ export default function EditorPanel({
               ))}
               <Button size="small" variant="outlined" startIcon={<AddRoundedIcon />} onClick={() => setProfile((p) => ({ ...p, projects: [...(p.projects || []), { ...EMPTY_PROJECT }] }))} sx={{ fontFamily: 'var(--font-family)', textTransform: 'none' }}>Add Project</Button>
             </ResumeSectionCard>
+            {(profile.customSections || []).map((section, idx) => (
+              <ResumeSectionCard 
+                key={idx}
+                defaultOpen={true}
+                title={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, minWidth: 0 }}>
+                    <InputBase
+                      value={section.sectionName || ''}
+                      onChange={(e) => {
+                        const next = [...(profile.customSections || [])];
+                        next[idx] = { ...next[idx], sectionName: e.target.value, sectionId: e.target.value.toLowerCase().replace(/\s+/g, '_') };
+                        setProfile((p) => ({ ...p, customSections: next }));
+                        scheduleProfilePatch();
+                      }}
+                      placeholder="Section Name"
+                      sx={{
+                        flex: 1,
+                        minWidth: 0,
+                        fontFamily: 'var(--font-family)',
+                        fontWeight: 600,
+                        fontSize: '0.9375rem',
+                        color: 'var(--text-primary)',
+                        '& input': {
+                          padding: '4px 8px',
+                          borderRadius: 1,
+                          '&:hover': {
+                            bgcolor: 'rgba(0, 0, 0, 0.02)',
+                          },
+                          '&:focus': {
+                            bgcolor: 'rgba(51, 94, 222, 0.04)',
+                            outline: `1.5px solid ${T.primary}`,
+                          }
+                        }
+                      }}
+                    />
+                  </Box>
+                }
+                badge={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          size="small"
+                          checked={section.enabled !== false}
+                          onChange={(e) => {
+                            const next = [...(profile.customSections || [])];
+                            next[idx] = { ...next[idx], enabled: e.target.checked };
+                            setProfile((p) => ({ ...p, customSections: next }));
+                            scheduleProfilePatch();
+                          }}
+                        />
+                      }
+                      label={<Typography sx={{ fontSize: '0.75rem', fontFamily: 'var(--font-family)' }}>Show</Typography>}
+                      sx={{ mr: 1 }}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setProfile((p) => ({
+                          ...p,
+                          customSections: p.customSections.filter((_, i) => i !== idx)
+                        }));
+                        scheduleProfilePatch();
+                      }}
+                      sx={{ color: 'var(--text-muted)', '&:hover': { color: 'error.main' } }}
+                    >
+                      <DeleteOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                }
+              >
+                <Box sx={{ mb: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                    <Typography variant="caption" sx={{ fontFamily: 'var(--font-family)', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600 }}>
+                      Format:
+                    </Typography>
+                    <ToggleButtonGroup
+                      value={section.format || 'bullets'}
+                      exclusive
+                      onChange={(e, newFormat) => {
+                        if (newFormat !== null) {
+                          const next = [...(profile.customSections || [])];
+                          next[idx] = { ...next[idx], format: newFormat };
+                          setProfile((p) => ({ ...p, customSections: next }));
+                          scheduleProfilePatch();
+                        }
+                      }}
+                      size="small"
+                      sx={{ 
+                        height: 28,
+                        '& .MuiToggleButton-root': {
+                          px: 1.5,
+                          py: 0.5,
+                          fontSize: '0.75rem',
+                          fontFamily: 'var(--font-family)',
+                          textTransform: 'none',
+                          border: '1px solid var(--border-color)',
+                          color: 'var(--text-secondary)',
+                          '&.Mui-selected': {
+                            bgcolor: 'var(--light-blue-bg)',
+                            color: 'var(--primary)',
+                            borderColor: 'var(--primary)',
+                            '&:hover': { bgcolor: 'var(--light-blue-bg)' }
+                          },
+                          '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.02)' }
+                        }
+                      }}
+                    >
+                      <ToggleButton value="bullets">
+                        <FormatListBulletedRoundedIcon sx={{ fontSize: 14, mr: 0.5 }} />
+                        Bullet Points
+                      </ToggleButton>
+                      <ToggleButton value="paragraph">
+                        <SubjectRoundedIcon sx={{ fontSize: 14, mr: 0.5 }} />
+                        Paragraph
+                      </ToggleButton>
+                    </ToggleButtonGroup>
+                  </Box>
+                </Box>
+
+                <Box>
+                  {section.format === 'paragraph' ? (
+                    <TextField
+                      size="small"
+                      fullWidth
+                      multiline
+                      minRows={3}
+                      placeholder="Write paragraph content here..."
+                      value={section.content || ''}
+                      onChange={(e) => {
+                        const next = [...(profile.customSections || [])];
+                        next[idx] = { ...next[idx], content: e.target.value };
+                        setProfile((p) => ({ ...p, customSections: next }));
+                        scheduleProfilePatch();
+                      }}
+                      sx={{ 
+                        fontFamily: 'var(--font-family)', 
+                        '& .MuiOutlinedInput-root': { 
+                          borderRadius: 1,
+                          fontSize: '0.875rem',
+                          lineHeight: 1.6
+                        } 
+                      }}
+                    />
+                  ) : (
+                    <BulletEditor
+                      bulletChar={getBulletChar(designConfig.bullet_icon)}
+                      value={section.content || ''}
+                      onChange={(val) => {
+                        const next = [...(profile.customSections || [])];
+                        next[idx] = { ...next[idx], content: val };
+                        setProfile((p) => ({ ...p, customSections: next }));
+                        scheduleProfilePatch();
+                      }}
+                    />
+                  )}
+                </Box>
+              </ResumeSectionCard>
+            ))}
+            <ResumeSectionCard 
+              title="Add Custom Section" 
+              defaultOpen={false}
+              badge={
+                <Chip 
+                  label="Optional" 
+                  size="small" 
+                  sx={{ 
+                    height: 20, 
+                    fontSize: '0.65rem', 
+                    fontWeight: 600,
+                    bgcolor: 'rgba(156, 163, 175, 0.12)',
+                    color: '#6B7280'
+                  }} 
+                />
+              }
+            >
+              <Typography variant="caption" color="var(--text-muted)" sx={{ display: 'block', mb: 2, fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
+                Add sections like Certifications, Awards, Publications, Volunteer Work, Languages, etc.
+              </Typography>
+              <Button
+                size="small"
+                variant="contained"
+                disableElevation
+                startIcon={<AddRoundedIcon />}
+                onClick={() => {
+                  const order = (profile.customSections || []).length;
+                  setProfile((p) => ({
+                    ...p,
+                    customSections: [...(p.customSections || []), { ...EMPTY_CUSTOM_SECTION, sectionName: 'New Section', sectionId: `section_${order}`, order }]
+                  }));
+                  scheduleProfilePatch();
+                }}
+                sx={{ 
+                  fontFamily: 'var(--font-family)', 
+                  textTransform: 'none',
+                  bgcolor: T.primary,
+                  fontSize: '0.8125rem',
+                  boxShadow: 'none',
+                  '&:hover': { bgcolor: T.primaryDark, boxShadow: 'none' }
+                }}
+              >
+                Add New Section
+              </Button>
+            </ResumeSectionCard>
           </Box>
         )}
         {activeTab === 'design' && (
@@ -731,6 +898,7 @@ export default function EditorPanel({
             onDesignChange={handleDesignChange}
             templates={templates}
             onSectionsOrderChange={handleSectionsOrderChange}
+            customSections={profile.customSections || []}
           />
         )}
       </Box>

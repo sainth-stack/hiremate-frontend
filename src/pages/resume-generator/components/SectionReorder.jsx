@@ -26,8 +26,12 @@ const SECTION_LABELS = {
   awards: 'Awards',
 };
 
-function SortableItem({ id }) {
+function SortableItem({ id, customSections }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  
+  // Check if this is a custom section
+  const customSection = customSections?.find(s => s.sectionId === id);
+  const label = customSection ? customSection.sectionName : (SECTION_LABELS[id] ?? id.charAt(0).toUpperCase() + id.slice(1));
 
   return (
     <Box
@@ -54,16 +58,51 @@ function SortableItem({ id }) {
     >
       <Typography sx={{ color: '#9CA3AF', fontSize: '0.9rem', lineHeight: 1, mr: 0.5 }}>⠿</Typography>
       <Typography variant="body2" sx={{ fontFamily: 'var(--font-family)', fontSize: '0.8125rem', color: '#374151', fontWeight: 500 }}>
-        {SECTION_LABELS[id] ?? id.charAt(0).toUpperCase() + id.slice(1)}
+        {label}
       </Typography>
+      {customSection && (
+        <Typography 
+          variant="caption" 
+          sx={{ 
+            ml: 'auto', 
+            px: 0.75, 
+            py: 0.25, 
+            bgcolor: 'rgba(99, 102, 241, 0.1)', 
+            color: '#6366f1', 
+            borderRadius: 0.5, 
+            fontSize: '0.65rem',
+            fontWeight: 600
+          }}
+        >
+          Custom
+        </Typography>
+      )}
     </Box>
   );
 }
 
 const DEFAULT_ORDER = ['summary', 'experience', 'skills', 'education', 'projects', 'certifications'];
 
-export default function SectionReorder({ sectionsOrder, onReorder }) {
-  const items = (sectionsOrder && sectionsOrder.length > 0) ? sectionsOrder : DEFAULT_ORDER;
+export default function SectionReorder({ sectionsOrder, onReorder, customSections = [] }) {
+  // Merge default sections with custom section IDs
+  const customSectionIds = customSections.filter(s => s.enabled !== false).map(s => s.sectionId);
+  const defaultWithCustom = [...DEFAULT_ORDER, ...customSectionIds];
+  
+  // Use provided order or default
+  let items = (sectionsOrder && sectionsOrder.length > 0) ? sectionsOrder : defaultWithCustom;
+  
+  // Add any new custom sections that aren't in the order yet
+  customSectionIds.forEach(id => {
+    if (!items.includes(id)) {
+      items = [...items, id];
+    }
+  });
+  
+  // Remove custom sections that no longer exist
+  items = items.filter(id => {
+    if (DEFAULT_ORDER.includes(id)) return true;
+    return customSectionIds.includes(id);
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -83,7 +122,7 @@ export default function SectionReorder({ sectionsOrder, onReorder }) {
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
         {items.map((section) => (
-          <SortableItem key={section} id={section} />
+          <SortableItem key={section} id={section} customSections={customSections} />
         ))}
       </SortableContext>
     </DndContext>

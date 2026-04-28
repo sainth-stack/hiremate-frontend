@@ -39,6 +39,7 @@ import AdminLearning from '../pages/admin/AdminLearning';
 import AdminIssues from '../pages/admin/AdminIssues';
 import AdminTokenUsage from '../pages/admin/AdminTokenUsage';
 import PrivacyPolicy from '../pages/legal/PrivacyPolicy';
+import TermsOfService from '../pages/legal/TermsOfService';
 import ReportIssuePage from '../pages/report-issue/ReportIssuePage';
 import JobRecommendationPage from '../pages/job-recommendation/JobRecommendationPage';
 
@@ -48,6 +49,7 @@ export default function AppRoutes() {
       <Routes>
         {/* Public routes — no auth required */}
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
 
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<Login />} />

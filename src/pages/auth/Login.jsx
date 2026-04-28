@@ -9,7 +9,7 @@ import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import VisibilityOffRoundedIcon from '@mui/icons-material/VisibilityOffRounded';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import logoImg from '../../assets/logo.png';
+import OpsBrainLogo from '../../components/ui/OpsBrainLogo';
 import { login, clearError } from '../../store/auth/authSlice';
 import { startGoogleLogin } from '../../services/authService';
 
@@ -27,21 +27,25 @@ function InputField({ icon: Icon, placeholder, value, onChange, onBlur, type = '
   return (
     <Box
       sx={{
-        display: 'flex', alignItems: 'center', gap: 1.25,
-        px: 1.75, py: 1.25, borderRadius: 2,
-        border: `1.5px solid ${error ? 'var(--error)' : 'var(--border-color)'}`,
-        bgcolor: 'var(--grey-5)',
-        transition: 'border-color 0.18s, box-shadow 0.18s',
+        display: 'flex', alignItems: 'center', gap: 1.5,
+        px: 1.5, py: 1.25, borderRadius: '10px',
+        border: `1px solid ${error ? 'var(--error)' : 'rgba(0,0,0,0.08)'}`,
+        bgcolor: '#ffffff',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
         '&:focus-within': {
-          borderColor: error ? 'var(--error)' : 'var(--primary)',
+          borderColor: error ? 'var(--error)' : '#1E3A8A',
           boxShadow: error
-            ? '0 0 0 3px rgba(220,38,38,0.1)'
-            : '0 0 0 3px rgba(59,130,246,0.12)',
+            ? '0 0 0 4px rgba(220,38,38,0.08)'
+            : '0 0 0 4px rgba(30,58,138,0.06)',
+          bgcolor: '#ffffff',
         },
-        '&:hover': { borderColor: error ? 'var(--error)' : 'var(--text-muted)' },
+        '&:hover': { 
+          borderColor: error ? 'var(--error)' : 'rgba(0,0,0,0.15)',
+        },
       }}
     >
-      {Icon && <Icon sx={{ fontSize: 17, color: 'var(--text-muted)', flexShrink: 0 }} />}
+      {Icon && <Icon sx={{ fontSize: 18, color: 'rgba(0,0,0,0.4)', flexShrink: 0 }} />}
       <InputBase
         placeholder={placeholder}
         value={value}
@@ -52,7 +56,7 @@ function InputField({ icon: Icon, placeholder, value, onChange, onBlur, type = '
         sx={{
           fontSize: 14, fontWeight: 500,
           color: 'var(--text-primary)',
-          '& input::placeholder': { color: 'var(--placeholder)', opacity: 1 },
+          '& input::placeholder': { color: 'rgba(0,0,0,0.3)', opacity: 1 },
         }}
       />
       {endAdornment}
@@ -94,12 +98,30 @@ export default function Login() {
     <Box>
       {/* Logo + heading */}
       <Box sx={{ mb: 4 }}>
-        <Box component="img" src={logoImg} alt="HireMate" sx={{ height: 32, objectFit: 'contain', mb: 3, display: { md: 'none' } }} />
-        <Typography sx={{ fontSize: 26, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.4px', mb: 0.5 }}>
+        <Box sx={{ mb: 4, display: { md: 'none' } }}>
+          <OpsBrainLogo variant="full" height={38} darkMode={false} />
+        </Box>
+        <Typography 
+          sx={{ 
+            fontSize: 30, 
+            fontWeight: 800, 
+            color: 'var(--text-primary)', 
+            letterSpacing: '-0.03em', 
+            mb: 1.25,
+            fontFamily: '"Inter", "Poppins", system-ui, -apple-system, sans-serif'
+          }}
+        >
           Welcome back
         </Typography>
-        <Typography sx={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 500 }}>
-          Sign in to continue to HireMate
+        <Typography 
+          sx={{ 
+            fontSize: 15, 
+            color: 'var(--text-muted)', 
+            fontWeight: 500,
+            lineHeight: 1.6
+          }}
+        >
+          Enter your details to access your account.
         </Typography>
       </Box>
 
@@ -145,7 +167,7 @@ export default function Login() {
             <Typography
               component={Link}
               to="/forgot-password"
-              sx={{ fontSize: 12, fontWeight: 600, color: 'var(--primary)', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+              sx={{ fontSize: 12, fontWeight: 600, color: '#1E3A8A', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
             >
               Forgot password?
             </Typography>
@@ -203,12 +225,20 @@ export default function Login() {
           variant="contained"
           disabled={loading}
           sx={{
-            mt: 0.5, height: 44, borderRadius: 2,
+            mt: 0.5, height: 44, borderRadius: '10px',
             textTransform: 'none', fontWeight: 700, fontSize: 15,
-            background: loading ? undefined : 'linear-gradient(135deg, var(--primary), #8B5CF6)',
-            boxShadow: '0 4px 14px rgba(37,99,235,0.3)',
+            bgcolor: '#0F1E35',
+            background: loading ? undefined : 'linear-gradient(135deg, #0F1E35 0%, #1E3A8A 100%)',
+            boxShadow: '0 4px 12px rgba(15,30,53,0.25)',
             letterSpacing: '0.01em',
-            '&:disabled': { opacity: 0.65 },
+            transition: 'all 0.2s',
+            '&:hover': {
+              transform: 'translateY(-1px)',
+              boxShadow: '0 6px 16px rgba(15,30,53,0.3)',
+              background: 'linear-gradient(135deg, #162a4a 0%, #2547a8 100%)',
+            },
+            '&:active': { transform: 'translateY(0)' },
+            '&:disabled': { opacity: 0.7 },
           }}
         >
           {loading
@@ -242,14 +272,15 @@ export default function Login() {
         variant="outlined"
         onClick={startGoogleLogin}
         sx={{
-          height: 44, borderRadius: 2, textTransform: 'none',
+          height: 44, borderRadius: '10px', textTransform: 'none',
           fontWeight: 600, fontSize: 14, gap: 1.5,
-          borderColor: 'var(--border-color)',
+          borderColor: 'rgba(0,0,0,0.08)',
           color: 'var(--text-primary)',
-          bgcolor: 'var(--grey-5)',
+          bgcolor: '#ffffff',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
           '&:hover': {
-            borderColor: 'var(--primary)',
-            bgcolor: 'rgba(59,130,246,0.05)',
+            borderColor: 'rgba(0,0,0,0.15)',
+            bgcolor: '#f9fafb',
           },
         }}
         startIcon={
@@ -270,9 +301,29 @@ export default function Login() {
         <Typography
           component={Link}
           to="/register"
-          sx={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+          sx={{ color: '#1E3A8A', fontWeight: 700, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
         >
           Create one
+        </Typography>
+      </Typography>
+
+      {/* Legal Links */}
+      <Typography sx={{ mt: 2.5, fontSize: 12, color: 'var(--text-muted)', textAlign: 'center' }}>
+        By continuing, you agree to our{' '}
+        <Typography
+          component={Link}
+          to="/terms-of-service"
+          sx={{ color: '#1E3A8A', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+        >
+          Terms of Service
+        </Typography>
+        {' '}and{' '}
+        <Typography
+          component={Link}
+          to="/privacy-policy"
+          sx={{ color: '#1E3A8A', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+        >
+          Privacy Policy
         </Typography>
       </Typography>
 

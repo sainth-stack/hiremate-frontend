@@ -1,31 +1,46 @@
 import React, { useState } from 'react';
-import { Box, Card, Typography, TextField, IconButton, Chip } from '@mui/material';
+import { Box, Card, Typography, TextField, IconButton, Chip, Button, InputBase } from '@mui/material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import ExpandLessRoundedIcon from '@mui/icons-material/ExpandLessRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 export const EMPTY_EDUCATION = { degree: '', fieldOfStudy: '', institution: '', startYear: '', endYear: '', grade: '', location: '' };
 export const EMPTY_EXPERIENCE = { jobTitle: '', companyName: '', payrollCompany: '', employmentType: '', startDate: '', endDate: '', location: '', workMode: '', description: '', techStack: '' };
 export const EMPTY_TECH_SKILL = { name: '', level: '', years: '' };
 export const EMPTY_SOFT_SKILL = { name: '' };
+export const EMPTY_SKILL_CATEGORY = { categoryName: '', skills: [], order: 0 };
+export const EMPTY_CUSTOM_SECTION = { sectionId: '', sectionName: '', content: '', format: 'bullets', order: 0, enabled: true };
 export const EMPTY_PROJECT = { name: '', description: '', role: '', techStack: '', githubUrl: '', liveUrl: '', projectType: '' };
 
 export function ResumeSectionCard({ title, defaultOpen = false, badge, children }) {
   const [open, setOpen] = useState(defaultOpen);
+  const isStringTitle = typeof title === 'string';
+  
   return (
     <Card sx={{ mb: 2, borderRadius: 1.5, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', overflow: 'visible', border: '1px solid var(--border-color)' }}>
       <Box
         onClick={() => setOpen((o) => !o)}
         sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, py: 1.75, cursor: 'pointer', '&:hover': { bgcolor: 'rgba(0,0,0,0.02)' } }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
-          <Typography variant="subtitle2" sx={{ fontFamily: 'var(--font-family)', fontWeight: 600, fontSize: '0.9375rem' }} color="var(--text-primary)">
-            {title}
-          </Typography>
-          {badge != null && !open && (
-            <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontFamily: 'var(--font-family)' }}>{badge}</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0, flex: 1 }}>
+          {isStringTitle ? (
+            <Typography variant="subtitle2" sx={{ fontFamily: 'var(--font-family)', fontWeight: 600, fontSize: '0.9375rem' }} color="var(--text-primary)">
+              {title}
+            </Typography>
+          ) : (
+            title
+          )}
+          {badge != null && (
+            <Box sx={{ flexShrink: 0 }}>
+              {typeof badge === 'string' ? (
+                <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontFamily: 'var(--font-family)' }}>{badge}</Typography>
+              ) : (
+                badge
+              )}
+            </Box>
           )}
         </Box>
         {open ? <ExpandLessRoundedIcon sx={{ color: 'var(--text-muted)', flexShrink: 0 }} /> : <ExpandMoreRoundedIcon sx={{ color: 'var(--text-muted)', flexShrink: 0 }} />}
@@ -255,6 +270,219 @@ export function KeywordMatchCompact({ keywordCount = 0, totalKeywords = 0, match
         <Typography sx={{ fontSize: '0.65rem', color: '#6B7280', lineHeight: 1.2, mt: 0.25, fontFamily: 'var(--font-family)' }}>
           {keywordCount}/{totalKeywords} keywords
         </Typography>
+      </Box>
+    </Box>
+  );
+}
+
+/**
+ * SkillCategoryEditor - Simplified chip-based skill editor
+ * categoryName: string - name of the skill category (left side label)
+ * skills: string[] - array of skill names
+ * onChange: (categoryName: string, skills: string[]) => void
+ * onRemove: () => void - callback to remove entire category
+ * canRemove: boolean - whether the remove button should be enabled
+ */
+export function SkillCategoryEditor({ categoryName, skills = [], onChange, onRemove, canRemove = true }) {
+  const [inputValue, setInputValue] = useState('');
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempCategoryName, setTempCategoryName] = useState(categoryName);
+
+  const handleAddSkill = () => {
+    const trimmed = inputValue.trim();
+    if (trimmed && !skills.includes(trimmed)) {
+      onChange(categoryName, [...skills, trimmed]);
+      setInputValue('');
+    }
+  };
+
+  const handleRemoveSkill = (skillToRemove) => {
+    onChange(categoryName, skills.filter(s => s !== skillToRemove));
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddSkill();
+    }
+  };
+
+  const handleSaveCategoryName = () => {
+    const trimmed = tempCategoryName.trim();
+    if (trimmed) {
+      onChange(trimmed, skills);
+      setIsEditingName(false);
+    }
+  };
+
+  const handleCategoryNameKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSaveCategoryName();
+    } else if (e.key === 'Escape') {
+      setTempCategoryName(categoryName);
+      setIsEditingName(false);
+    }
+  };
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 1.5,
+        p: 2.5,
+        borderRadius: 2,
+        bgcolor: '#fff',
+        border: '1px solid var(--border-color)',
+        boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ flex: 1, minWidth: 0, mr: 2 }}>
+          {isEditingName ? (
+            <InputBase
+              autoFocus
+              value={tempCategoryName}
+              onChange={(e) => setTempCategoryName(e.target.value)}
+              onKeyDown={handleCategoryNameKeyDown}
+              onBlur={handleSaveCategoryName}
+              sx={{
+                fontFamily: 'var(--font-family)',
+                fontWeight: 600,
+                fontSize: '0.9375rem',
+                color: 'var(--text-primary)',
+                border: '1.5px solid var(--primary)',
+                borderRadius: 1,
+                px: 1.5,
+                py: 0.75,
+                bgcolor: 'rgba(51, 94, 222, 0.04)',
+                width: '100%',
+              }}
+            />
+          ) : (
+            <Box 
+              onClick={() => setIsEditingName(true)}
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1,
+                cursor: 'pointer',
+                px: 1.5,
+                py: 0.75,
+                borderRadius: 1,
+                transition: 'all 0.15s',
+                '&:hover': {
+                  bgcolor: 'rgba(51, 94, 222, 0.06)',
+                },
+              }}
+            >
+              <Typography
+                sx={{
+                  fontFamily: 'var(--font-family)',
+                  fontWeight: 600,
+                  fontSize: '0.9375rem',
+                  color: 'var(--text-primary)',
+                }}
+              >
+                {categoryName}
+              </Typography>
+              <Chip
+                label={`${skills.length} skill${skills.length !== 1 ? 's' : ''}`}
+                size="small"
+                sx={{
+                  height: 20,
+                  fontSize: '0.6875rem',
+                  fontWeight: 600,
+                  bgcolor: 'rgba(51, 94, 222, 0.08)',
+                  color: 'var(--primary)',
+                  '& .MuiChip-label': { px: 0.75, py: 0 }
+                }}
+              />
+            </Box>
+          )}
+        </Box>
+        <IconButton
+          size="small"
+          onClick={onRemove}
+          disabled={!canRemove}
+          sx={{
+            color: 'var(--text-muted)',
+            flexShrink: 0,
+            '&:hover': {
+              color: '#DC2626',
+              bgcolor: 'rgba(220, 38, 38, 0.08)',
+            },
+            '&:disabled': {
+              opacity: 0.3,
+            },
+          }}
+        >
+          <DeleteOutlinedIcon fontSize="small" />
+        </IconButton>
+      </Box>
+
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, alignItems: 'center', minHeight: 32 }}>
+        {skills.map((skill, idx) => (
+          <Chip
+            key={idx}
+            label={skill}
+            onDelete={() => handleRemoveSkill(skill)}
+            deleteIcon={<CloseRoundedIcon sx={{ fontSize: '14px !important' }} />}
+            size="small"
+            sx={{
+              fontFamily: 'var(--font-family)',
+              fontSize: '0.8125rem',
+              height: 28,
+              bgcolor: 'rgba(51, 94, 222, 0.06)',
+              border: '1px solid rgba(51, 94, 222, 0.2)',
+              color: 'var(--text-primary)',
+              '& .MuiChip-label': {
+                px: 1.25
+              },
+              '& .MuiChip-deleteIcon': {
+                color: 'var(--text-muted)',
+                fontSize: 14,
+                '&:hover': {
+                  color: '#DC2626',
+                },
+              },
+            }}
+          />
+        ))}
+        <TextField
+          size="small"
+          placeholder={skills.length === 0 ? "Type a skill and press Enter..." : "Add another..."}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={handleAddSkill}
+          sx={{
+            minWidth: 140,
+            flex: '0 1 auto',
+            '& .MuiOutlinedInput-root': {
+              height: 28,
+              fontSize: '0.8125rem',
+              fontFamily: 'var(--font-family)',
+              bgcolor: 'white',
+              borderRadius: 1,
+              '& fieldset': {
+                borderColor: 'rgba(0, 0, 0, 0.12)',
+              },
+              '&:hover fieldset': {
+                borderColor: 'rgba(51, 94, 222, 0.4)',
+              },
+              '&.Mui-focused fieldset': {
+                borderWidth: 1.5,
+                borderColor: 'var(--primary)',
+              },
+            },
+            '& input::placeholder': {
+              fontSize: '0.8125rem',
+              opacity: 0.6
+            }
+          }}
+        />
       </Box>
     </Box>
   );
