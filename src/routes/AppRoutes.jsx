@@ -38,6 +38,7 @@ import AdminCareerPages from '../pages/admin/AdminCareerPages';
 import AdminLearning from '../pages/admin/AdminLearning';
 import AdminIssues from '../pages/admin/AdminIssues';
 import AdminTokenUsage from '../pages/admin/AdminTokenUsage';
+import PlanManagement from '../pages/admin/PlanManagement';
 import PrivacyPolicy from '../pages/legal/PrivacyPolicy';
 import TermsOfService from '../pages/legal/TermsOfService';
 import ReportIssuePage from '../pages/report-issue/ReportIssuePage';
@@ -69,6 +70,7 @@ export default function AppRoutes() {
               <Route path="learning" element={<AdminLearning />} />
               <Route path="issues" element={<AdminIssues />} />
               <Route path="token-usage" element={<AdminTokenUsage />} />
+              <Route path="plans" element={<PlanManagement />} />
             </Route>
           </Route>
           <Route element={<DashboardLayout />}>

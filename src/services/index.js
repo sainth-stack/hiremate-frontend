@@ -21,6 +21,7 @@ export {
 export {
   createOrderAPI,
   verifyPaymentAPI,
+  getPublicPlansAPI,
 } from './paymentService';
 
 export {

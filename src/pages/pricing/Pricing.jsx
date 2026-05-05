@@ -1,54 +1,47 @@
 import { useState } from 'react';
-import { Box, Typography, Button, Card, Grid, Alert, CircularProgress } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  Card,
+  Alert,
+  CircularProgress,
+  Stack,
+  Tooltip,
+  IconButton,
+} from '@mui/material';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
-import LockRoundedIcon from '@mui/icons-material/LockRounded';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { Link, useNavigate } from 'react-router-dom';
 import PageContainer from '../../components/common/PageContainer';
-import { createOrderAPI, verifyPaymentAPI } from '../../services';
+import { createOrderAPI, verifyPaymentAPI, getPublicPlansAPI } from '../../services';
+import { useQuery } from '@tanstack/react-query';
 
-const PLANS = [
-  {
-    id: 'daily',
-    title: 'Daily',
-    description: "You've spent more by accident.",
-    price: '99',
-    period: 'day',
-    highlight: false,
-  },
-  {
-    id: 'weekly',
-    title: 'Weekly',
-    description: 'A night out or an interview, your call.',
-    price: '399',
-    period: 'week',
-    highlight: true,
-    badge: 'BEST DEAL',
-  },
-  {
-    id: 'monthly',
-    title: 'Monthly',
-    description: "It's cheaper than skipping it, we've done the math.",
-    price: '999',
-    period: 'month',
-    highlight: false,
-  },
-];
+// ─── Constants ────────────────────────────────────────────────────────────────
 
-const FEATURES = [
-  'Unlimited resume generation',
-  'AI-powered auto-fill',
-  'Smart role recommendations',
-  'Unlimited resume storage',
-  'Application tracker',
-];
+const PUBLIC_PLANS_QUERY_KEY = ['public', 'plans'];
 
-const loadRazorpayScript = () => {
-  return new Promise((resolve) => {
-    if (window.Razorpay) {
-      resolve();
-      return;
-    }
+const PLAN_STYLE_META = {
+  free: {
+    buttonText: 'Get Started for Free',
+  },
+  pro: {
+    buttonText: 'Subscribe Now',
+  },
+  elite: {
+    buttonText: 'Subscribe Now',
+  },
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const loadRazorpayScript = () =>
+  new Promise((resolve) => {
+    if (window.Razorpay) { resolve(); return; }
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
@@ -56,7 +49,8 @@ const loadRazorpayScript = () => {
     script.onerror = () => resolve(new Error('Failed to load Razorpay'));
     document.body.appendChild(script);
   });
-};
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Pricing() {
   const [loadingPlanId, setLoadingPlanId] = useState(null);
@@ -64,26 +58,33 @@ export default function Pricing() {
   const [success, setSuccess] = useState(null);
   const navigate = useNavigate();
 
-  const handleSubscribe = async (plan) => {
+  const { data: plans = [], isLoading, isError } = useQuery({
+    queryKey: PUBLIC_PLANS_QUERY_KEY,
+    queryFn: async () => {
+      const response = await getPublicPlansAPI();
+      return response.data.data || [];
+    },
+    staleTime: 5 * 60 * 1000, // Plans rarely change — cache for 5 min
+  });
+
+  const handleSubscribe = async (plan, style) => {
+    if (plan.id === 'free') { navigate('/'); return; }
     setError(null);
     setSuccess(null);
     setLoadingPlanId(plan.id);
 
     try {
       const { data: orderData } = await createOrderAPI(plan.id);
-
       await loadRazorpayScript();
-      if (window.Razorpay === undefined) {
-        throw new Error('Payment gateway failed to load. Please try again.');
-      }
+      if (!window.Razorpay) throw new Error('Payment gateway failed to load. Please try again.');
 
       const options = {
         key: orderData.key_id,
         amount: orderData.amount,
         currency: orderData.currency,
         order_id: orderData.order_id,
-        name: 'OpsBrain',
-        description: `${plan.title} Plan - Brain for Jobs`,
+        name: 'HireMate',
+        description: `${plan.name} Plan - Career Success`,
         handler: async (response) => {
           try {
             await verifyPaymentAPI({
@@ -92,34 +93,43 @@ export default function Pricing() {
               razorpay_signature: response.razorpay_signature,
               plan_id: plan.id,
             });
-            setSuccess(`Successfully subscribed to ${plan.title} plan!`);
+            setSuccess(`Successfully subscribed to ${plan.name} plan!`);
           } catch (err) {
             setError(err.response?.data?.detail || 'Payment verification failed');
           } finally {
             setLoadingPlanId(null);
           }
         },
-        modal: {
-          ondismiss: () => setLoadingPlanId(null),
-        },
+        modal: { ondismiss: () => setLoadingPlanId(null) },
       };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      new window.Razorpay(options).open();
     } catch (err) {
       const msg = err.response?.data?.detail || err.message || 'Failed to initiate payment';
       setError(msg);
-      if (err.response?.status === 401) {
-        navigate('/login', { state: { from: '/pricing' } });
-      }
+      if (err.response?.status === 401) navigate('/login', { state: { from: '/pricing' } });
       setLoadingPlanId(null);
     }
   };
 
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+        <CircularProgress color="primary" />
+      </Box>
+    );
+  }
+
   return (
-    <PageContainer maxWidth="md" sx={{ py: { xs: 4, sm: 6 } }}>
+    <PageContainer
+      sx={{
+        px: { xs: 3, sm: 6, md: 8 },  // left/right margin
+        py: { xs: 4, sm: 6 },
+      }}
+    >
       <Box sx={{ textAlign: 'center' }}>
-        {/* Mission badge */}
+
+        {/* Badge */}
         <Box
           sx={{
             display: 'inline-flex',
@@ -162,12 +172,13 @@ export default function Pricing() {
             mx: 'auto',
           }}
         >
-          91% of our users report getting an interview within 2 weeks of subscribing
+          Join thousands of professionals landing interviews with HireMate AI.
         </Typography>
 
-        {error && (
+        {/* Alerts */}
+        {(isError || error) && (
           <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
-            {error}
+            {error || 'Failed to load subscription plans. Please try again later.'}
           </Alert>
         )}
         {success && (
@@ -176,173 +187,129 @@ export default function Pricing() {
           </Alert>
         )}
 
-        {/* Pricing cards */}
+        {/* Plans Grid */}
         <Box
           sx={{
-            width: { xs: '100%', sm: '80%' },
-            maxWidth: 1200,
-            mx: 'auto',
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
+            gridTemplateColumns: { xs: '1fr', sm: `repeat(${Math.min(plans.length, 3)}, 1fr)` },
             gap: 3,
             mb: 5,
           }}
         >
-          {PLANS.map((plan) => (
-            <Card
-              key={plan.id}
-              sx={{
-                position: 'relative',
-                borderRadius: 'var(--pricing-card-radius)',
-                boxShadow: 'var(--pricing-card-shadow)',
-                border: 2,
-                borderColor: plan.highlight ? 'var(--pricing-accent)' : 'var(--pricing-card-border)',
-                overflow: 'visible',
-              }}
-            >
-              {plan.badge && (
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: -10,
-                    right: 12,
-                    px: 1.5,
-                    py: 0.5,
-                    borderRadius: 1,
-                    bgcolor: 'var(--pricing-badge-bg)',
-                    color: 'var(--white)',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    letterSpacing: '0.02em',
-                  }}
-                >
-                  {plan.badge}
-                </Box>
-              )}
-              <Grid container sx={{ p: 3, pt: plan.badge ? 4 : 3 }}>
-                <Grid item xs={12}>
-                <Typography
-                  sx={{
-                    fontSize: 'var(--font-size-section-header)',
-                    fontWeight: 700,
-                    color: 'var(--text-primary)',
-                    mb: 1,
-                  }}
-                >
-                  {plan.title}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: 'var(--font-size-helper)',
-                    color: 'var(--text-secondary)',
-                    mb: 2,
-                  }}
-                >
-                  {plan.description}
-                </Typography>
-                <Box sx={{ mb: 3 }}>
-                  <Typography component="span" sx={{ fontSize: 'var(--font-size-helper)', color: 'var(--text-secondary)' }}>
-                    INR{' '}
-                  </Typography>
-                  <Typography
-                    component="span"
+          {plans.map((plan) => {
+            const meta = PLAN_STYLE_META[plan.id] || { buttonText: 'Subscribe' };
+            const isFeatured = Boolean(plan.is_featured);
+            const highlight = isFeatured;
+            const badge = isFeatured ? 'MOST POPULAR' : null;
+
+            return (
+              <Card
+                key={plan.id}
+                sx={{
+                  position: 'relative',
+                  borderRadius: 'var(--pricing-card-radius)',
+                  boxShadow: 'var(--pricing-card-shadow)',
+                  border: 2,
+                  borderColor: highlight ? 'var(--pricing-accent)' : 'var(--pricing-card-border)',
+                  overflow: 'visible',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                {badge && (
+                  <Box
                     sx={{
-                      fontSize: '1.5rem',
+                      position: 'absolute',
+                      top: -10,
+                      right: 12,
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: 1,
+                      bgcolor: 'var(--pricing-badge-bg)',
+                      color: 'var(--white)',
+                      fontSize: '0.75rem',
                       fontWeight: 700,
-                      color: 'var(--text-primary)',
+                      letterSpacing: '0.02em',
                     }}
                   >
-                    {plan.price}
-                  </Typography>
-                  <Typography component="span" sx={{ fontSize: 'var(--font-size-helper)', color: 'var(--text-muted)' }}>
-                    /{plan.period}
-                  </Typography>
-                </Box>
-                <Button
-                  fullWidth
-                  variant={plan.highlight ? 'contained' : 'outlined'}
-                  disabled={!!loadingPlanId}
-                  onClick={() => handleSubscribe(plan)}
-                  sx={{
-                    py: 1.25,
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    fontSize: 'var(--font-size-helper)',
-                    borderRadius: 'var(--pricing-card-radius)',
-                    ...(plan.highlight
-                      ? {
-                          bgcolor: 'var(--pricing-accent)',
-                          color: 'var(--white)',
-                          '&:hover': { bgcolor: 'var(--pricing-accent-dark)' },
-                        }
-                      : {
-                          borderColor: 'var(--border-color)',
-                          color: 'var(--text-primary)',
-                          '&:hover': {
-                            borderColor: 'var(--pricing-accent)',
-                            bgcolor: 'var(--sidebar-item-hover-bg)',
-                          },
-                        }),
-                  }}
-                >
-                  {loadingPlanId === plan.id ? (
-                    <CircularProgress size={24} color="inherit" />
-                  ) : (
-                    'Subscribe Now'
-                  )}
-                </Button>
-                </Grid>
-              </Grid>
-            </Card>
-          ))}
-        </Box>
+                    {badge}
+                  </Box>
+                )}
 
-        {/* Features */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.75, mb: 2 }}>
-          <LockRoundedIcon sx={{ fontSize: 20, color: 'var(--text-secondary)' }} />
-          <Typography sx={{ fontSize: 'var(--font-size-helper)', color: 'var(--text-secondary)' }}>
-            Every plan unlocks everything
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 1,
-            justifyContent: 'center',
-            mb: 4,
-          }}
-        >
-          {FEATURES.map((feature) => (
-            <Box
-              key={feature}
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.5,
-                px: 1.5,
-                py: 0.5,
-                borderRadius: '9999px',
-                bgcolor: 'var(--pricing-accent)',
-                color: 'var(--white)',
-                fontSize: 'var(--font-size-helper)',
-                fontWeight: 500,
-              }}
-            >
-              <CheckRoundedIcon sx={{ fontSize: 16 }} />
-              {feature}
-            </Box>
-          ))}
+                <Box sx={{ p: 3, pt: badge ? 4 : 3, flexGrow: 1 }}>
+                  <Typography
+                    sx={{ fontSize: 'var(--font-size-section-header)', fontWeight: 700, color: 'var(--text-primary)', mb: 1 }}
+                  >
+                    {plan.name}
+                  </Typography>
+                  <Typography
+                    sx={{ fontSize: 'var(--font-size-helper)', color: 'var(--text-secondary)', mb: 2, minHeight: 40 }}
+                  >
+                    {plan.description}
+                  </Typography>
+
+                  <Box sx={{ mb: 3 }}>
+                    <Typography component="span" sx={{ fontSize: 'var(--font-size-helper)', color: 'var(--text-secondary)' }}>
+                      INR{' '}
+                    </Typography>
+                    <Typography component="span" sx={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                      {plan.amount / 100}
+                    </Typography>
+                    <Typography component="span" sx={{ fontSize: 'var(--font-size-helper)', color: 'var(--text-muted)' }}>
+                      /{plan.amount === 0 ? 'forever' : 'month'}
+                    </Typography>
+                  </Box>
+
+                  <Stack spacing={1.5} sx={{ mb: 4, textAlign: 'left' }}>
+                    {(plan.features || []).map((feature, idx) => (
+                      <Box key={idx} sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                        <CheckCircleRoundedIcon sx={{ color: 'var(--pricing-accent)', fontSize: 18 }} />
+                        <Typography variant="body2" sx={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-primary)' }}>
+                          {feature}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
+
+                <Box sx={{ p: 3, pt: 0 }}>
+                  <Button
+                    fullWidth
+                    variant={highlight ? 'contained' : 'outlined'}
+                    disabled={!!loadingPlanId}
+                    onClick={() => handleSubscribe(plan, meta)}
+                    sx={{
+                      py: 1.25,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      fontSize: 'var(--font-size-helper)',
+                      borderRadius: 'var(--pricing-card-radius)',
+                      ...(highlight
+                        ? {
+                            bgcolor: 'var(--pricing-accent)',
+                            color: 'var(--white)',
+                            '&:hover': { bgcolor: 'var(--pricing-accent-dark)' },
+                          }
+                        : {
+                            borderColor: 'var(--border-color)',
+                            color: 'var(--text-primary)',
+                            '&:hover': {
+                              borderColor: 'var(--pricing-accent)',
+                              bgcolor: 'var(--sidebar-item-hover-bg)',
+                            },
+                          }),
+                    }}
+                  >
+                    {loadingPlanId === plan.id ? <CircularProgress size={24} color="inherit" /> : meta.buttonText}
+                  </Button>
+                </Box>
+              </Card>
+            );
+          })}
         </Box>
 
         {/* Footer */}
-        <Typography
-          sx={{
-            fontSize: '0.8125rem',
-            color: 'var(--text-muted)',
-            mb: 2,
-          }}
-        >
+        <Typography sx={{ fontSize: '0.8125rem', color: 'var(--text-muted)', mb: 2 }}>
           Cancel anytime • No hidden fees • Instant access
         </Typography>
         <Box

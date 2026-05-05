@@ -39,3 +39,16 @@ export const getAdminSubmissionLogDetailAPI = (id) =>
 /** Aggregated AI token usage (admin). Backend: GET /admin/token-usage */
 export const getAdminTokenUsageAPI = (params = {}) =>
   axiosClient.get('/admin/token-usage', { params });
+
+// Subscription Plan Management
+export const getAdminPlansAPI = () =>
+  axiosClient.get('/admin/plans');
+
+export const updateAdminPlanAPI = (id, data) =>
+  axiosClient.put(`/admin/plans/${id}`, data);
+
+export const createAdminPlanAPI = (data) =>
+  axiosClient.post('/admin/plans', data);
+
+export const deleteAdminPlanAPI = (id) =>
+  axiosClient.delete(`/admin/plans/${id}`);
