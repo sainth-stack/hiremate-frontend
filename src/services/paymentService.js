@@ -12,3 +12,9 @@ export const createOrderAPI = (planId) =>
  */
 export const verifyPaymentAPI = (data) =>
   axiosClient.post('/payment/verify', data);
+
+/**
+ * Fetch all active subscription plans (public).
+ */
+export const getPublicPlansAPI = () =>
+  axiosClient.get('/payment/plans');

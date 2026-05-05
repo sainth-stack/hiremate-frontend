@@ -15,11 +15,13 @@ import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded';
 import BugReportRoundedIcon from '@mui/icons-material/BugReportRounded';
 import AdminPanelSettingsRoundedIcon from '@mui/icons-material/AdminPanelSettingsRounded';
 import DataUsageRoundedIcon from '@mui/icons-material/DataUsageRounded';
+import SubscriptionsRoundedIcon from '@mui/icons-material/SubscriptionsRounded';
 import Navbar from '../../components/common/Navbar';
 
 const ADMIN_NAV = [
   { label: 'Overview', path: '/admin', icon: DashboardRoundedIcon },
   { label: 'Users', path: '/admin/users', icon: PeopleRoundedIcon },
+  { label: 'Plan Management', path: '/admin/plans', icon: SubscriptionsRoundedIcon },
   { label: 'Companies Viewed', path: '/admin/companies', icon: BusinessRoundedIcon },
   { label: 'Career Page Links', path: '/admin/career-pages', icon: LinkRoundedIcon },
   { label: 'Learning', path: '/admin/learning', icon: SchoolRoundedIcon },

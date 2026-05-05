@@ -21,14 +21,17 @@
     "@tanstack/react-query": "^5.95.2",
     "axios": "^1.13.5",
     "date-fns": "^4.1.0",
+    "formik": "^2.4.9",
     "framer-motion": "^12.34.3",
     "lucide-react": "^0.474.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-hot-toast": "^2.6.0",
     "react-markdown": "^9.1.0",
     "react-pdf": "^10.4.0",
     "react-redux": "^9.2.0",
-    "react-router-dom": "^7.13.0"
+    "react-router-dom": "^7.13.0",
+    "yup": "^1.7.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

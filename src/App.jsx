@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { getTheme } from './theme/theme';
 import { store } from './store';
 import AppRoutes from './routes/AppRoutes';
+import { Toaster } from 'react-hot-toast';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, retry: 1 } },
@@ -33,6 +34,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <ThemeGate>
           <AppRoutes />
+          <Toaster position="top-right" />
         </ThemeGate>
       </QueryClientProvider>
     </Provider>
