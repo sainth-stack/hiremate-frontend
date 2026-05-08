@@ -158,7 +158,7 @@ const StarGuideSidebar = memo(({ starCoverage, config, border, muted, textColor 
         >
           <Box sx={{ 
             width: 32, height: 32, borderRadius: 1.25, bgcolor: active ? cfg.color : border, 
-            color: active ? '#fff' : muted, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.85rem' 
+            color: active ? 'var(--button-primary-text)' : muted, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.85rem' 
           }}>
             {active ? <CheckRoundedIcon sx={{ fontSize: 18 }} /> : key.toUpperCase()}
           </Box>
@@ -220,7 +220,7 @@ const ResponseEditor = memo(({ transcript, isListening, activeIndex, onFullTextC
               if (!isListening) setBaseText(internalText); // Capture current text as base before mic starts
               toggleListening();
             }} 
-            sx={{ width: 44, height: 44, borderRadius: 1.5, bgcolor: isListening ? 'var(--error)' : 'var(--light-blue-bg-08)', color: isListening ? '#fff' : THEME.primary, '&:hover': { bgcolor: isListening ? 'var(--error-dark)' : 'var(--light-blue-bg-12)' } }}
+            sx={{ width: 44, height: 44, borderRadius: 1.5, bgcolor: isListening ? 'var(--error)' : 'var(--light-blue-bg-08)', color: isListening ? 'var(--button-primary-text)' : THEME.primary, '&:hover': { bgcolor: isListening ? 'var(--error-dark)' : 'var(--light-blue-bg-12)' } }}
           >
              {isListening ? <X size={22} /> : <Mic size={22} />}
           </IconButton>
@@ -459,7 +459,7 @@ export default function MockInterviewSession() {
                      p: 2.5,
                      borderRadius: 2,
                      border: m.accent ? '1.5px solid rgba(51, 94, 222, 0.28)' : `1px solid ${border}`,
-                     bgcolor: '#fff',
+                     bgcolor: 'var(--bg-paper)',
                      boxShadow: m.accent ? '0 4px 20px rgba(51, 94, 222, 0.1)' : 'none',
                      transition: 'all 0.2s',
                      '&:hover': {
@@ -470,7 +470,7 @@ export default function MockInterviewSession() {
                  >
                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 1.5 }}>
                      <Box sx={{ width: 44, height: 44, borderRadius: 2, bgcolor: m.accent ? THEME.primary : THEME.primarySoft, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                       <m.icon size={22} color={m.accent ? '#fff' : THEME.primary} />
+                       <m.icon size={22} color={m.accent ? 'var(--button-primary-text)' : THEME.primary} />
                      </Box>
                      <Box sx={{ flex: 1, minWidth: 0 }}>
                        <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: 0.8, color: THEME.primary, textTransform: 'uppercase', mb: 0.35 }}>{m.category}</Typography>
@@ -531,7 +531,7 @@ export default function MockInterviewSession() {
           </Box>
         </Box>
         <TimerDisplay onTick={(val) => { totalSecondsRef.current = val; }} />
-        <Button variant="contained" disableElevation onClick={handleSubmit} disabled={isAiThinking} sx={{ ml: 2, borderRadius: 1.5, textTransform: 'none', fontWeight: 800, bgcolor: THEME.primary, '&:hover': { bgcolor: 'var(--primary-dark)' } }}>{isAiThinking ? <CircularProgress size={18} sx={{ color: '#fff' }} /> : activeIndex === questions.length - 1 ? 'Finish Session' : 'Next Question'}</Button>
+        <Button variant="contained" disableElevation onClick={handleSubmit} disabled={isAiThinking} sx={{ ml: 2, borderRadius: 1.5, textTransform: 'none', fontWeight: 800, bgcolor: THEME.primary, '&:hover': { bgcolor: 'var(--primary-dark)' } }}>{isAiThinking ? <CircularProgress size={18} sx={{ color: 'var(--button-primary-text)' }} /> : activeIndex === questions.length - 1 ? 'Finish Session' : 'Next Question'}</Button>
       </Box>
 
       <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
@@ -558,7 +558,7 @@ export default function MockInterviewSession() {
       <AnimatePresence>
         {showEncouragement && (
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.8 }} style={{ position: 'fixed', bottom: 60, left: '50%', transform: 'translateX(-50%)', zIndex: 1000 }}>
-            <Box sx={{ px: 4, py: 2, borderRadius: 2, bgcolor: 'var(--success)', color: '#fff', display: 'flex', alignItems: 'center', gap: 2, boxShadow: '0 10px 40px rgba(16,185,129,0.3)' }}><Sparkles size={22} fill="currentColor" /><Typography sx={{ fontWeight: 900, fontSize: '0.95rem' }}>Perfect STAR Match Detected!</Typography></Box>
+            <Box sx={{ px: 4, py: 2, borderRadius: 2, bgcolor: 'var(--success)', color: 'var(--button-primary-text)', display: 'flex', alignItems: 'center', gap: 2, boxShadow: '0 10px 40px rgba(16,185,129,0.3)' }}><Sparkles size={22} fill="currentColor" /><Typography sx={{ fontWeight: 900, fontSize: '0.95rem' }}>Perfect STAR Match Detected!</Typography></Box>
           </motion.div>
         )}
       </AnimatePresence>

@@ -310,7 +310,7 @@ export default function AiResumeStudio() {
       sx={{
         minHeight: '100%',
         width: '100%',
-        bgcolor: '#fafbfc',
+        bgcolor: THEME.pageBg,
         fontFamily: 'var(--font-family)',
         pb: 5,
       }}
@@ -384,7 +384,7 @@ export default function AiResumeStudio() {
                     : `1px solid ${THEME.border}`,
                   cursor: 'pointer',
                   transition: 'box-shadow 0.2s, border-color 0.2s',
-                  bgcolor: '#fff',
+                  bgcolor: THEME.surface,
                   boxShadow: tool.accent ? '0 4px 20px rgba(51, 94, 222, 0.1)' : 'none',
                   overflow: 'visible',
                   '&:hover': {
@@ -409,7 +409,7 @@ export default function AiResumeStudio() {
                       flexShrink: 0,
                     }}
                   >
-                    <Icon sx={{ fontSize: 24, color: tool.accent ? '#fff' : THEME.primary }} />
+                    <Icon sx={{ fontSize: 24, color: tool.accent ? 'var(--button-primary-text)' : THEME.primary }} />
                   </Box>
                   <Box sx={{ flex: 1, minWidth: 0 }}>
                     <Typography
@@ -476,8 +476,8 @@ export default function AiResumeStudio() {
                     ...(tool.accent
                       ? {
                           bgcolor: THEME.primary,
-                          color: '#fff',
-                          '&:hover': { bgcolor: 'var(--primary-dark, #2a4bc4)' },
+                          color: 'var(--button-primary-text)',
+                          '&:hover': { bgcolor: 'var(--primary-dark)' },
                         }
                       : {
                           color: THEME.primary,
@@ -496,7 +496,7 @@ export default function AiResumeStudio() {
         {/* Tabs + documents panel */}
         <Box
           sx={{
-            bgcolor: '#fff',
+            bgcolor: THEME.surface,
             borderRadius: 2,
             border: `1px solid ${THEME.border}`,
             boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
@@ -536,7 +536,7 @@ export default function AiResumeStudio() {
             overflow: 'auto',
             position: 'relative',
             minHeight: listLoading ? 220 : undefined,
-            bgcolor: '#fff',
+            bgcolor: THEME.surface,
           }}
         >
           {listLoading && (
@@ -565,7 +565,7 @@ export default function AiResumeStudio() {
             sx={{
               px: { xs: 2, sm: 2.5 },
               py: 1.25,
-              bgcolor: '#fff',
+              bgcolor: THEME.surface,
               borderBottom: `1px solid ${THEME.border}`,
             }}
           >
@@ -637,7 +637,7 @@ export default function AiResumeStudio() {
                     fontSize: '0.8125rem',
                     bgcolor: THEME.primary,
                     boxShadow: 'none',
-                    '&:hover': { bgcolor: 'var(--primary-dark, #2a4bc4)', boxShadow: 'none' },
+                    '&:hover': { bgcolor: 'var(--primary-dark)', boxShadow: 'none' },
                   }}
                 >
                   Upload
@@ -695,7 +695,7 @@ export default function AiResumeStudio() {
                           sx={{
                             height: 36,
                             borderRadius: 1,
-                            bgcolor: '#fff',
+                bgcolor: THEME.surface,
                             fontSize: '0.8125rem',
                             fontWeight: 500,
                             '& .MuiOutlinedInput-notchedOutline': {
@@ -758,7 +758,7 @@ export default function AiResumeStudio() {
                     '& .MuiOutlinedInput-root': {
                       height: 36,
                       borderRadius: 1,
-                      bgcolor: '#fff',
+                            bgcolor: THEME.surface,
                       fontSize: '0.8125rem',
                       pl: 0.5,
                     },
@@ -818,7 +818,7 @@ export default function AiResumeStudio() {
                     letterSpacing: '0.06em',
                     textTransform: 'uppercase',
                     color: THEME.textSecondary,
-                    bgcolor: '#f1f5f9',
+                    bgcolor: THEME.previewCanvas,
                     borderBottom: `1px solid ${THEME.border}`,
                     textAlign: 'left',
                   },
@@ -890,7 +890,7 @@ export default function AiResumeStudio() {
                     hover
                     sx={{
                       transition: 'background-color 0.15s ease',
-                      '&:nth-of-type(even)': { bgcolor: 'rgba(248, 250, 252, 0.85)' },
+                      '&:nth-of-type(even)': { bgcolor: 'var(--bg-light)' },
                       '&:last-child td': { borderBottom: 0 },
                     }}
                   >
@@ -934,8 +934,8 @@ export default function AiResumeStudio() {
                                   height: 20,
                                   fontSize: '0.65rem',
                                   fontWeight: 600,
-                                  bgcolor: 'rgba(34, 197, 94, 0.12)',
-                                  color: 'success.dark',
+                                  bgcolor: 'var(--success-bg)',
+                                  color: 'var(--success-dark)',
                                   '& .MuiChip-label': { px: 0.75 },
                                 }}
                               />

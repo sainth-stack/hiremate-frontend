@@ -33,10 +33,10 @@ import { BrainCircuit, Layers, Activity, Book, ShieldCheck, Search, Building2, T
 import PageContainer from '../../components/common/PageContainer';
 import { getCompanyBriefingAPI } from '../../services/briefingService';
 
-const PRIMARY_HEX = '#335ede';
-const PRIMARY_SOFT = 'rgba(51, 94, 222, 0.08)';
-const SUCCESS_HEX = '#10b981';
-const BORDER_HEX = 'rgba(0,0,0,0.08)';
+const PRIMARY_HEX = 'var(--primary)';
+const PRIMARY_SOFT = 'var(--light-blue-bg)';
+const SUCCESS_HEX = 'var(--success)';
+const BORDER_HEX = 'var(--border-color)';
 
 const ICON_MAP = {
   FlashOnRoundedIcon: SpeedRoundedIcon,
@@ -78,8 +78,8 @@ const TABS = [
 
 const priorityMeta = {
   high: { color: PRIMARY_HEX, bg: PRIMARY_SOFT, label: 'High' },
-  medium: { color: '#3b82f6', bg: 'rgba(59,130,246,0.1)', label: 'Med' },
-  low: { color: '#0ea5e9', bg: 'rgba(14,165,233,0.1)', label: 'Low' },
+  medium: { color: 'var(--primary)', bg: 'var(--light-blue-bg)', label: 'Med' },
+  low: { color: 'var(--accent-cyan)', bg: 'var(--light-blue-bg)', label: 'Low' },
 };
 
 export default function CompanyBriefing() {
@@ -109,9 +109,9 @@ export default function CompanyBriefing() {
     };
   }, [briefedData]);
 
-  const bg = isDark ? theme.palette.background.default : '#fafbfc';
+  const bg = isDark ? theme.palette.background.default : 'var(--bg-main)';
   const surface = theme.palette.background.paper;
-  const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+  const border = isDark ? 'rgba(255,255,255,0.08)' : 'var(--border-color)';
   const textColor = theme.palette.text.primary;
   const muted = theme.palette.text.secondary;
 
@@ -150,7 +150,7 @@ export default function CompanyBriefing() {
 
         {/* Studio Identity Box — NOW AT TOP */}
         <Card elevation={0} sx={{ p: 2.5, borderRadius: 2, border: `1px solid ${border}`, bgcolor: surface, display: 'flex', alignItems: 'center', gap: 2.5, mb: 3 }}>
-           <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: PRIMARY_HEX, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+           <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: PRIMARY_HEX, color: 'var(--button-primary-text)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <BusinessRoundedIcon sx={{ fontSize: 28 }} />
            </Box>
            <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -216,7 +216,7 @@ export default function CompanyBriefing() {
                     }}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                      <Box sx={{ width: 44, height: 44, borderRadius: 2, bgcolor: PRIMARY_HEX, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 16px rgba(51,94,222,0.15)' }}>
+                      <Box sx={{ width: 44, height: 44, borderRadius: 2, bgcolor: PRIMARY_HEX, color: 'var(--button-primary-text)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 16px rgba(51,94,222,0.15)' }}>
                         <BrainCircuit size={24} />
                       </Box>
                       <Box>
@@ -234,8 +234,8 @@ export default function CompanyBriefing() {
                     {[
                       { icon: <Timer size={22} />, label: 'Pipeline', value: `${briefing.interviewRounds.length} Rounds`, color: PRIMARY_HEX },
                       { icon: <PeopleAltRoundedIcon sx={{ fontSize: 22 }} />, label: 'Scale', value: briefing.size, color: SUCCESS_HEX },
-                      { icon: <Target size={22} />, label: 'Prep Focus', value: `${briefing.topicsToPrep.length} Topics`, color: '#3b82f6' },
-                      { icon: <Compass size={22} />, label: 'Intelligence', value: `${briefing.cultureSignals.length} Insights`, color: '#0ea5e9' },
+                      { icon: <Target size={22} />, label: 'Prep Focus', value: `${briefing.topicsToPrep.length} Topics`, color: 'var(--primary)' },
+                      { icon: <Compass size={22} />, label: 'Intelligence', value: `${briefing.cultureSignals.length} Insights`, color: 'var(--accent-cyan)' },
                     ].map((stat, i) => (
                       <Grid item xs={12} sm={6} md={3} key={i}>
                         <Card elevation={0} sx={{ p: 2.5, borderRadius: 2, border: `1px solid ${border}`, bgcolor: surface, display: 'flex', alignItems: 'center', gap: 2.5 }}>
@@ -267,7 +267,7 @@ export default function CompanyBriefing() {
                               bgcolor: idx === 0 ? PRIMARY_HEX : surface, 
                               border: `1.5px solid ${idx === 0 ? PRIMARY_HEX : border}`, 
                               display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                              color: idx === 0 ? '#fff' : muted, 
+                              color: idx === 0 ? 'var(--button-primary-text)' : muted, 
                               fontWeight: 900, fontSize: '0.9rem',
                               boxShadow: idx === 0 ? (isDark ? '0 4px 24px rgba(0,0,0,0.6)' : '0 8px 16px rgba(51,94,222,0.15)') : 'none',
                               zIndex: 1
@@ -346,7 +346,7 @@ export default function CompanyBriefing() {
                   <Grid container spacing={2}>
                     {briefing?.topicsToPrep.map((t, idx) => {
                       const pm = priorityMeta[t.priority] || priorityMeta.medium;
-                      const rc = t.readiness >= 70 ? SUCCESS_HEX : t.readiness >= 45 ? '#3b82f6' : PRIMARY_HEX;
+                      const rc = t.readiness >= 70 ? SUCCESS_HEX : t.readiness >= 45 ? 'var(--primary)' : PRIMARY_HEX;
                       return (
                         <Grid item width={'100%'} xs={12} key={idx}>
                           <Card elevation={0} sx={{ p: 3, borderRadius: 2, bgcolor: surface, border: `1px solid ${border}` }}>

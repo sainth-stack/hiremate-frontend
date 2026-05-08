@@ -43,6 +43,7 @@ export {
   getAdminSubmissionLogsAPI,
   getAdminSubmissionLogDetailAPI,
   getAdminTokenUsageAPI,
+  getAdminIngestionRunsAPI,
 } from './adminService';
 
 export {

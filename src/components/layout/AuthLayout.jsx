@@ -199,7 +199,7 @@ export default function AuthLayout() {
                 color: 'var(--text-muted)', 
                 textDecoration: 'none',
                 fontWeight: 500,
-                '&:hover': { color: '#1E3A8A', textDecoration: 'underline' } 
+                '&:hover': { color: 'var(--primary)', textDecoration: 'underline' } 
               }}
             >
               Privacy Policy
@@ -213,7 +213,7 @@ export default function AuthLayout() {
                 color: 'var(--text-muted)', 
                 textDecoration: 'none',
                 fontWeight: 500,
-                '&:hover': { color: '#1E3A8A', textDecoration: 'underline' } 
+                '&:hover': { color: 'var(--primary)', textDecoration: 'underline' } 
               }}
             >
               Terms of Service

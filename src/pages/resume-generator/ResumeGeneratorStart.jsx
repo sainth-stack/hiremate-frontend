@@ -132,7 +132,7 @@ export default function ResumeGeneratorStart() {
       sx={{
         minHeight: '100%',
         width: '100%',
-        bgcolor: '#fafbfc',
+        bgcolor: THEME.pageBg,
         fontFamily: 'var(--font-family)',
         display: 'flex',
         flexDirection: 'column',
@@ -179,7 +179,7 @@ export default function ResumeGeneratorStart() {
             gap: 3,
             p: 2.5,
             mb: 3,
-            bgcolor: '#fff',
+            bgcolor: THEME.surface,
             border: `1px solid ${THEME.border}`,
             borderRadius: 2,
             boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
@@ -277,7 +277,7 @@ export default function ResumeGeneratorStart() {
         {/* Option 2 — Existing Resumes (documents panel style) */}
         <Box
           sx={{
-            bgcolor: '#fff',
+            bgcolor: THEME.surface,
             borderRadius: 2,
             border: `1px solid ${THEME.border}`,
             boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
@@ -343,7 +343,7 @@ export default function ResumeGeneratorStart() {
                 size="small"
                 sx={{
                   height: 22,
-                  bgcolor: '#f1f5f9',
+                  bgcolor: THEME.previewCanvas,
                   color: THEME.textSecondary,
                   fontWeight: 600,
                   fontSize: '0.72rem',
@@ -358,7 +358,7 @@ export default function ResumeGeneratorStart() {
             sx={{
               px: { xs: 2, sm: 2.5 },
               py: 1.25,
-              bgcolor: '#fff',
+              bgcolor: THEME.surface,
               borderBottom: `1px solid ${THEME.border}`,
             }}
           >
@@ -381,13 +381,13 @@ export default function ResumeGeneratorStart() {
                 '& .MuiOutlinedInput-root': {
                   height: 36,
                   borderRadius: 1,
-                  bgcolor: '#fff',
+                  bgcolor: THEME.surface,
                   fontSize: '0.8125rem',
                   fontFamily: 'var(--font-family)',
                   pl: 0.5,
                 },
                 '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(15, 23, 42, 0.12)',
+                  borderColor: THEME.mutedBorder,
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
                   borderColor: 'rgba(51, 94, 222, 0.35)',
@@ -450,7 +450,7 @@ export default function ResumeGeneratorStart() {
                       borderBottom:
                         idx < filteredResumes.length - 1 ? '1px solid rgba(0, 0, 0, 0.06)' : 'none',
                       transition: 'background 0.12s',
-                      '&:hover': { bgcolor: '#fafbfc' },
+                      '&:hover': { bgcolor: THEME.pageBg },
                     }}
                   >
                     {/* Avatar */}
@@ -490,8 +490,8 @@ export default function ResumeGeneratorStart() {
                           size="small"
                           sx={{
                             height: 17,
-                            bgcolor: '#ecfdf5',
-                            color: '#059669',
+                            bgcolor: 'var(--success-bg)',
+                            color: 'var(--success)',
                             fontWeight: 700,
                             fontSize: '0.6rem',
                             fontFamily: 'var(--font-family)',
@@ -520,8 +520,8 @@ export default function ResumeGeneratorStart() {
                         sx={{
                           color: THEME.textSecondary,
                           '&:hover': {
-                            color: '#ef4444',
-                            bgcolor: 'rgba(239, 68, 68, 0.06)',
+                            color: 'var(--error)',
+                            bgcolor: 'var(--error-bg)',
                           },
                         }}
                       >
@@ -555,14 +555,14 @@ export default function ResumeGeneratorStart() {
                           fontSize: '0.8125rem',
                           fontWeight: 600,
                           bgcolor: THEME.primary,
-                          color: '#fff',
+                          color: 'var(--button-primary-text)',
                           borderRadius: 1,
                           height: 36,
                           minHeight: 36,
                           px: 2,
                           boxShadow: 'none',
                           '&:hover': {
-                            bgcolor: 'var(--primary-dark, #1d4ed8)',
+                            bgcolor: 'var(--primary-dark)',
                             boxShadow: 'none',
                           },
                         }}
@@ -614,7 +614,7 @@ export default function ResumeGeneratorStart() {
               px: 2.5,
               py: 0.875,
               borderRadius: 1,
-              '&:hover': { bgcolor: '#fafbfc' },
+              '&:hover': { bgcolor: THEME.pageBg },
             }}
           >
             Cancel
@@ -628,18 +628,18 @@ export default function ResumeGeneratorStart() {
               fontFamily: 'var(--font-family)',
               fontSize: '0.875rem',
               fontWeight: 600,
-              bgcolor: '#ef4444',
+              bgcolor: 'var(--error)',
               color: 'white',
               px: 2.5,
               py: 0.875,
               borderRadius: '8px',
               boxShadow: 'none',
               '&:hover': {
-                bgcolor: '#dc2626',
+                bgcolor: 'var(--error-dark)',
                 boxShadow: '0 2px 8px rgba(239, 68, 68, 0.25)',
               },
               '&:disabled': {
-                bgcolor: '#fca5a5',
+                bgcolor: 'var(--error-light)',
                 color: 'white',
               },
             }}

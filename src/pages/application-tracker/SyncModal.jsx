@@ -90,13 +90,13 @@ export default function SyncModal({ open, onClose, onSync, isLoading }) {
               width: 40,
               height: 40,
               borderRadius: 2,
-              bgcolor: 'rgba(37,99,235,0.1)',
+              bgcolor: 'var(--light-blue-bg-08)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Mail size={20} color="#2563EB" />
+            <Mail size={20} color="var(--primary)" />
           </Box>
           <Box>
             <Typography sx={{ fontWeight: 900, fontSize: '1.25rem', color: 'var(--text-primary)' }}>
@@ -125,11 +125,11 @@ export default function SyncModal({ open, onClose, onSync, isLoading }) {
                   sx={{
                     fontWeight: 700,
                     fontSize: '0.8rem',
-                    bgcolor: preset === p.value ? 'rgba(37,99,235,0.1)' : 'rgba(0,0,0,0.04)',
-                    color: preset === p.value ? '#2563EB' : 'var(--text-secondary)',
-                    border: preset === p.value ? '2px solid #2563EB' : 'none',
+                    bgcolor: preset === p.value ? 'var(--light-blue-bg-08)' : 'var(--bg-light)',
+                    color: preset === p.value ? 'var(--primary)' : 'var(--text-secondary)',
+                    border: preset === p.value ? '2px solid var(--primary)' : 'none',
                     '&:hover': {
-                      bgcolor: preset === p.value ? 'rgba(37,99,235,0.15)' : 'rgba(0,0,0,0.08)',
+                      bgcolor: preset === p.value ? 'var(--light-blue-bg-15)' : 'var(--sidebar-item-hover-bg)',
                     },
                   }}
                 />
@@ -196,8 +196,8 @@ export default function SyncModal({ open, onClose, onSync, isLoading }) {
             icon={<AlertCircle size={16} />}
             sx={{
               fontSize: '0.8rem',
-              bgcolor: 'rgba(37,99,235,0.05)',
-              border: '1px solid rgba(37,99,235,0.2)',
+              bgcolor: 'var(--light-blue-bg)',
+              border: '1px solid var(--light-blue-bg-15)',
               '& .MuiAlert-icon': { alignItems: 'center' },
             }}
           >
@@ -215,13 +215,13 @@ export default function SyncModal({ open, onClose, onSync, isLoading }) {
               sx={{
                 p: 2,
                 borderRadius: 2,
-                bgcolor: 'rgba(16,185,129,0.05)',
-                border: '1px solid rgba(16,185,129,0.2)',
+                bgcolor: 'var(--success-bg)',
+                border: '1px solid var(--success-bk)',
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                <Calendar size={14} color="#10B981" />
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: '#10B981' }}>
+                <Calendar size={14} color="var(--success)" />
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--success)' }}>
                   SELECTED RANGE
                 </Typography>
               </Box>
@@ -254,8 +254,8 @@ export default function SyncModal({ open, onClose, onSync, isLoading }) {
             fontWeight: 800,
             px: 3,
             borderRadius: 2,
-            bgcolor: '#2563EB',
-            '&:hover': { bgcolor: '#1E40AF' },
+            bgcolor: 'var(--primary)',
+            '&:hover': { bgcolor: 'var(--primary-dark)' },
           }}
         >
           {isLoading ? 'Starting Sync...' : 'Start Sync'}

@@ -31,11 +31,11 @@ We'd love to have your decision by end of next week. How does this sound?`,
 ];
 
 const TACTIC_SUGGESTIONS = [
-  { label: '⚓ Anchor Higher', prompt: 'My research and competing offers suggest a range of ₹32–35L. Is there flexibility on the base to get closer to that range?', color: '#6366f1', bg: 'rgba(99,102,241,0.1)' },
-  { label: '⏳ Ask for Time', prompt: "Thank you for the offer! I'm very excited about the opportunity. Could I have until end of this week to review the full details with my family?", color: '#0ea5e9', bg: 'rgba(14,165,233,0.1)' },
-  { label: '📦 Bundle Ask', prompt: 'The base is slightly below my target of ₹32L. Could we explore either a higher base or additional ESOPs to bridge the gap?', color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)' },
-  { label: '⚡ Competing Offer', prompt: 'I have a competing offer at ₹31L base. Stripe is my first choice — is there any flexibility to get closer to that number?', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
-  { label: '✅ Accept Gracefully', prompt: "Thank you so much! I'm thrilled to accept. I'd love to start as soon as possible. What are the next steps?", color: '#10b981', bg: 'rgba(16,185,129,0.1)' },
+  { label: '⚓ Anchor Higher', prompt: 'My research and competing offers suggest a range of ₹32–35L. Is there flexibility on the base to get closer to that range?', color: 'var(--primary)', bg: 'var(--light-blue-bg)' },
+  { label: '⏳ Ask for Time', prompt: "Thank you for the offer! I'm very excited about the opportunity. Could I have until end of this week to review the full details with my family?", color: 'var(--accent-cyan)', bg: 'var(--light-blue-bg)' },
+  { label: '📦 Bundle Ask', prompt: 'The base is slightly below my target of ₹32L. Could we explore either a higher base or additional ESOPs to bridge the gap?', color: 'var(--secondary)', bg: 'var(--light-blue-bg)' },
+  { label: '⚡ Competing Offer', prompt: 'I have a competing offer at ₹31L base. Stripe is my first choice — is there any flexibility to get closer to that number?', color: 'var(--warning)', bg: 'var(--warning-bg)' },
+  { label: '✅ Accept Gracefully', prompt: "Thank you so much! I'm thrilled to accept. I'd love to start as soon as possible. What are the next steps?", color: 'var(--success)', bg: 'var(--success-bg)' },
 ];
 
 const AI_RESPONSES = {
@@ -81,11 +81,11 @@ export default function OfferNegotiation() {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
-  const bg = isDark ? '#0f0f13' : '#f4f5f9';
-  const surface = isDark ? '#16161e' : '#ffffff';
+  const bg = isDark ? 'var(--bg-default)' : 'var(--bg-main)';
+  const surface = isDark ? 'var(--bg-paper)' : 'var(--bg-paper)';
   const border = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
   const muted = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
-  const textColor = isDark ? '#ffffff' : '#0f0f13';
+  const textColor = isDark ? 'var(--text-primary)' : 'var(--text-primary)';
 
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [input, setInput] = useState('');
@@ -155,7 +155,7 @@ export default function OfferNegotiation() {
             color: muted,
             border: `1px solid ${border}`,
             borderRadius: 1.5,
-            '&:hover': { color: '#f59e0b', borderColor: 'rgba(245,158,11,0.35)', bgcolor: 'rgba(245,158,11,0.06)' },
+            '&:hover': { color: 'var(--warning)', borderColor: 'var(--warning)', bgcolor: 'var(--warning-bg)' },
           }}
         >
           <ArrowBackRoundedIcon fontSize="small" />
@@ -166,14 +166,14 @@ export default function OfferNegotiation() {
             width: 38,
             height: 38,
             borderRadius: 2,
-            background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+            background: 'linear-gradient(135deg, var(--warning), var(--error))',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
           }}
         >
-          <SavingsRoundedIcon sx={{ fontSize: 20, color: '#fff' }} />
+          <SavingsRoundedIcon sx={{ fontSize: 20, color: 'var(--button-primary-text)' }} />
         </Box>
 
         <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -194,7 +194,7 @@ export default function OfferNegotiation() {
             border: '1px solid rgba(245,158,11,0.25)',
           }}
         >
-          <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#f59e0b' }}>🎭 AI Roleplay</Typography>
+          <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--warning)' }}>🎭 AI Roleplay</Typography>
         </Box>
       </Box>
 
@@ -229,8 +229,8 @@ export default function OfferNegotiation() {
                         height: 36,
                         borderRadius: '50%',
                         background: msg.role === 'ai'
-                          ? 'linear-gradient(135deg, #f59e0b, #ef4444)'
-                          : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                          ? 'linear-gradient(135deg, var(--warning), var(--error))'
+                          : 'linear-gradient(135deg, var(--primary), var(--secondary))',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -241,8 +241,8 @@ export default function OfferNegotiation() {
                       }}
                     >
                       {msg.role === 'ai'
-                        ? <SmartToyRoundedIcon sx={{ fontSize: 18, color: '#fff' }} />
-                        : <PersonRoundedIcon sx={{ fontSize: 18, color: '#fff' }} />
+                        ? <SmartToyRoundedIcon sx={{ fontSize: 18, color: 'var(--button-primary-text)' }} />
+                        : <PersonRoundedIcon sx={{ fontSize: 18, color: 'var(--button-primary-text)' }} />
                       }
                     </Box>
 
@@ -288,14 +288,14 @@ export default function OfferNegotiation() {
                       width: 36,
                       height: 36,
                       borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+                      background: 'linear-gradient(135deg, var(--warning), var(--error))',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
                     }}
                   >
-                    <SmartToyRoundedIcon sx={{ fontSize: 18, color: '#fff' }} />
+                    <SmartToyRoundedIcon sx={{ fontSize: 18, color: 'var(--button-primary-text)' }} />
                   </Box>
                   <Box
                     sx={{
@@ -314,7 +314,7 @@ export default function OfferNegotiation() {
                             width: 7,
                             height: 7,
                             borderRadius: '50%',
-                            bgcolor: '#f59e0b',
+                            bgcolor: 'var(--warning)',
                             animation: 'bounce 1s ease-in-out infinite',
                             animationDelay: `${delay}s`,
                           }}
@@ -411,7 +411,7 @@ export default function OfferNegotiation() {
                   fontSize: '0.88rem',
                   lineHeight: 1.7,
                   background: 'transparent',
-                  color: isDark ? 'rgba(255,255,255,0.87)' : '#0f0f13',
+                  color: isDark ? 'rgba(255,255,255,0.87)' : 'var(--text-primary)',
                   boxSizing: 'border-box',
                 }}
               />
@@ -423,7 +423,7 @@ export default function OfferNegotiation() {
                 height: 44,
                 borderRadius: 2.5,
                 background: input.trim() && !isAiTyping
-                  ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
+                  ? 'linear-gradient(135deg, var(--primary), var(--secondary))'
                   : isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)',
                 display: 'flex',
                 alignItems: 'center',
@@ -435,7 +435,7 @@ export default function OfferNegotiation() {
                 '&:hover': input.trim() && !isAiTyping ? { transform: 'translateY(-1px)' } : {},
               }}
             >
-              <SendRoundedIcon sx={{ fontSize: 18, color: input.trim() && !isAiTyping ? '#fff' : muted }} />
+              <SendRoundedIcon sx={{ fontSize: 18, color: input.trim() && !isAiTyping ? 'var(--button-primary-text)' : muted }} />
             </Box>
           </Box>
         </Box>
@@ -457,7 +457,7 @@ export default function OfferNegotiation() {
           {/* Offer history */}
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              <TrendingUpRoundedIcon sx={{ fontSize: 16, color: '#10b981' }} />
+              <TrendingUpRoundedIcon sx={{ fontSize: 16, color: 'var(--success)' }} />
               <Typography sx={{ fontWeight: 800, fontSize: '0.85rem', color: textColor }}>Offer History</Typography>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -483,7 +483,7 @@ export default function OfferNegotiation() {
                     }}
                   >
                     <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: muted }}>{o.label}</Typography>
-                    <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: i === offerHistory.length - 1 ? '#10b981' : textColor }}>
+                    <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: i === offerHistory.length - 1 ? 'var(--success)' : textColor }}>
                       {o.value}
                     </Typography>
                   </Box>
@@ -514,7 +514,7 @@ export default function OfferNegotiation() {
                       border: '1px solid rgba(99,102,241,0.25)',
                       fontSize: '0.72rem',
                       fontWeight: 700,
-                      color: '#6366f1',
+                      color: 'var(--primary)',
                     }}
                   >
                     {t}
@@ -529,7 +529,7 @@ export default function OfferNegotiation() {
           {/* Coach tip */}
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.25 }}>
-              <LightbulbOutlinedIcon sx={{ fontSize: 15, color: '#f59e0b' }} />
+              <LightbulbOutlinedIcon sx={{ fontSize: 15, color: 'var(--warning)' }} />
               <Typography sx={{ fontWeight: 800, fontSize: '0.85rem', color: textColor }}>Coach Tip</Typography>
             </Box>
             <Box

@@ -32,23 +32,23 @@ function InputField({ icon: Icon, placeholder, value, onChange, onBlur, type = '
       sx={{
         display: 'flex', alignItems: 'center', gap: 1.5,
         px: 1.5, py: 1.25, borderRadius: '10px',
-        border: `1px solid ${error ? 'var(--error)' : 'rgba(0,0,0,0.08)'}`,
-        bgcolor: '#ffffff',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+        border: `1px solid ${error ? 'var(--error)' : 'var(--border-color)'}`,
+        bgcolor: 'var(--bg-paper)',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
         '&:focus-within': {
-          borderColor: error ? 'var(--error)' : '#1E3A8A',
+          borderColor: error ? 'var(--error)' : 'var(--primary)',
           boxShadow: error
             ? '0 0 0 4px rgba(220,38,38,0.08)'
-            : '0 0 0 4px rgba(30,58,138,0.06)',
-          bgcolor: '#ffffff',
+            : '0 0 0 4px rgba(37,99,235,0.12)',
+          bgcolor: 'var(--bg-paper)',
         },
         '&:hover': { 
-          borderColor: error ? 'var(--error)' : 'rgba(0,0,0,0.15)',
+          borderColor: error ? 'var(--error)' : 'var(--border-hover)',
         },
       }}
     >
-      {Icon && <Icon sx={{ fontSize: 18, color: 'rgba(0,0,0,0.4)', flexShrink: 0 }} />}
+      {Icon && <Icon sx={{ fontSize: 18, color: 'var(--text-muted)', flexShrink: 0 }} />}
       <InputBase
         placeholder={placeholder}
         value={value}
@@ -59,7 +59,7 @@ function InputField({ icon: Icon, placeholder, value, onChange, onBlur, type = '
         sx={{
           fontSize: 14, fontWeight: 500,
           color: 'var(--text-primary)',
-          '& input::placeholder': { color: 'rgba(0,0,0,0.3)', opacity: 1 },
+          '& input::placeholder': { color: 'var(--placeholder)', opacity: 1 },
         }}
       />
       {endAdornment}
@@ -261,7 +261,7 @@ export default function Register() {
           <Typography
             component={Link}
             to="/terms-of-service"
-            sx={{ color: '#1E3A8A', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+            sx={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
           >
             Terms of Service
           </Typography>
@@ -269,7 +269,7 @@ export default function Register() {
           <Typography
             component={Link}
             to="/privacy-policy"
-            sx={{ color: '#1E3A8A', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+            sx={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
           >
             Privacy Policy
           </Typography>
@@ -285,8 +285,8 @@ export default function Register() {
           sx={{
             mt: 0.5, height: 44, borderRadius: '10px',
             textTransform: 'none', fontWeight: 700, fontSize: 15,
-            bgcolor: '#0F1E35',
-            background: loading ? undefined : 'linear-gradient(135deg, #0F1E35 0%, #1E3A8A 100%)',
+            bgcolor: 'var(--primary-dark)',
+            background: loading ? undefined : 'linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%)',
             boxShadow: '0 4px 12px rgba(15,30,53,0.25)',
             letterSpacing: '0.01em',
             transition: 'all 0.2s',
@@ -332,13 +332,13 @@ export default function Register() {
         sx={{
           height: 44, borderRadius: '10px', textTransform: 'none',
           fontWeight: 600, fontSize: 14, gap: 1.5,
-          borderColor: 'rgba(0,0,0,0.08)',
+          borderColor: 'var(--border-color)',
           color: 'var(--text-primary)',
-          bgcolor: '#ffffff',
-          boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+          bgcolor: 'var(--bg-paper)',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
           '&:hover': {
-            borderColor: 'rgba(0,0,0,0.15)',
-            bgcolor: '#f9fafb',
+            borderColor: 'var(--border-hover)',
+            bgcolor: 'var(--sidebar-item-hover-bg)',
           },
         }}
         startIcon={
@@ -359,7 +359,7 @@ export default function Register() {
         <Typography
           component={Link}
           to="/login"
-          sx={{ color: '#1E3A8A', fontWeight: 700, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+          sx={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
         >
           Log in
         </Typography>

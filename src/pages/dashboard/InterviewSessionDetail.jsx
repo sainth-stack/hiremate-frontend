@@ -42,9 +42,9 @@ function formatTime(seconds) {
 }
 
 // ── FIXED COLORS FOR ALPHA() ──
-const SUCCESS_HEX = '#10b981';
-const PRIMARY_HEX = '#335ede';
-const MUTED_HEX = '#64748b';
+const SUCCESS_HEX = 'var(--success)';
+const PRIMARY_HEX = 'var(--primary)';
+const MUTED_HEX = 'var(--text-secondary)';
 
 function scoreColorHex(s) {
   return s >= 75 ? SUCCESS_HEX : s >= 50 ? PRIMARY_HEX : MUTED_HEX;
@@ -145,7 +145,7 @@ export default function InterviewSessionDetail() {
                         height: '100%',
                         borderRadius: 2,
                         border: m.accent ? `1.5px solid ${alpha(m.color, 0.28)}` : `1px solid ${border}`,
-                        bgcolor: '#fff',
+                        bgcolor: 'var(--bg-paper)',
                         boxShadow: m.accent ? `0 4px 20px ${alpha(m.color, 0.08)}` : 'none',
                         transition: 'all 0.2s',
                         '&:hover': {
@@ -156,7 +156,7 @@ export default function InterviewSessionDetail() {
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.25, mb: 2.5 }}>
                         <Box sx={{ width: 44, height: 44, borderRadius: 2, bgcolor: m.accent ? m.color : THEME.primarySoft, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <m.icon size={22} color={m.accent ? '#fff' : THEME.primary} />
+                          <m.icon size={22} color={m.accent ? 'var(--button-primary-text)' : THEME.primary} />
                         </Box>
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                           <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: 0.8, color: THEME.primary, textTransform: 'uppercase', mb: 0.3 }}>{m.category}</Typography>
@@ -181,13 +181,13 @@ export default function InterviewSessionDetail() {
              sx={{ 
                 p: 4.5, borderRadius: 2, 
                 border: '1.5px solid rgba(51, 94, 222, 0.28)',
-                bgcolor: '#fff',
+                bgcolor: 'var(--bg-paper)',
                 boxShadow: '0 4px 20px rgba(51, 94, 222, 0.05)',
                 display: 'flex', flexDirection: 'column', gap: 3
              }}
            >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.25 }}>
-                 <Box sx={{ width: 44, height: 44, borderRadius: 2, bgcolor: THEME.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                 <Box sx={{ width: 44, height: 44, borderRadius: 2, bgcolor: THEME.primary, color: 'var(--button-primary-text)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <BrainCircuit size={24} />
                  </Box>
                  <Typography sx={{ fontWeight: 950, fontSize: '1.4rem', color: THEME.primary, letterSpacing: '-0.02em' }}>Coach Intelligence</Typography>
@@ -211,7 +211,7 @@ export default function InterviewSessionDetail() {
                 <Card 
                   elevation={0} 
                   sx={{ 
-                    p: { xs: 3, md: 5 }, borderRadius: 2, border: `1px solid ${border}`, bgcolor: '#fff', 
+                    p: { xs: 3, md: 5 }, borderRadius: 2, border: `1px solid ${border}`, bgcolor: 'var(--bg-paper)', 
                     display: 'flex', flexDirection: 'column', gap: 4, transition: 'all 0.2s', 
                     '&:hover': { borderColor: THEME.primary, boxShadow: '0 8px 30px rgba(0,0,0,0.04)' } 
                   }}

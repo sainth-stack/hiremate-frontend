@@ -36,6 +36,7 @@ import {
   EMPTY_PROJECT,
 } from './SharedComponents';
 import { RESUME_STUDIO_THEME as T } from '../../../utilities/resumeStudioTheme';
+import { CHROME_EXTENSION_WEBSTORE_URL } from '../../../utilities/const';
 
 const toolbarBtnSecondary = {
   height: 36,
@@ -87,6 +88,11 @@ export default function EditorPanel({
   handleTailorMore,
   selectedResumeId,
 }) {
+  const handleOpenExtensionStore = () => {
+    window.open(CHROME_EXTENSION_WEBSTORE_URL, '_blank', 'noopener,noreferrer');
+    setExtensionBannerDismissedAndStore(true);
+  };
+
   return (
     <Box
       sx={{
@@ -285,19 +291,19 @@ export default function EditorPanel({
         sx={{
           flex: 1,
           overflowY: 'auto',
-          bgcolor: '#FFFFFF',
+          bgcolor: T.surface,
           minHeight: 0,
           '&::-webkit-scrollbar': {
             width: '8px',
           },
           '&::-webkit-scrollbar-track': {
-            bgcolor: '#F9FAFB',
+            bgcolor: 'var(--bg-light)',
           },
           '&::-webkit-scrollbar-thumb': {
-            bgcolor: '#D1D5DB',
+            bgcolor: 'var(--border-hover)',
             borderRadius: '4px',
             '&:hover': {
-              bgcolor: '#9CA3AF',
+              bgcolor: 'var(--text-muted)',
             },
           },
         }}
@@ -311,7 +317,7 @@ export default function EditorPanel({
                   size="small"
                   sx={{ bgcolor: T.primarySoft, color: T.primary, fontWeight: 700, fontSize: '0.7rem', height: 22, '& .MuiChip-label': { px: 1 } }}
                 />
-                <Typography sx={{ fontSize: '0.75rem', color: '#94a3b8', fontFamily: 'var(--font-family)' }}>
+                <Typography sx={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--font-family)' }}>
                   Live preview from your profile
                 </Typography>
               </Box>
@@ -343,12 +349,12 @@ export default function EditorPanel({
                     }}
                   />
                   <Tooltip title="Save name">
-                    <IconButton size="small" onClick={() => handleRenameResume(resumeTitleValue)} sx={{ color: '#16a34a', p: 0.5 }}>
+                    <IconButton size="small" onClick={() => handleRenameResume(resumeTitleValue)} sx={{ color: 'var(--success)', p: 0.5 }}>
                       <CheckRoundedIcon sx={{ fontSize: 16 }} />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Cancel">
-                    <IconButton size="small" onClick={() => setIsTitleEditing(false)} sx={{ color: '#9ca3af', p: 0.5 }}>
+                    <IconButton size="small" onClick={() => setIsTitleEditing(false)} sx={{ color: 'var(--text-muted)', p: 0.5 }}>
                       <CloseRoundedIcon sx={{ fontSize: 16 }} />
                     </IconButton>
                   </Tooltip>
@@ -857,7 +863,7 @@ export default function EditorPanel({
                     fontSize: '0.65rem', 
                     fontWeight: 600,
                     bgcolor: 'rgba(156, 163, 175, 0.12)',
-                    color: '#6B7280'
+                    color: 'var(--text-muted)'
                   }} 
                 />
               }
@@ -906,8 +912,8 @@ export default function EditorPanel({
         <Box sx={{ px: 2, py: 2, borderTop: `1px solid ${T.border}`, bgcolor: T.surface, flexShrink: 0 }}>
           <Button
             size="small"
-            onClick={() => setExtensionBannerDismissedAndStore(true)}
-            sx={{ fontSize: '0.875rem', color: '#9CA3AF', textTransform: 'none', fontFamily: 'var(--font-family)', minWidth: 0, '&:hover': { color: '#4B5563', bgcolor: 'transparent' } }}
+            onClick={handleOpenExtensionStore}
+            sx={{ fontSize: '0.875rem', color: 'var(--text-muted)', textTransform: 'none', fontFamily: 'var(--font-family)', minWidth: 0, '&:hover': { color: 'var(--text-secondary)', bgcolor: 'transparent' } }}
           >
             Install Chrome Extension
           </Button>

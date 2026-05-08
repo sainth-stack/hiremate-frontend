@@ -39,49 +39,49 @@ const COLUMNS = [
     id: 'saved',
     label: 'SAVED',
     statuses: ['saved', 'not_yet_applied', 'i_have_not_yet_applied'],
-    accent: '#1E293B',
+    accent: 'var(--text-primary)',
     emptyMsg: 'No saved jobs',
   },
   {
     id: 'applied',
     label: 'APPLIED',
     statuses: ['applied', 'acknowledged'],
-    accent: '#2563EB',
+    accent: 'var(--primary)',
     emptyMsg: 'No applications yet',
   },
   {
     id: 'in_review',
     label: 'IN REVIEW',
     statuses: ['in_review'],
-    accent: '#3B82F6',
+    accent: 'var(--primary-light)',
     emptyMsg: 'None under review',
   },
   {
     id: 'interviewing',
     label: 'INTERVIEWING',
     statuses: ['interview_scheduled', 'interview_completed'],
-    accent: '#6366F1',
+    accent: 'var(--secondary)',
     emptyMsg: 'No interviews scheduled',
   },
   {
     id: 'offer',
     label: 'OFFER',
     statuses: ['offer_received'],
-    accent: '#0EA5E9',
+    accent: 'var(--info)',
     emptyMsg: 'No offers received',
   },
   {
     id: 'rejected',
     label: 'REJECTED',
     statuses: ['rejected', 'ghosted', 'withdrawn'],
-    accent: '#94A3B8',
+    accent: 'var(--text-muted)',
     emptyMsg: 'No rejected jobs',
   },
 ];
 
 const AVATAR_PALETTE = [
-  '#2563EB', '#3B82F6', '#6366F1', '#0891B2',
-  '#0D9488', '#7C3AED', '#DB2777', '#D97706',
+  'var(--primary)', 'var(--primary-light)', 'var(--secondary)', 'var(--info)',
+  'var(--accent-green)', 'var(--light-blue-2)', 'var(--light-blue)', 'var(--warning)',
 ];
 
 const getAvatarColor = (name = '') =>
@@ -101,8 +101,8 @@ function FavoriteButton({ appId }) {
       onClick={(e) => { e.stopPropagation(); setLiked((v) => !v); }}
       sx={{
         p: 0.5,
-        color: liked ? '#EF4444' : 'var(--text-muted)',
-        '&:hover': { color: '#EF4444', bgcolor: 'rgba(239,68,68,0.08)' },
+        color: liked ? 'var(--error)' : 'var(--text-muted)',
+        '&:hover': { color: 'var(--error)', bgcolor: 'var(--error-bg)' },
       }}
     >
       {liked
@@ -229,7 +229,7 @@ export default function ApplicationTrackerPage() {
         flexDirection: 'column',
         height: '100vh',
         overflow: 'hidden',
-        bgcolor: theme.palette.mode === 'dark' ? '#0b0f19' : '#F0F4FF',
+        bgcolor: 'var(--bg-default)',
       }}
     >
       {/* ── Header ── */}
@@ -260,16 +260,16 @@ export default function ApplicationTrackerPage() {
                 height: 22,
                 fontSize: 10,
                 fontWeight: 800,
-                bgcolor: theme.palette.mode === 'dark' ? 'rgba(37,99,235,0.15)' : '#EFF6FF',
-                color: '#2563EB',
+                bgcolor: 'var(--sidebar-item-active-bg)',
+                color: 'var(--primary)',
                 border: '1px solid',
-                borderColor: theme.palette.mode === 'dark' ? 'rgba(37,99,235,0.3)' : '#BFDBFE',
+                borderColor: 'var(--border-color)',
                 letterSpacing: '0.04em',
                 '& .MuiChip-label': { px: 1.25 },
               }}
             />
             {lastSyncTime && (
-              <Typography variant="caption" fontWeight={600} sx={{ fontSize: 11, color: '#94A3B8' }}>
+              <Typography variant="caption" fontWeight={600} sx={{ fontSize: 11, color: 'var(--text-muted)' }}>
                 · Synced {lastSyncTime.toLocaleTimeString()}
               </Typography>
             )}
@@ -282,8 +282,8 @@ export default function ApplicationTrackerPage() {
             sx={{
               height: 34, px: 2.5, borderRadius: 2, whiteSpace: 'nowrap',
               textTransform: 'none', fontWeight: 700, fontSize: 12,
-              bgcolor: '#2563EB', boxShadow: '0 2px 8px rgba(37,99,235,0.25)',
-              '&:hover': { bgcolor: '#1D4ED8' },
+              bgcolor: 'var(--primary)', boxShadow: '0 2px 8px rgba(37,99,235,0.25)',
+              '&:hover': { bgcolor: 'var(--primary-dark)' },
             }}
           >
             Add Application
@@ -316,15 +316,15 @@ export default function ApplicationTrackerPage() {
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchRoundedIcon sx={{ color: '#94A3B8', fontSize: 16 }} />
+                  <SearchRoundedIcon sx={{ color: 'var(--text-muted)', fontSize: 16 }} />
                 </InputAdornment>
               ),
               sx: {
                 height: 38, borderRadius: '10px',
-                bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#F8FAFC', fontSize: 13,
+                bgcolor: 'var(--bg-light)', fontSize: 13,
                 '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' },
-                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#93C5FD' },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#2563EB' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--border-hover)' },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--primary)' },
               },
             },
           }}
@@ -343,22 +343,22 @@ export default function ApplicationTrackerPage() {
             input: {
               startAdornment: (
                 <InputAdornment position="start" sx={{ mr: 1 }}>
-                  <Typography sx={{ fontSize: 10, fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase' }}>From</Typography>
+                  <Typography sx={{ fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>From</Typography>
                 </InputAdornment>
               ),
               endAdornment: appliedFrom && (
                 <InputAdornment position="end">
                   <IconButton size="small" onClick={() => setAppliedFrom('')} sx={{ mr: -0.5 }}>
-                    <ClearRoundedIcon sx={{ fontSize: 16, color: '#94A3B8' }} />
+                    <ClearRoundedIcon sx={{ fontSize: 16, color: 'var(--text-muted)' }} />
                   </IconButton>
                 </InputAdornment>
               ),
               sx: {
                 height: 38, borderRadius: '10px',
-                bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#F8FAFC', fontSize: 13,
+                bgcolor: 'var(--bg-light)', fontSize: 13,
                 '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' },
-                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#93C5FD' },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#2563EB' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--border-hover)' },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--primary)' },
                 '& input::-webkit-calendar-picker-indicator': { cursor: 'pointer' }
               },
             }
@@ -376,22 +376,22 @@ export default function ApplicationTrackerPage() {
             input: {
               startAdornment: (
                 <InputAdornment position="start" sx={{ mr: 1 }}>
-                  <Typography sx={{ fontSize: 10, fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase' }}>Until</Typography>
+                  <Typography sx={{ fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Until</Typography>
                 </InputAdornment>
               ),
               endAdornment: appliedUntil && (
                 <InputAdornment position="end">
                   <IconButton size="small" onClick={() => setAppliedUntil('')} sx={{ mr: -0.5 }}>
-                    <ClearRoundedIcon sx={{ fontSize: 16, color: '#94A3B8' }} />
+                    <ClearRoundedIcon sx={{ fontSize: 16, color: 'var(--text-muted)' }} />
                   </IconButton>
                 </InputAdornment>
               ),
               sx: {
                 height: 38, borderRadius: '10px',
-                bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#F8FAFC', fontSize: 13,
+                bgcolor: 'var(--bg-light)', fontSize: 13,
                 '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' },
-                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#93C5FD' },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#2563EB' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--border-hover)' },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--primary)' },
                 '& input::-webkit-calendar-picker-indicator': { cursor: 'pointer' }
               },
             }
@@ -408,14 +408,14 @@ export default function ApplicationTrackerPage() {
                 displayEmpty
                 sx={{
                   height: 38, borderRadius: '10px', fontSize: 13, fontWeight: 600,
-                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#F8FAFC', 
+                  bgcolor: 'var(--bg-light)', 
                   color: jobTypeFilter === 'all' ? 'text.disabled' : 'text.primary',
                   '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' },
-                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#93C5FD' },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#2563EB' },
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--border-hover)' },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--primary)' },
                 }}
               >
-                <MenuItem value="all" sx={{ fontSize: 13, color: '#94A3B8' }}>Job Type</MenuItem>
+                <MenuItem value="all" sx={{ fontSize: 13, color: 'var(--text-muted)' }}>Job Type</MenuItem>
                 <MenuItem value="full_time" sx={{ fontSize: 13 }}>Full-time</MenuItem>
                 <MenuItem value="part_time" sx={{ fontSize: 13 }}>Part-time</MenuItem>
                 <MenuItem value="contract" sx={{ fontSize: 13 }}>Contract</MenuItem>
@@ -431,14 +431,14 @@ export default function ApplicationTrackerPage() {
                 displayEmpty
                 sx={{
                   height: 38, borderRadius: '10px', fontSize: 13, fontWeight: 600,
-                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#F8FAFC', 
+                  bgcolor: 'var(--bg-light)', 
                   color: statusFilter === 'all' ? 'text.disabled' : 'text.primary',
                   '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' },
-                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#93C5FD' },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#2563EB' },
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--border-hover)' },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--primary)' },
                 }}
               >
-                <MenuItem value="all" sx={{ fontSize: 13, color: '#94A3B8' }}>Status</MenuItem>
+                <MenuItem value="all" sx={{ fontSize: 13, color: 'var(--text-muted)' }}>Status</MenuItem>
                 <MenuItem value="applied" sx={{ fontSize: 13 }}>Applied</MenuItem>
                 <MenuItem value="acknowledged" sx={{ fontSize: 13 }}>Acknowledged</MenuItem>
                 <MenuItem value="in_review" sx={{ fontSize: 13 }}>In Review</MenuItem>
@@ -466,8 +466,8 @@ export default function ApplicationTrackerPage() {
               sx={{
                 height: 38, px: 2, borderRadius: '10px',
                 textTransform: 'none', fontWeight: 700, fontSize: 13,
-                color: 'text.secondary', bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#F8FAFC', border: '1px solid', borderColor: 'divider',
-                '&:hover': { bgcolor: 'background.paper', borderColor: '#CBD5E1' },
+                color: 'text.secondary', bgcolor: 'var(--bg-light)', border: '1px solid', borderColor: 'divider',
+                '&:hover': { bgcolor: 'background.paper', borderColor: 'var(--border-hover)' },
               }}
             >
               More
@@ -485,7 +485,7 @@ export default function ApplicationTrackerPage() {
                 }
               }}
             >
-              <Typography variant="overline" sx={{ px: 1, fontSize: 10, fontWeight: 900, color: '#94A3B8', letterSpacing: '0.1em' }}>
+              <Typography variant="overline" sx={{ px: 1, fontSize: 10, fontWeight: 900, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
                 Quick Filters
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mt: 1 }}>
@@ -532,7 +532,7 @@ export default function ApplicationTrackerPage() {
             height: 38, px: 2, borderRadius: '10px', whiteSpace: 'nowrap',
             textTransform: 'none', fontWeight: 700, fontSize: 13,
             borderColor: 'divider', color: 'text.secondary',
-            '&:hover': { borderColor: '#2563EB', color: '#2563EB', bgcolor: 'rgba(37,99,235,0.08)' },
+            '&:hover': { borderColor: 'var(--primary)', color: 'var(--primary)', bgcolor: 'var(--light-blue-bg-08)' },
             '&:disabled': { opacity: 0.5 },
           }}
         >
@@ -553,7 +553,7 @@ export default function ApplicationTrackerPage() {
           borderColor: 'divider',
           alignItems: 'stretch',
           '&::-webkit-scrollbar': { height: 6 },
-          '&::-webkit-scrollbar-thumb': { bgcolor: '#CBD5E1', borderRadius: 99 },
+          '&::-webkit-scrollbar-thumb': { bgcolor: 'var(--border-hover)', borderRadius: 99 },
         }}
       >
         {COLUMNS.map((col) => {
@@ -584,7 +584,7 @@ export default function ApplicationTrackerPage() {
                       width: 32, height: 32, borderRadius: 1.5,
                       bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider',
                       color: 'text.disabled',
-                      '&:hover': { bgcolor: 'rgba(37,99,235,0.08)', color: '#2563EB', borderColor: '#93C5FD' },
+                      '&:hover': { bgcolor: 'var(--light-blue-bg-08)', color: 'var(--primary)', borderColor: 'var(--border-hover)' },
                     }}
                   >
                     <VisibilityRoundedIcon sx={{ fontSize: 15 }} />
@@ -592,7 +592,7 @@ export default function ApplicationTrackerPage() {
                 </Tooltip>
                 <Typography
                   sx={{
-                    fontSize: 10, fontWeight: 800, color: '#94A3B8',
+                    fontSize: 10, fontWeight: 800, color: 'var(--text-muted)',
                     textTransform: 'uppercase', letterSpacing: '0.08em',
                     writingMode: 'vertical-rl', textOrientation: 'mixed',
                     mt: 0.5,
@@ -633,7 +633,7 @@ export default function ApplicationTrackerPage() {
                 <IconButton
                   size="small"
                   onClick={() => toggleColumn(col.id)}
-                  sx={{ p: 0.5, color: '#94A3B8', '&:hover': { color: '#64748B', bgcolor: 'rgba(0,0,0,0.05)' } }}
+                  sx={{ p: 0.5, color: 'var(--text-muted)', '&:hover': { color: 'var(--text-secondary)', bgcolor: 'var(--sidebar-item-hover-bg)' } }}
                 >
                   <VisibilityOffRoundedIcon sx={{ fontSize: 16 }} />
                 </IconButton>
@@ -641,7 +641,7 @@ export default function ApplicationTrackerPage() {
                   sx={{
                     fontSize: 12.5,
                     fontWeight: 900,
-                    color: '#64748B', // Grayish header text as in image
+                    color: 'var(--text-secondary)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.08em',
                     flex: 1,
@@ -674,7 +674,7 @@ export default function ApplicationTrackerPage() {
                       key={i}
                       sx={{
                         height: 100, borderRadius: 2,
-                        bgcolor: '#EFF6FF',
+                        bgcolor: 'var(--light-blue-bg-08)',
                         animation: 'pulse 1.5s ease-in-out infinite',
                       }}
                     />
@@ -694,7 +694,7 @@ export default function ApplicationTrackerPage() {
                     <Typography
                       variant="caption"
                       fontWeight={600}
-                      sx={{ fontSize: 12, color: '#94A3B8' }}
+                      sx={{ fontSize: 12, color: 'var(--text-muted)' }}
                     >
                       {col.emptyMsg}
                     </Typography>
@@ -722,7 +722,7 @@ export default function ApplicationTrackerPage() {
                             transition: 'box-shadow 0.18s, border-color 0.18s',
                             '&:hover': {
                               boxShadow: '0 6px 20px rgba(37,99,235,0.1)',
-                              borderColor: '#93C5FD',
+                              borderColor: 'var(--border-hover)',
                             },
                           }}
                         >
@@ -735,7 +735,7 @@ export default function ApplicationTrackerPage() {
                                 borderRadius: 1.5,
                                 flexShrink: 0,
                                 bgcolor: getAvatarColor(app.company || ''),
-                                color: '#fff',
+                                color: 'var(--primary-contrast)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -761,16 +761,16 @@ export default function ApplicationTrackerPage() {
                                 {app.role || '—'}
                               </Typography>
                               <Typography
-                                sx={{ fontSize: 13, fontWeight: 700, color: '#64748B', mb: 0.5 }}
+                                sx={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', mb: 0.5 }}
                               >
                                 {app.company || 'Unknown'}
                               </Typography>
                               {app.location && (
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  <LocationOnOutlinedIcon sx={{ fontSize: 14, color: '#94A3B8' }} />
+                                  <LocationOnOutlinedIcon sx={{ fontSize: 14, color: 'var(--text-muted)' }} />
                                   <Typography
                                     sx={{
-                                      fontSize: 11.5, fontWeight: 600, color: '#94A3B8',
+                                      fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)',
                                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                                     }}
                                   >
@@ -793,8 +793,8 @@ export default function ApplicationTrackerPage() {
                                 gap: 0.5,
                               }}
                             >
-                              <CalendarTodayOutlinedIcon sx={{ fontSize: 11, color: '#CBD5E1' }} />
-                              <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#CBD5E1', textTransform: 'uppercase' }}>
+                              <CalendarTodayOutlinedIcon sx={{ fontSize: 11, color: 'var(--text-muted)' }} />
+                              <Typography sx={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                                 {formatDate(app.applied_date)}
                               </Typography>
                             </Box>
@@ -830,14 +830,14 @@ export default function ApplicationTrackerPage() {
           >
             <Box
               sx={{
-                bgcolor: '#fff',
+                bgcolor: 'var(--bg-paper)',
                 borderRadius: 3,
-                border: '1px solid #E2E8F0',
+                border: '1px solid var(--divider)',
                 boxShadow: '0 16px 48px rgba(15,23,42,0.12)',
                 overflow: 'hidden',
               }}
             >
-              <Box sx={{ height: 3, bgcolor: '#2563EB' }} />
+              <Box sx={{ height: 3, bgcolor: 'var(--primary)' }} />
               <Box sx={{ p: 2.5 }}>
                 <Box
                   sx={{
@@ -851,17 +851,17 @@ export default function ApplicationTrackerPage() {
                     <Box
                       sx={{
                         width: 32, height: 32, borderRadius: 1.5, flexShrink: 0,
-                        bgcolor: '#2563EB',
+                        bgcolor: 'var(--primary)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}
                     >
                       <SyncRoundedIcon sx={{ fontSize: 16, color: 'white', animation: 'spin 1s linear infinite' }} />
                     </Box>
                     <Box>
-                      <Typography sx={{ fontSize: 13, fontWeight: 800, color: '#1E293B', lineHeight: 1.2 }}>
+                      <Typography sx={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.2 }}>
                         Syncing Gmail
                       </Typography>
-                      <Typography sx={{ fontSize: 11, fontWeight: 600, color: '#94A3B8' }}>
+                      <Typography sx={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)' }}>
                         {syncStatus?.total_threads || 0} emails found
                       </Typography>
                     </Box>
@@ -872,10 +872,10 @@ export default function ApplicationTrackerPage() {
                     disabled={stopMutation.isPending}
                     sx={{
                       minWidth: 0, px: 1.5, py: 0.5, borderRadius: 1.5,
-                      bgcolor: 'rgba(239,68,68,0.08)', color: '#DC2626',
+                      bgcolor: 'var(--error-bg)', color: 'var(--error)',
                       fontSize: 11, fontWeight: 800, textTransform: 'none',
-                      border: '1px solid #FECACA',
-                      '&:hover': { bgcolor: '#DC2626', color: 'white', borderColor: '#DC2626' },
+                      border: '1px solid var(--error-bk)',
+                      '&:hover': { bgcolor: 'var(--error)', color: 'white', borderColor: 'var(--error)' },
                       '&:disabled': { opacity: 0.5 },
                     }}
                   >
@@ -885,20 +885,20 @@ export default function ApplicationTrackerPage() {
 
                 <Box sx={{ mb: 2 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.75 }}>
-                    <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#94A3B8' }}>
+                    <Typography sx={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)' }}>
                       Processing…
                     </Typography>
-                    <Typography sx={{ fontSize: 11, fontWeight: 800, color: '#2563EB' }}>
+                    <Typography sx={{ fontSize: 11, fontWeight: 800, color: 'var(--primary)' }}>
                       {progress}%
                     </Typography>
                   </Box>
-                  <Box sx={{ height: 5, bgcolor: '#EFF6FF', borderRadius: 99, overflow: 'hidden' }}>
+                  <Box sx={{ height: 5, bgcolor: 'var(--light-blue-bg-08)', borderRadius: 99, overflow: 'hidden' }}>
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${progress}%` }}
                       style={{
                         height: '100%',
-                        bgcolor: '#2563EB',
+                        bgcolor: 'var(--primary)',
                         borderRadius: 99,
                       }}
                     />
@@ -907,13 +907,13 @@ export default function ApplicationTrackerPage() {
 
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1 }}>
                   {[
-                    { label: 'Scanned', value: syncStatus?.parsed_count ?? 0, bg: '#F8FAFC', color: '#1E293B' },
-                    { label: 'Jobs Found', value: syncStatus?.ai_count ?? 0, bg: '#EFF6FF', color: '#2563EB' },
+                    { label: 'Scanned', value: syncStatus?.parsed_count ?? 0, bg: 'var(--bg-light)', color: 'var(--text-primary)' },
+                    { label: 'Jobs Found', value: syncStatus?.ai_count ?? 0, bg: 'var(--light-blue-bg-08)', color: 'var(--primary)' },
                     {
                       label: 'Remaining',
                       value: Math.max(0, (syncStatus?.total_threads ?? 0) - (syncStatus?.parsed_count ?? 0)),
                       bg: 'rgba(245,158,11,0.08)',
-                      color: '#F59E0B',
+                      color: 'var(--warning)',
                     },
                   ].map((stat) => (
                     <Box
@@ -924,7 +924,7 @@ export default function ApplicationTrackerPage() {
                         {stat.value}
                       </Typography>
                       <Typography
-                        sx={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}
+                        sx={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}
                       >
                         {stat.label}
                       </Typography>
@@ -969,7 +969,7 @@ export default function ApplicationTrackerPage() {
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         input[type="date"].date-placeholder:before {
           content: attr(data-placeholder);
-          color: #94A3B8;
+          color: var(--text-muted);
           font-weight: 600;
           font-size: 13px;
         }

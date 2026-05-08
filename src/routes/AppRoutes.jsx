@@ -39,10 +39,13 @@ import AdminLearning from '../pages/admin/AdminLearning';
 import AdminIssues from '../pages/admin/AdminIssues';
 import AdminTokenUsage from '../pages/admin/AdminTokenUsage';
 import PlanManagement from '../pages/admin/PlanManagement';
+import AdminIngestionRuns from '../pages/admin/AdminIngestionRuns';
 import PrivacyPolicy from '../pages/legal/PrivacyPolicy';
 import TermsOfService from '../pages/legal/TermsOfService';
 import ReportIssuePage from '../pages/report-issue/ReportIssuePage';
 import JobRecommendationPage from '../pages/job-recommendation/JobRecommendationPage';
+import CompanySearch from '../pages/dashboard/CompanySearch';
+import ExtensionUninstallPage from '../pages/extension-uninstall/ExtensionUninstallPage';
 
 export default function AppRoutes() {
   return (
@@ -51,6 +54,7 @@ export default function AppRoutes() {
         {/* Public routes — no auth required */}
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/extension/uninstall" element={<ExtensionUninstallPage />} />
 
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<Login />} />
@@ -70,6 +74,7 @@ export default function AppRoutes() {
               <Route path="learning" element={<AdminLearning />} />
               <Route path="issues" element={<AdminIssues />} />
               <Route path="token-usage" element={<AdminTokenUsage />} />
+              <Route path="ingestion-runs" element={<AdminIngestionRuns />} />
               <Route path="plans" element={<PlanManagement />} />
             </Route>
           </Route>
@@ -97,7 +102,7 @@ export default function AppRoutes() {
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/report-issue" element={<ReportIssuePage />} />
             <Route path="/job-recommendation" element={<JobRecommendationPage />} />
-            <Route path="/company-search" element={<Navigate to="/job-recommendation" replace />} />
+            <Route path="/company-search" element={<CompanySearch />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
