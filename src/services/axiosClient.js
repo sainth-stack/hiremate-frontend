@@ -1,5 +1,8 @@
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import { BASE_URL } from '../utilities/const';
+import { store } from '../store';
+import { updateTokenBalance } from '../store/auth/authSlice';
 
 const _inflight = new Map();
 
@@ -55,7 +58,15 @@ async function _doRefresh() {
 
 // Response interceptor: 401 → refresh → retry once
 axiosClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Sync token balance from backend header so Navbar stays up-to-date
+    // without a full profile re-fetch after every AI call.
+    const balance = response.headers['x-token-balance'];
+    if (balance !== undefined) {
+      store.dispatch(updateTokenBalance(balance));
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
 
@@ -90,6 +101,23 @@ axiosClient.interceptors.response.use(
       } finally {
         _isRefreshing = false;
       }
+    }
+
+    // Global Error Toasting
+    if (error.response) {
+      const { status, data } = error.response;
+      
+      // Handle Forbidden (Insufficient Tokens or Admin required)
+      if (status === 403) {
+        toast.error(data.detail || 'Access Denied: Insufficient tokens or permissions.');
+      } 
+      // Handle other critical errors (except 401 which is handled above)
+      else if (status >= 500) {
+        toast.error('Server error. Please try again later.');
+      }
+    } else if (error.request) {
+      // Network error (no response received)
+      toast.error('Network error. Please check your connection.');
     }
 
     return Promise.reject(error);

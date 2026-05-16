@@ -93,6 +93,12 @@ const NAV_CONFIG = {
       showIncompleteIndicator: true
     },
     { 
+      label: 'Usage & Limits', 
+      path: '/usage', 
+      icon: DataUsageRoundedIcon, 
+      color: BRAND_COLORS.ACCENT_CYAN 
+    },
+    { 
       label: 'Settings', 
       path: '/settings', 
       icon: TuneRoundedIcon, 
@@ -127,6 +133,7 @@ const NAV_CONFIG = {
 
 const USER_MENU_CONFIG = [
   { label: 'Profile', path: '/profile', icon: AccountCircleRoundedIcon },
+  { label: 'Usage & Limits', path: '/usage', icon: DataUsageRoundedIcon },
   { label: 'Subscription & Billing', path: '/pricing', icon: CreditCardRoundedIcon },
   { label: 'Settings', path: '/settings', icon: TuneRoundedIcon },
   { label: 'Help & Support', path: '/help', icon: HelpOutlineRoundedIcon },

@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import {
   Typography,
   Box,
@@ -15,6 +16,7 @@ import PageContainer from '../components/common/PageContainer';
 
 export default function Settings() {
   const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.user);
 
   const handleViewPlans = () => {
     navigate('/pricing');
@@ -88,7 +90,7 @@ export default function Settings() {
                     mb: 0.5,
                   }}
                 >
-                  Credits Available
+                  AI Tokens Available
                 </Typography>
                 <Typography
                   sx={{
@@ -96,7 +98,9 @@ export default function Settings() {
                     color: 'var(--text-secondary)',
                   }}
                 >
-                  5 CV credits, 4 autofill units
+                  {user?.token_balance === -1
+                    ? 'Unlimited tokens (Elite plan)'
+                    : `${(user?.token_balance || 0).toLocaleString()} tokens remaining`}
                 </Typography>
               </Box>
             </Box>

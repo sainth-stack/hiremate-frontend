@@ -100,6 +100,17 @@ const authSlice = createSlice({
       localStorage.setItem(TOKEN_KEY, token);
       saveUserToStorage(user);
     },
+    updateTokenBalance(state, action) {
+      // Patch token_balance in Redux + localStorage from X-Token-Balance header
+      // without requiring a full profile re-fetch.
+      if (state.user) {
+        const balance = action.payload === 'unlimited' ? -1 : Number(action.payload);
+        if (!Number.isNaN(balance)) {
+          state.user = { ...state.user, token_balance: balance };
+          saveUserToStorage(state.user);
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     // login
@@ -162,5 +173,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearError, loginWithGoogle } = authSlice.actions;
+export const { logout, clearError, loginWithGoogle, updateTokenBalance } = authSlice.actions;
 export default authSlice.reducer;
