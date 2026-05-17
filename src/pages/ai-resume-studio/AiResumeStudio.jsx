@@ -476,7 +476,7 @@ export default function AiResumeStudio() {
                     ...(tool.accent
                       ? {
                           bgcolor: THEME.primary,
-                          color: 'var(--button-primary-text)',
+                          color: 'var(--white)',
                           '&:hover': { bgcolor: 'var(--primary-dark)' },
                         }
                       : {
