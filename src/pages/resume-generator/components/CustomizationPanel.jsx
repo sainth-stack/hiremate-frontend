@@ -75,10 +75,10 @@ function getTemplateImageSrc(template) {
 }
 
 function atsScoreColor(score) {
-  if (score >= 90) return '#059669';
-  if (score >= 80) return '#0d9488';
-  if (score >= 70) return '#d97706';
-  return '#64748b';
+  if (score >= 90) return 'var(--success)';
+  if (score >= 80) return 'var(--accent-cyan)';
+  if (score >= 70) return 'var(--warning)';
+  return 'var(--text-secondary)';
 }
 
 /** Normalize template / user hex for `<input type="color">` (requires #rrggbb). */
@@ -169,7 +169,7 @@ function ColorPickerRow({ id, label, value, fallbackHex, onChange, onClear }) {
 function TemplateTile({ template, selected, onSelect }) {
   const [imgErr, setImgErr] = useState(false);
   const img = getTemplateImageSrc(template);
-  const paletteColor = template.color_schemes?.[0]?.primary ?? '#374151';
+  const paletteColor = template.color_schemes?.[0]?.primary ?? 'var(--text-secondary)';
   const ats = typeof template.ats_score === 'number' ? template.ats_score : 0;
 
   return (
@@ -208,7 +208,7 @@ function TemplateTile({ template, selected, onSelect }) {
             position: 'relative',
             width: '100%',
             aspectRatio: '120 / 160',
-            bgcolor: '#f1f5f9',
+            bgcolor: T.previewCanvas,
             flexShrink: 0,
           }}
         >
@@ -248,7 +248,7 @@ function TemplateTile({ template, selected, onSelect }) {
                   sx={{
                     width: `${w * 80}%`,
                     height: 3,
-                    bgcolor: '#cbd5e1',
+                    bgcolor: 'var(--border-hover)',
                     borderRadius: 0.5,
                     mt: i === 2 ? 0.75 : 0,
                   }}
@@ -265,7 +265,7 @@ function TemplateTile({ template, selected, onSelect }) {
                 width: 26,
                 height: 26,
                 borderRadius: '50%',
-                bgcolor: 'rgba(255,255,255,0.96)',
+                bgcolor: 'var(--bg-paper)',
                 boxShadow: '0 2px 8px rgba(15, 23, 42, 0.12)',
                 display: 'flex',
                 alignItems: 'center',
@@ -311,7 +311,7 @@ function TemplateTile({ template, selected, onSelect }) {
             </Typography>
             {template.premium && (
               <DiamondRoundedIcon
-                sx={{ fontSize: 12, color: '#b45309', flexShrink: 0, opacity: 0.9 }}
+                sx={{ fontSize: 12, color: 'var(--warning)', flexShrink: 0, opacity: 0.9 }}
                 aria-label="Premium template"
               />
             )}
@@ -1055,10 +1055,10 @@ export default function CustomizationPanel({
                   bgcolor: on ? T.primarySoft : T.pageBg,
                   color: on ? T.primary : T.textSecondary,
                   border: '1px solid',
-                  borderColor: on ? 'rgba(51, 94, 222, 0.35)' : T.mutedBorder,
+                  borderColor: on ? T.primary : T.mutedBorder,
                   transition: 'all 0.15s',
                   '&:hover': {
-                    bgcolor: on ? 'rgba(51, 94, 222, 0.16)' : 'rgba(148, 163, 184, 0.2)',
+                    bgcolor: on ? T.primarySoft : 'var(--sidebar-item-hover-bg)',
                   },
                   '& .MuiChip-label': { px: 1 },
                 }}

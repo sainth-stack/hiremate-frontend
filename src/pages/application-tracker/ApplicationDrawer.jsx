@@ -25,24 +25,24 @@ import {
 } from '../../services/applicationsService';
 
 const STATUS_COLORS = {
-  applied: { bg: 'rgba(148,163,184,0.1)', text: '#64748B' },
-  acknowledged: { bg: 'rgba(37,99,235,0.08)', text: '#2563EB' },
-  in_review: { bg: 'rgba(245,158,11,0.08)', text: '#D97706' },
-  interview_scheduled: { bg: 'rgba(124,58,237,0.08)', text: '#7C3AED' },
-  interview_completed: { bg: 'rgba(99,102,241,0.08)', text: '#6366F1' },
-  offer_received: { bg: 'rgba(16,185,129,0.08)', text: '#10B981' },
-  rejected: { bg: 'rgba(239,68,68,0.08)', text: '#EF4444' },
-  ghosted: { bg: 'rgba(148,163,184,0.1)', text: '#64748B' },
-  withdrawn: { bg: 'rgba(245,158,11,0.08)', text: '#D97706' },
+  applied: { bg: 'var(--bg-light)', text: 'var(--text-secondary)' },
+  acknowledged: { bg: 'var(--light-blue-bg-08)', text: 'var(--primary)' },
+  in_review: { bg: 'rgba(245,158,11,0.08)', text: 'var(--warning)' },
+  interview_scheduled: { bg: 'var(--light-blue-bg-08)', text: 'var(--secondary)' },
+  interview_completed: { bg: 'var(--light-blue-bg-08)', text: 'var(--secondary)' },
+  offer_received: { bg: 'var(--success-bg)', text: 'var(--success)' },
+  rejected: { bg: 'var(--error-bg)', text: 'var(--error)' },
+  ghosted: { bg: 'var(--bg-light)', text: 'var(--text-secondary)' },
+  withdrawn: { bg: 'rgba(245,158,11,0.08)', text: 'var(--warning)' },
 };
 
 const EVENT_TYPE_CONFIG = {
-  interview: { icon: Video, color: '#2563EB', label: 'Interview' },
-  assessment: { icon: Code, color: '#F59E0B', label: 'Assessment' },
-  technical_screen: { icon: Code, color: '#DC2626', label: 'Technical Screen' },
-  culture_fit: { icon: Users, color: '#6366F1', label: 'Culture Fit' },
-  offer_call: { icon: Phone, color: '#10B981', label: 'Offer Call' },
-  onboarding: { icon: Building, color: '#10B981', label: 'Onboarding' },
+  interview: { icon: Video, color: 'var(--primary)', label: 'Interview' },
+  assessment: { icon: Code, color: 'var(--warning)', label: 'Assessment' },
+  technical_screen: { icon: Code, color: 'var(--error)', label: 'Technical Screen' },
+  culture_fit: { icon: Users, color: 'var(--secondary)', label: 'Culture Fit' },
+  offer_call: { icon: Phone, color: 'var(--success)', label: 'Offer Call' },
+  onboarding: { icon: Building, color: 'var(--success)', label: 'Onboarding' },
 };
 
 function TabPanel({ children, value, index }) {
@@ -197,8 +197,8 @@ function OverviewTab({ app, onStatusChange }) {
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Award size={16} color="#10B981" />
-                        <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: '#10B981' }}>
+                        <Award size={16} color="var(--success)" />
+                        <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--success)' }}>
                           GLASSDOOR RATING
                         </Typography>
                       </Box>
@@ -216,7 +216,7 @@ function OverviewTab({ app, onStatusChange }) {
                       )}
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Typography sx={{ fontSize: '2.5rem', fontWeight: 900, color: '#10B981', lineHeight: 1 }}>
+                      <Typography sx={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--success)', lineHeight: 1 }}>
                         {companyProfile.glassdoor_rating.toFixed(1)}
                       </Typography>
                       <Box sx={{ flex: 1 }}>
@@ -226,7 +226,7 @@ function OverviewTab({ app, onStatusChange }) {
                           precision={0.1}
                           size="medium"
                           sx={{ 
-                            '& .MuiRating-iconFilled': { color: '#10B981' },
+                            '& .MuiRating-iconFilled': { color: 'var(--success)' },
                             '& .MuiRating-iconEmpty': { color: 'rgba(16,185,129,0.2)' },
                           }}
                         />
@@ -239,15 +239,15 @@ function OverviewTab({ app, onStatusChange }) {
                               borderRadius: 2,
                               bgcolor: 'rgba(16,185,129,0.1)',
                               '& .MuiLinearProgress-bar': {
-                                bgcolor: '#10B981',
+                                bgcolor: 'var(--success)',
                                 borderRadius: 2,
                               }
                             }}
                           />
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1 }}>
-                          <ThumbsUp size={11} color="#10B981" />
-                          <Typography sx={{ fontSize: '0.7rem', color: '#10B981', fontWeight: 600 }}>
+                          <ThumbsUp size={11} color="var(--success)" />
+                          <Typography sx={{ fontSize: '0.7rem', color: 'var(--success)', fontWeight: 600 }}>
                             {companyProfile.glassdoor_rating >= 4.0 ? 'Highly Rated' : 
                              companyProfile.glassdoor_rating >= 3.5 ? 'Well Rated' : 'Rated'}
                           </Typography>
@@ -535,7 +535,7 @@ function HRContactsTab({ app }) {
                           size="small"
                           href={contact.linkedin_url}
                           target="_blank"
-                          sx={{ p: 0.5, color: '#0077B5' }}
+                          sx={{ p: 0.5, color: 'var(--primary)' }}
                         >
                           <Linkedin size={16} />
                         </IconButton>
@@ -691,7 +691,7 @@ function TimelineTab({ app }) {
                               size="small"
                               sx={{
                                 bgcolor: 'rgba(16,185,129,0.08)',
-                                color: '#10B981',
+                                color: 'var(--success)',
                                 fontWeight: 700,
                                 fontSize: '0.65rem',
                               }}
@@ -917,10 +917,10 @@ function SalaryTab({ app }) {
                           : 'rgba(148,163,184,0.15)',
                       color:
                         salaryEstimate.confidence === 'high'
-                          ? '#10B981'
+                          ? 'var(--success)'
                           : salaryEstimate.confidence === 'medium'
-                          ? '#F59E0B'
-                          : '#64748B',
+                          ? 'var(--warning)'
+                          : 'var(--text-secondary)',
                     }}
                   />
                 )}
@@ -943,8 +943,8 @@ function SalaryTab({ app }) {
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                  <WorkOutlineIcon sx={{ fontSize: 16, color: '#F59E0B' }} />
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: '#F59E0B', letterSpacing: 0.5 }}>
+                  <WorkOutlineIcon sx={{ fontSize: 16, color: 'var(--warning)' }} />
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--warning)', letterSpacing: 0.5 }}>
                     JOB DESCRIPTION SALARY
                   </Typography>
                 </Box>

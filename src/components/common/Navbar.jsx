@@ -24,7 +24,7 @@ import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import { Tooltip } from '@mui/material';
 import { logout } from '../../store/auth/authSlice';
 import SignOutConfirmDialog from './SignOutConfirmDialog';
-import logoImg from '../../assets/logo.png';
+import logoImg from '../../assets/opsbrain-logo-full.png';
 
 const menuItems = [
   { label: 'Profile', path: '/profile', icon: PersonRoundedIcon },
@@ -196,7 +196,7 @@ export default function Navbar({ showProfile = true }) {
                 sx={{
                   width: 36,
                   height: 36,
-                  background: 'linear-gradient(135deg, #1E3A8A 0%, #06B6D4 100%)',
+                  background: 'linear-gradient(135deg, var(--primary) 0%, var(--accent-cyan) 100%)',
                   fontSize: '0.95rem',
                 }}
               >
@@ -216,7 +216,7 @@ export default function Navbar({ showProfile = true }) {
                 <Typography
                   sx={{
                     fontSize: '0.75rem',
-                    color: 'var(--text-secondary, #64748b)',
+                    color: 'var(--text-secondary)',
                     lineHeight: 1.2,
                   }}
                 >
@@ -226,7 +226,7 @@ export default function Navbar({ showProfile = true }) {
               <KeyboardArrowDownRoundedIcon
                 sx={{
                   fontSize: 20,
-                  color: 'var(--text-secondary, #64748b)',
+                  color: 'var(--text-secondary)',
                   transform: open ? 'rotate(180deg)' : 'rotate(0)',
                   transition: 'transform 0.2s',
                 }}
@@ -246,6 +246,9 @@ export default function Navbar({ showProfile = true }) {
                     minWidth: 240,
                     boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
                     borderRadius: 2,
+                    bgcolor: 'var(--bg-paper)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--border-color)',
                   },
                 },
               }}
@@ -257,7 +260,7 @@ export default function Navbar({ showProfile = true }) {
                 <Typography
                   sx={{
                     fontSize: '0.8125rem',
-                    color: 'var(--text-secondary, #64748b)',
+                    color: 'var(--text-secondary)',
                     mt: 0.25,
                   }}
                 >

@@ -4,7 +4,7 @@ import {
   Alert,
   Box,
   Button,
-  Chip,
+  CircularProgress,
   LinearProgress,
   Snackbar,
   Typography,
@@ -16,16 +16,8 @@ import JobMatchCard from '../../components/CompanySearch/JobMatchCard';
 import { fetchJobsCorpus } from '../../services/companySearchService';
 import { fetchUserProfile, enrichJobsWithMatchScores } from '../../services/matchScoreService';
 
-// Career links scraping removed - now using public APIs for job ingestion
-// const STEPS = [
-//   { label: 'Upload Companies', description: 'PDF or DOCX company list' },
-//   { label: 'Resolve Links', description: 'Careers site + LinkedIn for manual apply' },
-//   { label: 'Search Jobs', description: 'Stream open roles per company' },
-// ];
-
 const EMPTY_FILTERS = {
   countries: [],
-  search: '',
   jobTitle: '',
   experienceLevels: [],
   jobTypes: [],
@@ -38,46 +30,6 @@ const EMPTY_FILTERS = {
 };
 
 const PAGE_SIZE = 10;
-const SUPPORTED_COUNTRIES = ['India', 'United States'];
-
-const COUNTRY_ALIASES = {
-  india: 'India',
-  in: 'India',
-  us: 'United States',
-  usa: 'United States',
-  'united states': 'United States',
-  'united states of america': 'United States',
-};
-
-function normalizeCountry(value) {
-  if (!value || typeof value !== 'string') return '';
-  const normalized = value.trim().toLowerCase();
-  if (COUNTRY_ALIASES[normalized]) return COUNTRY_ALIASES[normalized];
-  if (normalized.includes('india')) return 'India';
-  if (normalized.includes('united states') || normalized.includes('usa') || normalized.includes(' us ')) {
-    return 'United States';
-  }
-  return '';
-}
-
-function detectCountryFromBrowser() {
-  const browserLang = typeof navigator !== 'undefined' ? navigator.language : '';
-  const langCountry = normalizeCountry(browserLang.split('-')?.[1] || '');
-  if (langCountry) return langCountry;
-
-  const tz = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone || '' : '';
-  if (tz.startsWith('Asia/')) return 'India';
-  if (tz.startsWith('America/')) return 'United States';
-  return '';
-}
-
-function getDefaultCountry(userProfile) {
-  const fromProfile = normalizeCountry(userProfile?.country || userProfile?.location || '');
-  if (fromProfile) return fromProfile;
-  const fromBrowser = detectCountryFromBrowser();
-  if (fromBrowser) return fromBrowser;
-  return 'India';
-}
 
 function useDebounced(value, delay) {
   const [debounced, setDebounced] = useState(value);
@@ -88,28 +40,15 @@ function useDebounced(value, delay) {
   return debounced;
 }
 
-function toCsv(list = []) {
-  if (!Array.isArray(list)) return '';
-  return list
-    .map((item) => (typeof item === 'string' ? item.trim() : ''))
-    .filter(Boolean)
-    .join(',');
-}
-
-export default function JobRecommendationPage() {
+export default function CompanySearchPage() {
   const [filters, setFilters] = useState(() => ({ ...EMPTY_FILTERS }));
-  const [hasDefaultCountryApplied, setHasDefaultCountryApplied] = useState(false);
-  const debouncedSearch = useDebounced(filters.search, 350);
-  const effectiveFilters = useMemo(
-    () => ({ ...filters, search: debouncedSearch }),
-    [filters, debouncedSearch]
-  );
+  const debouncedFilters = useDebounced(filters, 400);
   const [page, setPage] = useState(1);
   const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
     setPage(1);
-  }, [effectiveFilters]);
+  }, [debouncedFilters]);
 
   // Fetch user profile on mount
   useEffect(() => {
@@ -120,17 +59,6 @@ export default function JobRecommendationPage() {
     loadUserProfile();
   }, []);
 
-  useEffect(() => {
-    if (hasDefaultCountryApplied) return;
-    const selectedCountry = getDefaultCountry(userProfile);
-    if (!SUPPORTED_COUNTRIES.includes(selectedCountry)) return;
-    setFilters((prev) => ({
-      ...prev,
-      countries: prev.countries?.length ? prev.countries : [selectedCountry],
-    }));
-    setHasDefaultCountryApplied(true);
-  }, [userProfile, hasDefaultCountryApplied]);
-
   const queryParams = useMemo(() => {
     const p = { page, page_size: PAGE_SIZE };
     
@@ -140,36 +68,20 @@ export default function JobRecommendationPage() {
     p.posted_from = yesterday.toISOString().split('T')[0];
     
     // Only add filters if they have values
-    if (effectiveFilters.jobTitle && effectiveFilters.jobTitle.trim()) {
-      p.role = effectiveFilters.jobTitle;
+    if (debouncedFilters.jobTitle && debouncedFilters.jobTitle.trim()) {
+      p.role = debouncedFilters.jobTitle;
     }
-    if (effectiveFilters.countries && effectiveFilters.countries.length > 0) {
-      p.location = effectiveFilters.countries[0];
-    }
-    if (effectiveFilters.experienceLevels?.length) {
-      p.experience_levels = toCsv(effectiveFilters.experienceLevels);
-    }
-    if (effectiveFilters.jobTypes?.length) {
-      p.job_types = toCsv(effectiveFilters.jobTypes);
-    }
-    if (effectiveFilters.workModes?.length) {
-      p.work_modes = toCsv(effectiveFilters.workModes);
-    }
-    if (effectiveFilters.search && effectiveFilters.search.trim()) {
-      const searchTerm = effectiveFilters.search.trim();
-      p.q = searchTerm;
-      if (!p.role && !effectiveFilters.jobTitle) {
-        p.role = searchTerm;
-      }
+    if (debouncedFilters.countries && debouncedFilters.countries.length > 0) {
+      p.location = debouncedFilters.countries[0];
     }
     
     // Apply date filter if specified
-    if (effectiveFilters.datePosted && effectiveFilters.datePosted !== 'Past 24 hours') {
+    if (debouncedFilters.datePosted && debouncedFilters.datePosted !== 'Past 24 hours') {
       const daysMap = {
         'Past week': 7,
         'Past month': 30,
       };
-      const days = daysMap[effectiveFilters.datePosted];
+      const days = daysMap[debouncedFilters.datePosted];
       if (days) {
         const filterDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
         p.posted_from = filterDate.toISOString().split('T')[0];
@@ -177,31 +89,103 @@ export default function JobRecommendationPage() {
     }
     
     return p;
-  }, [effectiveFilters, page]);
+  }, [debouncedFilters, page]);
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['jobs-recommendation', queryParams],
+    queryKey: ['jobs-advanced', queryParams],
     queryFn: () => fetchJobsCorpus(queryParams).then((r) => r.data),
     staleTime: 30_000,
   });
 
-  const [snackbar, setSnackbar] = useState({ open: false, message: '' });
-
   const mockJobs = [
     {
       id: 1,
-      title: 'Full Stack Engineer',
-      company: 'Kontakt.io',
+      title: 'Full Stack Software Developer',
+      company: 'LivePerson',
+      company_type: 'Artificial Intelligence (AI) · Big Data · Public Company',
+      location: 'United States',
+      remote: true,
+      experience_level: 'Mid Level',
+      salary_min: 120000,
+      salary_max: 135000,
+      posted_at: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+      applicant_count: 33,
+      h1b_sponsor: true,
+      url: 'https://example.com',
+      match_data: {
+        overall: 88,
+        experienceLevel: 95,
+        skills: 85,
+        industryExperience: 84,
+      },
+    },
+    {
+      id: 2,
+      title: 'Full Stack Product Engineer (Java)',
+      company: 'Allstate',
+      company_type: 'Banking · Finance · Public Company',
       location: 'United States',
       remote: false,
       experience_level: 'Mid Level',
-      salary_min: null,
-      salary_max: null,
-      posted_at: new Date(Date.now() - 0 * 60 * 60 * 1000).toISOString(),
-      applicant_count: 33,
+      salary_min: 85000,
+      salary_max: 145000,
+      posted_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+      applicant_count: 25,
+      no_h1b: true,
       url: 'https://example.com',
+      match_data: {
+        overall: 90,
+        experienceLevel: 92,
+        skills: 88,
+        industryExperience: 90,
+      },
+    },
+    {
+      id: 3,
+      title: 'Software Engineer I',
+      company: 'Sony Interactive Entertainment',
+      company_type: 'Entertainment / Consumer Goods · Music · Late Stage',
+      location: 'United States, Madison, WI',
+      remote: false,
+      experience_level: 'New Grad, Entry Level',
+      salary_min: 114000,
+      salary_max: 172000,
+      posted_at: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+      applicant_count: 32,
+      h1b_sponsor: true,
+      work_life_balance: true,
+      url: 'https://example.com',
+      match_data: {
+        overall: 97,
+        experienceLevel: 100,
+        skills: 95,
+        industryExperience: 96,
+      },
+    },
+    {
+      id: 4,
+      title: 'Senior Application Engineer- Python/JavaScript/Typescript',
+      company: 'Egen',
+      company_type: 'Big Data · Artificial Intelligence (AI) · Late Stage',
+      location: 'United States',
+      remote: true,
+      experience_level: 'Mid, Senior Level',
+      salary_min: 120000,
+      salary_max: 140000,
+      posted_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      applicant_count: 15,
+      h1b_sponsor: true,
+      url: 'https://example.com',
+      match_data: {
+        overall: 81,
+        experienceLevel: 75,
+        skills: 88,
+        industryExperience: 80,
+      },
     },
   ];
+
+  const [snackbar, setSnackbar] = useState({ open: false, message: '' });
 
   // Enrich jobs with dynamic match scores based on user profile
   const rawJobs = data?.items || mockJobs;
@@ -212,90 +196,44 @@ export default function JobRecommendationPage() {
   const total = data?.total || mockJobs.length;
 
   return (
-    <PageContainer
-      sx={{
-        maxWidth: '1440px',
-        px: { xs: 1.5, md: 3 },
-      }}
-    >
-      <Box sx={{ py: { xs: 1.75, md: 2.5 } }}>
+    <PageContainer>
+      <Box sx={{ py: { xs: 2, md: 3 } }}>
         {/* Page Header */}
-        <Box sx={{ mb: { xs: 2, md: 2.5 } }}>
+        <Box sx={{ mb: 3 }}>
           <Typography
-            fontWeight={600}
+            variant="h5"
+            fontWeight={700}
             sx={{
               color: 'var(--text-primary)',
-              fontSize: { xs: '1.75rem', md: '2rem' },
-              lineHeight: 1.2,
-              letterSpacing: '-0.02em',
-              mb: 0.75,
+              fontSize: { xs: '1.375rem', md: '1.5rem' },
+              letterSpacing: -0.2,
+              mb: 0.5,
             }}
           >
-            Job Recommendation
+            Company Search
           </Typography>
           <Typography
             variant="body2"
             sx={{
               color: 'var(--text-secondary)',
               fontSize: '0.875rem',
-              lineHeight: 1.45,
-              mb: 1.25,
             }}
           >
-            Discover curated roles matched to your profile from India and the United States
+            Explore job opportunities from top companies
           </Typography>
-
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            <Chip
-              label={`${total} jobs available`}
-              sx={{
-                height: 30,
-                borderRadius: '10px',
-                border: '1px solid #dbe3f2',
-                bgcolor: '#f8fbff',
-                color: '#1E3A8A',
-                fontWeight: 600,
-              }}
-            />
-            <Chip
-              label={`Country: ${filters.countries?.[0] || 'All'}`}
-              sx={{
-                height: 30,
-                borderRadius: '10px',
-                border: '1px solid #e2e8f0',
-                bgcolor: 'var(--bg-paper)',
-                color: 'var(--text-secondary)',
-                fontWeight: 600,
-              }}
-            />
-          </Box>
         </Box>
 
         {/* Filters */}
-        <Box
-          sx={{
-            mb: { xs: 2, md: 2.5 },
-            position: 'sticky',
-            top: 0,
-            zIndex: 6,
-            bgcolor: 'var(--bg-default)',
-            pt: 0.75,
-            pb: 1.25,
-          }}
-        >
-          <AdvancedFiltersBar
-            filters={filters}
-            onChange={setFilters}
-            countryOptions={SUPPORTED_COUNTRIES}
-          />
+        <Box sx={{ mb: 3 }}>
+          <AdvancedFiltersBar filters={filters} onChange={setFilters} />
           {isFetching && !isLoading && (
             <LinearProgress
               sx={{
-                mt: 1.25,
-                borderRadius: 999,
-                height: 2,
-                bgcolor: 'rgba(59, 130, 246, 0.1)',
-                '& .MuiLinearProgress-bar': { bgcolor: '#3b82f6' },
+                mt: 2,
+                borderRadius: 1,
+                height: 3,
+                bgcolor: 'var(--light-blue-bg)',
+                '& .MuiLinearProgress-bar': { bgcolor: 'var(--primary)' },
               }}
             />
           )}
@@ -304,13 +242,7 @@ export default function JobRecommendationPage() {
         {/* Jobs List */}
         <Box>
           {isLoading ? (
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' },
-                gap: 2,
-              }}
-            >
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {Array.from({ length: 3 }).map((_, i) => (
                 <Box
                   key={i}
@@ -325,13 +257,7 @@ export default function JobRecommendationPage() {
             </Box>
           ) : jobs && jobs.length > 0 ? (
             <>
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' },
-                  gap: 2,
-                }}
-              >
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {jobs.map((job) => (
                   <JobMatchCard key={job.id} job={job} />
                 ))}
@@ -343,8 +269,8 @@ export default function JobRecommendationPage() {
                   sx={{
                     display: 'flex',
                     justifyContent: 'center',
-                    gap: 1.5,
-                    mt: 3.5,
+                    gap: 2,
+                    mt: 4,
                     alignItems: 'center',
                   }}
                 >
@@ -358,18 +284,16 @@ export default function JobRecommendationPage() {
                       fontSize: '0.875rem',
                       borderColor: 'var(--dashboard-border-subtle)',
                       color: 'var(--text-primary)',
-                      borderRadius: '12px',
-                      px: 2.25,
-                      py: 0.8,
+                      borderRadius: '10px',
                       '&:hover': {
-                        borderColor: '#3b82f6',
-                        bgcolor: '#f5f9ff',
+                        borderColor: 'var(--primary)',
+                        bgcolor: 'var(--light-blue-bg)',
                       },
                     }}
                   >
                     Previous
                   </Button>
-                  <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                  <Typography sx={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-secondary)' }}>
                     Page {page} of {Math.ceil(total / PAGE_SIZE)}
                   </Typography>
                   <Button
@@ -382,12 +306,10 @@ export default function JobRecommendationPage() {
                       fontSize: '0.875rem',
                       borderColor: 'var(--dashboard-border-subtle)',
                       color: 'var(--text-primary)',
-                      borderRadius: '12px',
-                      px: 2.25,
-                      py: 0.8,
+                      borderRadius: '10px',
                       '&:hover': {
-                        borderColor: '#3b82f6',
-                        bgcolor: '#f5f9ff',
+                        borderColor: 'var(--primary)',
+                        bgcolor: 'var(--light-blue-bg)',
                       },
                     }}
                   >

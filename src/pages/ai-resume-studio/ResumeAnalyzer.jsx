@@ -25,11 +25,14 @@ import { analyzeResumeAPI } from '../../services';
 
 /** Matches `AiResumeStudio` tool cards and documents panel */
 const THEME = {
-  primary: 'var(--primary, #335ede)',
-  primarySoft: 'var(--light-blue-bg, rgba(51, 94, 222, 0.08))',
-  border: 'var(--divider, rgba(0,0,0,0.08))',
+  primary: 'var(--primary)',
+  primarySoft: 'var(--light-blue-bg)',
+  border: 'var(--divider)',
   textPrimary: 'var(--text-primary)',
   textSecondary: 'var(--text-secondary)',
+  pageBg: 'var(--bg-main)',
+  surface: 'var(--bg-paper)',
+  previewCanvas: 'var(--bg-light)',
 };
 
 const ANALYSIS_CHECKS = [
@@ -100,7 +103,7 @@ export default function ResumeAnalyzer() {
       sx={{
         minHeight: '100%',
         width: '100%',
-        bgcolor: '#fafbfc',
+        bgcolor: THEME.pageBg,
         fontFamily: 'var(--font-family)',
         pb: 5,
       }}
@@ -189,7 +192,7 @@ export default function ResumeAnalyzer() {
         <Card
           elevation={0}
           sx={{
-            bgcolor: '#fff',
+            bgcolor: THEME.surface,
             borderRadius: 2,
             border: `1px solid ${THEME.border}`,
             boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
@@ -286,7 +289,7 @@ export default function ResumeAnalyzer() {
                   px: { xs: 2, sm: 2.5 },
                   py: 2,
                   borderBottom: `1px solid ${THEME.border}`,
-                  bgcolor: '#fff',
+                  bgcolor: THEME.surface,
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
@@ -334,7 +337,7 @@ export default function ResumeAnalyzer() {
                   sx={{
                     borderRadius: 2,
                     border: `1px solid ${THEME.border}`,
-                    bgcolor: '#f8fafc',
+                    bgcolor: THEME.pageBg,
                     overflow: 'hidden',
                     mb: 3,
                   }}
@@ -344,7 +347,7 @@ export default function ResumeAnalyzer() {
                       px: 2,
                       py: 1.25,
                       borderBottom: `1px solid ${THEME.border}`,
-                      bgcolor: '#f1f5f9',
+                      bgcolor: THEME.previewCanvas,
                     }}
                   >
                     <Typography
@@ -369,7 +372,7 @@ export default function ResumeAnalyzer() {
                           label={check.label}
                           size="small"
                           sx={{
-                            bgcolor: '#fff',
+                            bgcolor: THEME.surface,
                             color: THEME.textPrimary,
                             fontWeight: 500,
                             fontSize: '0.75rem',
@@ -432,9 +435,9 @@ export default function ResumeAnalyzer() {
                         gap: 2,
                         px: 3,
                         py: 2,
-                        bgcolor: '#f0fdf4',
+                        bgcolor: 'var(--success-bg)',
                         borderRadius: 2.5,
-                        border: '1.5px solid #86efac',
+                        border: '1.5px solid var(--success-light)',
                       }}
                     >
                       <Box
@@ -442,7 +445,7 @@ export default function ResumeAnalyzer() {
                           width: 44,
                           height: 44,
                           borderRadius: 2,
-                          bgcolor: '#10b981',
+                          bgcolor: 'var(--success)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -455,7 +458,7 @@ export default function ResumeAnalyzer() {
                         <Typography
                           sx={{
                             fontSize: '0.9375rem',
-                            color: '#065f46',
+                            color: 'var(--success-dark)',
                             fontWeight: 600,
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -465,11 +468,11 @@ export default function ResumeAnalyzer() {
                         >
                           {resumeFile.name}
                         </Typography>
-                        <Typography sx={{ fontSize: '0.8125rem', color: '#059669', fontWeight: 500 }}>
+                        <Typography sx={{ fontSize: '0.8125rem', color: 'var(--success)', fontWeight: 500 }}>
                           {(resumeFile.size / 1024 / 1024).toFixed(2)} MB
                         </Typography>
                       </Box>
-                      <CheckCircleRoundedIcon sx={{ fontSize: 28, color: '#10b981' }} />
+                      <CheckCircleRoundedIcon sx={{ fontSize: 28, color: 'var(--success)' }} />
                     </Box>
                   )}
                 </Box>
@@ -509,7 +512,7 @@ export default function ResumeAnalyzer() {
                       minWidth: { xs: '100%', sm: 220 },
                       boxShadow: 'none',
                       '&:hover': {
-                        bgcolor: resumeFile ? 'var(--primary-dark, #2a4bc4)' : undefined,
+                        bgcolor: resumeFile ? 'var(--primary-dark)' : undefined,
                         boxShadow: 'none',
                       },
                       '&:disabled': {

@@ -31,10 +31,10 @@ const STAR_KEYWORDS = {
 };
 
 const STAR_CONFIG = {
-  s: { label: 'Situation', desc: 'Set the context — when, where, what was happening', tip: 'Keep it to 1–2 sentences. Interviewers want context, not a full backstory.', color: '#6366f1', bg: 'rgba(99,102,241,0.08)', example: '"While working at Acme as a junior developer last March..."' },
-  t: { label: 'Task', desc: 'Your specific responsibility in that situation', tip: 'Use "I" not "we". Be clear about what YOU were responsible for.', color: '#8b5cf6', bg: 'rgba(139,92,246,0.08)', example: '"My task was to rebuild the authentication flow..."' },
-  a: { label: 'Action', desc: 'The specific steps you personally took', tip: 'This is the most important part. Name tools, techniques, and concrete decisions you made.', color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', example: '"I decided to implement JWT with a refresh token strategy..."' },
-  r: { label: 'Result', desc: 'The quantified outcome and business impact', tip: 'Always end with a number. Even estimates count — "roughly 40% faster" beats "much faster".', color: '#10b981', bg: 'rgba(16,185,129,0.08)', example: '"As a result, login time dropped from 3s to under 800ms."' },
+  s: { label: 'Situation', desc: 'Set the context — when, where, what was happening', tip: 'Keep it to 1–2 sentences. Interviewers want context, not a full backstory.', color: 'var(--primary)', bg: 'var(--light-blue-bg)', example: '"While working at Acme as a junior developer last March..."' },
+  t: { label: 'Task', desc: 'Your specific responsibility in that situation', tip: 'Use "I" not "we". Be clear about what YOU were responsible for.', color: 'var(--secondary)', bg: 'var(--light-blue-bg)', example: '"My task was to rebuild the authentication flow..."' },
+  a: { label: 'Action', desc: 'The specific steps you personally took', tip: 'This is the most important part. Name tools, techniques, and concrete decisions you made.', color: 'var(--warning)', bg: 'var(--warning-bg)', example: '"I decided to implement JWT with a refresh token strategy..."' },
+  r: { label: 'Result', desc: 'The quantified outcome and business impact', tip: 'Always end with a number. Even estimates count — "roughly 40% faster" beats "much faster".', color: 'var(--success)', bg: 'var(--success-bg)', example: '"As a result, login time dropped from 3s to under 800ms."' },
 };
 
 function analyzeText(text) {
@@ -97,11 +97,11 @@ export default function StarCoach() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [sessionScores, setSessionScores] = useState([]);
 
-  const bg = isDark ? '#0f0f13' : '#f4f5f9';
-  const surface = isDark ? '#16161e' : '#ffffff';
+  const bg = isDark ? 'var(--bg-default)' : 'var(--bg-main)';
+  const surface = isDark ? 'var(--bg-paper)' : 'var(--bg-paper)';
   const border = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
   const muted = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
-  const textColor = isDark ? '#ffffff' : '#0f0f13';
+  const textColor = isDark ? 'var(--text-primary)' : 'var(--text-primary)';
 
   const currentQ = PRACTICE_QUESTIONS[questionIndex];
   const liveScores = analyzeText(answer);
@@ -129,7 +129,7 @@ export default function StarCoach() {
     ? Math.round(sessionScores.reduce((a, b) => a + b, 0) / sessionScores.length)
     : null;
 
-  const overallColor = (s) => s >= 75 ? '#10b981' : s >= 45 ? '#f59e0b' : '#ef4444';
+  const overallColor = (s) => s >= 75 ? 'var(--success)' : s >= 45 ? 'var(--warning)' : 'var(--error)';
 
   return (
     <PageContainer
@@ -161,7 +161,7 @@ export default function StarCoach() {
             color: muted,
             border: `1px solid ${border}`,
             borderRadius: 1.5,
-            '&:hover': { color: '#10b981', borderColor: 'rgba(16,185,129,0.35)', bgcolor: 'rgba(16,185,129,0.06)' },
+            '&:hover': { color: 'var(--success)', borderColor: 'var(--success)', bgcolor: 'var(--success-bg)' },
           }}
         >
           <ArrowBackRoundedIcon fontSize="small" />
@@ -189,9 +189,9 @@ export default function StarCoach() {
                 cursor: 'pointer',
                 transition: 'all 0.25s',
                 bgcolor: i < sessionScores.length
-                  ? '#10b981'
+                  ? 'var(--success)'
                   : i === questionIndex
-                    ? '#6366f1'
+                    ? 'var(--primary)'
                     : isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
               }}
             />
@@ -209,8 +209,8 @@ export default function StarCoach() {
               textAlign: 'center',
             }}
           >
-            <Typography sx={{ fontSize: '0.62rem', color: '#10b981', fontWeight: 700 }}>Session Avg</Typography>
-            <Typography sx={{ fontWeight: 900, fontSize: '1rem', color: '#10b981', lineHeight: 1 }}>{avgScore}%</Typography>
+            <Typography sx={{ fontSize: '0.62rem', color: 'var(--success)', fontWeight: 700 }}>Session Avg</Typography>
+            <Typography sx={{ fontWeight: 900, fontSize: '1rem', color: 'var(--success)', lineHeight: 1 }}>{avgScore}%</Typography>
           </Box>
         )}
       </Box>
@@ -246,7 +246,7 @@ export default function StarCoach() {
                               height: 28,
                               borderRadius: '50%',
                               background: live ? cfg.color : isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)',
-                              color: live ? '#fff' : muted,
+                              color: live ? 'var(--button-primary-text)' : muted,
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -306,7 +306,7 @@ export default function StarCoach() {
                           bgcolor: 'rgba(99,102,241,0.12)',
                           fontSize: '0.7rem',
                           fontWeight: 700,
-                          color: '#6366f1',
+                          color: 'var(--primary)',
                         }}
                       >
                         {currentQ.category}
@@ -401,7 +401,7 @@ export default function StarCoach() {
                 fontSize: '0.95rem',
                 lineHeight: 1.85,
                 background: 'transparent',
-                color: isDark ? 'rgba(255,255,255,0.87)' : '#0f0f13',
+                color: isDark ? 'rgba(255,255,255,0.87)' : 'var(--text-primary)',
                 boxSizing: 'border-box',
               }}
             />
@@ -425,7 +425,7 @@ export default function StarCoach() {
                   sx={{
                     fontSize: '0.78rem',
                     fontWeight: 600,
-                    color: answer.length < 80 ? '#f59e0b' : muted,
+                    color: answer.length < 80 ? 'var(--warning)' : muted,
                   }}
                 >
                   {answer.length} chars
@@ -440,7 +440,7 @@ export default function StarCoach() {
                       border: `1px solid ${liveCoveredCount === 4 ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)'}`,
                       fontSize: '0.7rem',
                       fontWeight: 700,
-                      color: liveCoveredCount === 4 ? '#10b981' : '#f59e0b',
+                      color: liveCoveredCount === 4 ? 'var(--success)' : 'var(--warning)',
                     }}
                   >
                     {liveCoveredCount}/4 STAR detected
@@ -458,9 +458,9 @@ export default function StarCoach() {
                   py: 1,
                   borderRadius: 2.5,
                   background: answer.trim().length >= 30 && !isAnalyzing
-                    ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
+                    ? 'linear-gradient(135deg, var(--primary), var(--secondary))'
                     : isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)',
-                  color: answer.trim().length >= 30 && !isAnalyzing ? '#fff' : muted,
+                  color: answer.trim().length >= 30 && !isAnalyzing ? 'var(--button-primary-text)' : muted,
                   cursor: answer.trim().length >= 30 && !isAnalyzing ? 'pointer' : 'default',
                   fontWeight: 700,
                   fontSize: '0.85rem',
@@ -477,7 +477,7 @@ export default function StarCoach() {
                         height: 14,
                         borderRadius: '50%',
                         border: '2px solid rgba(255,255,255,0.3)',
-                        borderTopColor: '#fff',
+                        borderTopColor: 'var(--button-primary-text)',
                         animation: 'spin 0.8s linear infinite',
                       }}
                     />
@@ -517,14 +517,14 @@ export default function StarCoach() {
                           bgcolor: 'rgba(99,102,241,0.12)',
                         }}
                       >
-                        <AutoAwesomeRoundedIcon sx={{ fontSize: 20, color: '#6366f1' }} />
+                        <AutoAwesomeRoundedIcon sx={{ fontSize: 20, color: 'var(--primary)' }} />
                       </Box>
                       <Box sx={{ flex: 1 }}>
                         <Typography sx={{ fontWeight: 800, fontSize: '1rem', color: textColor }}>STAR Analysis Results</Typography>
                         <Typography sx={{ fontSize: '0.75rem', color: muted }}>Based on keyword detection and structural analysis</Typography>
                       </Box>
                       <Box sx={{ textAlign: 'right' }}>
-                        {result.overall === 100 && <EmojiEventsRoundedIcon sx={{ color: '#f59e0b', fontSize: 20, mb: 0.25, display: 'block', ml: 'auto' }} />}
+                        {result.overall === 100 && <EmojiEventsRoundedIcon sx={{ color: 'var(--warning)', fontSize: 20, mb: 0.25, display: 'block', ml: 'auto' }} />}
                         <Typography sx={{ fontWeight: 900, fontSize: '2rem', color: overallColor(result.overall), lineHeight: 1 }}>
                           {result.overall}%
                         </Typography>
@@ -583,7 +583,7 @@ export default function StarCoach() {
                       {['s', 't', 'a', 'r'].map((key) => {
                         const cfg = STAR_CONFIG[key];
                         const score = result.scores[key];
-                        const rc = score >= 65 ? '#10b981' : score >= 35 ? '#f59e0b' : '#ef4444';
+                        const rc = score >= 65 ? 'var(--success)' : score >= 35 ? 'var(--warning)' : 'var(--error)';
                         return (
                           <Box key={key}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.75 }}>
@@ -624,7 +624,7 @@ export default function StarCoach() {
                       border: '1px solid rgba(14,165,233,0.18)',
                     }}
                   >
-                    <Typography sx={{ fontWeight: 800, fontSize: '0.88rem', color: '#0ea5e9', mb: 1.25 }}>
+                    <Typography sx={{ fontWeight: 800, fontSize: '0.88rem', color: 'var(--accent-cyan)', mb: 1.25 }}>
                       Priority Improvement
                     </Typography>
                     <Typography sx={{ fontSize: '0.9rem', lineHeight: 1.85, color: isDark ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)' }}>
@@ -650,7 +650,7 @@ export default function StarCoach() {
                         fontSize: '0.85rem',
                         color: textColor,
                         transition: 'all 0.2s',
-                        '&:hover': { borderColor: '#6366f150', bgcolor: 'rgba(99,102,241,0.05)' },
+                        '&:hover': { borderColor: 'var(--primary)', bgcolor: 'var(--light-blue-bg)' },
                       }}
                     >
                       <RefreshRoundedIcon sx={{ fontSize: 17 }} />
@@ -665,11 +665,11 @@ export default function StarCoach() {
                         px: 3.5,
                         py: 1.25,
                         borderRadius: 2.5,
-                        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                        background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
                         cursor: 'pointer',
                         fontWeight: 700,
                         fontSize: '0.85rem',
-                        color: '#fff',
+                        color: 'var(--button-primary-text)',
                         boxShadow: '0 4px 16px rgba(99,102,241,0.35)',
                         transition: 'all 0.2s',
                         '&:hover': { transform: 'translateY(-1px)', boxShadow: '0 6px 20px rgba(99,102,241,0.4)' },

@@ -32,17 +32,17 @@ function getInitials(title = '') {
 }
 
 const THEME = {
-  primary: 'var(--primary, #335ede)',
-  primarySoft: 'var(--light-blue-bg, rgba(51, 94, 222, 0.08))',
-  border: 'var(--divider, rgba(0, 0, 0, 0.08))',
-  textPrimary: 'var(--text-primary, #1e293b)',
-  textSecondary: 'var(--text-secondary, #64748b)',
+  primary: 'var(--primary)',
+  primarySoft: 'var(--light-blue-bg)',
+  border: 'var(--divider)',
+  textPrimary: 'var(--text-primary)',
+  textSecondary: 'var(--text-secondary)',
 };
 
 function scoreColor(score) {
-  if (score >= 75) return '#10b981'; // Success Green
+  if (score >= 75) return 'var(--success)';
   if (score >= 50) return THEME.primary; // Primary Blue
-  return '#f59e0b'; // Amber
+  return 'var(--warning)';
 }
 
 function scoreLabel(score) {
@@ -203,7 +203,7 @@ export default function InterviewPractice() {
             sx={{ 
               borderRadius: 1, py: 1, fontWeight: 600, textTransform: 'none', 
               fontSize: '0.85rem', bgcolor: THEME.primary,
-              '&:hover': { bgcolor: '#2a4bc4' }
+              '&:hover': { bgcolor: 'var(--primary-dark)' }
             }}
           >
             New Session
@@ -211,9 +211,9 @@ export default function InterviewPractice() {
           
           <Box sx={{ 
             mt: 2, display: 'flex', alignItems: 'center', gap: 1, 
-            px: 1.5, py: 0.75, borderRadius: 1.5, bgcolor: isDark ? alpha('#fff', 0.03) : '#f8fafc',
+            px: 1.5, py: 0.75, borderRadius: 1.5, bgcolor: isDark ? 'rgba(255,255,255,0.03)' : 'var(--bg-light)',
             border: `1px solid ${THEME.border}`,
-            '&:focus-within': { borderColor: THEME.primary, bgcolor: isDark ? alpha('#fff', 0.05) : '#fff' },
+            '&:focus-within': { borderColor: THEME.primary, bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'var(--bg-paper)' },
             transition: 'all 0.2s'
           }}>
             <SearchRoundedIcon sx={{ fontSize: 18, color: THEME.textSecondary }} />
@@ -246,15 +246,15 @@ export default function InterviewPractice() {
                   sx={{ 
                     display: 'flex', alignItems: 'center', gap: 1.5, p: 1.25, mb: 0.5, 
                     borderRadius: 1.5, cursor: 'pointer', border: '1px solid', transition: 'all 0.2s', 
-                    borderColor: isActive ? alpha('#335ede', 0.2) : 'transparent', 
+                    borderColor: isActive ? 'var(--primary)' : 'transparent', 
                     bgcolor: isActive ? THEME.primarySoft : 'transparent', 
-                    '&:hover': { bgcolor: isActive ? alpha('#335ede', 0.12) : 'rgba(0,0,0,0.03)', '& .del-btn': { opacity: 1 } } 
+                    '&:hover': { bgcolor: isActive ? 'var(--light-blue-bg-12)' : 'var(--sidebar-item-hover-bg)', '& .del-btn': { opacity: 1 } } 
                   }}
                 >
                   <Box sx={{ 
                     width: 32, height: 32, borderRadius: 1, 
                     background: isActive ? THEME.primary : THEME.primarySoft, 
-                    color: isActive ? '#fff' : THEME.primary, 
+                    color: isActive ? 'var(--button-primary-text)' : THEME.primary, 
                     display: 'flex', alignItems: 'center', justifyContent: 'center', 
                     fontWeight: 700, fontSize: '0.6875rem', flexShrink: 0 
                   }}>
@@ -296,7 +296,7 @@ export default function InterviewPractice() {
                 <Box 
                   sx={{ 
                     width: 80, height: 80, borderRadius: '50%', 
-                    bgcolor: THEME.primarySoft, border: `3px solid ${isDark ? alpha('#335ede', 0.2) : alpha('#335ede', 0.1)}`,
+                    bgcolor: THEME.primarySoft, border: `3px solid ${isDark ? 'var(--light-blue-bg-12)' : 'var(--light-blue-bg-08)'}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', 
                     mb: 3, animation: 'pulse 2s infinite'
                   }}
@@ -354,7 +354,7 @@ export default function InterviewPractice() {
                     </Box>
 
                     {/* Readiness ring */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, p: 2, px: 3, borderRadius: 2, bgcolor: isDark ? alpha('#fff', 0.02) : '#f8fafc', border: `1px solid ${THEME.border}` }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, p: 2, px: 3, borderRadius: 2, bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'var(--bg-light)', border: `1px solid ${THEME.border}` }}>
                       <Box sx={{ position: 'relative', display: 'inline-flex' }}>
                         <CircularProgress variant="determinate" value={100} size={50} thickness={4.5} sx={{ color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', position: 'absolute' }} />
                         <CircularProgress variant="determinate" value={selected?.readinessScore ?? 0} size={50} thickness={4.5} sx={{ color: scSelected, transition: 'all 0.6s ease' }} />
@@ -418,18 +418,18 @@ export default function InterviewPractice() {
                           pt: tool.accent ? 2.5 : 2,
                           borderRadius: 2,
                           border: tool.accent
-                            ? `1.5px solid ${alpha('#335ede', 0.28)}`
+                            ? '1.5px solid var(--primary)'
                             : `1px solid ${THEME.border}`,
                           cursor: 'pointer',
                           transition: 'all 0.2s',
                           bgcolor: 'background.paper',
-                          boxShadow: tool.accent ? `0 4px 20px ${alpha('#335ede', isDark ? 0.2 : 0.1)}` : 'none',
+                          boxShadow: tool.accent ? `0 4px 20px ${isDark ? 'rgba(51,94,222,0.2)' : 'rgba(51,94,222,0.1)'}` : 'none',
                           overflow: 'visible',
                           '&:hover': {
                             boxShadow: tool.accent
-                              ? `0 8px 28px ${alpha('#335ede', isDark ? 0.3 : 0.16)}`
+                              ? `0 8px 28px ${isDark ? 'rgba(51,94,222,0.3)' : 'rgba(51,94,222,0.16)'}`
                               : isDark ? '0 8px 24px rgba(0,0,0,0.4)' : '0 4px 16px rgba(0, 0, 0, 0.08)',
-                            borderColor: alpha('#335ede', 0.4),
+                            borderColor: 'var(--primary)',
                             transform: 'translateY(-2px)'
                           },
                         }}
@@ -447,7 +447,7 @@ export default function InterviewPractice() {
                               flexShrink: 0,
                             }}
                           >
-                            <Icon sx={{ fontSize: 24, color: tool.accent ? '#fff' : THEME.primary }} />
+                            <Icon sx={{ fontSize: 24, color: tool.accent ? 'var(--button-primary-text)' : THEME.primary }} />
                           </Box>
                           <Box sx={{ flex: 1, minWidth: 0 }}>
                             <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: 0.8, color: THEME.primary, textTransform: 'uppercase', mb: 0.35 }}>
@@ -477,8 +477,8 @@ export default function InterviewPractice() {
                             ...(tool.accent
                               ? {
                                   bgcolor: THEME.primary,
-                                  color: '#fff',
-                                  '&:hover': { bgcolor: '#2a4bc4' },
+                                  color: 'var(--button-primary-text)',
+                                  '&:hover': { bgcolor: 'var(--primary-dark)' },
                                 }
                               : {
                                   color: THEME.primary,
@@ -523,11 +523,11 @@ export default function InterviewPractice() {
         <DialogContent sx={{ p: 3.5 }}>
           <Box sx={{ mb: 3 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, fontSize: '0.82rem' }}>Job Link <Typography component="span" variant="caption" sx={{ color: 'text.disabled', fontWeight: 400 }}>(optional)</Typography></Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, borderRadius: 2.5, border: '1.5px solid', borderColor: 'divider', overflow: 'hidden', '&:focus-within': { borderColor: '#2563eb' }, transition: 'border-color 0.2s' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, borderRadius: 2.5, border: '1.5px solid', borderColor: 'divider', overflow: 'hidden', '&:focus-within': { borderColor: 'var(--primary)' }, transition: 'border-color 0.2s' }}>
               <Box sx={{ px: 1.5, py: 1.2, bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', borderRight: '1px solid', borderColor: 'divider' }}>
                 <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 600 }}>https://</Typography>
               </Box>
-              <input value={jobLink} onChange={(e) => setJobLink(e.target.value)} placeholder="linkedin.com/jobs/..." style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', padding: '10px 14px', fontSize: '0.88rem', color: isDark ? '#e2e8f0' : '#1e293b', fontFamily: 'inherit' }} />
+              <input value={jobLink} onChange={(e) => setJobLink(e.target.value)} placeholder="linkedin.com/jobs/..." style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', padding: '10px 14px', fontSize: '0.88rem', color: isDark ? 'var(--text-primary)' : 'var(--text-primary)', fontFamily: 'inherit' }} />
             </Box>
           </Box>
 
@@ -539,7 +539,7 @@ export default function InterviewPractice() {
               </Typography>
             </Box>
             <TextField fullWidth multiline rows={7} placeholder={'Paste the full job posting here…\n\nThe more detail you include, the better your personalized Q&A and gap analysis will be.'} value={jobDescription} onChange={(e) => setJobDescription(e.target.value.slice(0, JOB_DESCRIPTION_MAX))}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2.5, fontSize: '0.9rem', lineHeight: 1.7, '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#2563eb' } } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2.5, fontSize: '0.9rem', lineHeight: 1.7, '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--primary)' } } }}
             />
           </Box>
 
@@ -547,7 +547,7 @@ export default function InterviewPractice() {
             <Button fullWidth variant="outlined" onClick={() => setModalOpen(false)} sx={{ borderRadius: 1.5, fontWeight: 700, textTransform: 'none', py: 1.2, color: THEME.textSecondary, borderColor: THEME.border }}>
               Cancel
             </Button>
-            <Button fullWidth variant="contained" disableElevation onClick={handleCreate} disabled={!jobDescription.trim() && !jobLink.trim()} startIcon={<AutoAwesomeRoundedIcon />} sx={{ borderRadius: 1.5, fontWeight: 700, textTransform: 'none', py: 1.2, bgcolor: THEME.primary, '&:hover': { bgcolor: '#2a4bc4' } }}>
+            <Button fullWidth variant="contained" disableElevation onClick={handleCreate} disabled={!jobDescription.trim() && !jobLink.trim()} startIcon={<AutoAwesomeRoundedIcon />} sx={{ borderRadius: 1.5, fontWeight: 700, textTransform: 'none', py: 1.2, bgcolor: THEME.primary, '&:hover': { bgcolor: 'var(--primary-dark)' } }}>
               Generate Prep Pack
             </Button>
           </Box>

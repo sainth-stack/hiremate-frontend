@@ -40,6 +40,10 @@ export const getAdminSubmissionLogDetailAPI = (id) =>
 export const getAdminTokenUsageAPI = (params = {}) =>
   axiosClient.get('/admin/token-usage', { params });
 
+/** Ingestion run analytics (admin). Backend: GET /admin/ingestion-runs */
+export const getAdminIngestionRunsAPI = (params = {}) =>
+  axiosClient.get('/admin/ingestion-runs', { params });
+
 // Subscription Plan Management
 export const getAdminPlansAPI = () =>
   axiosClient.get('/admin/plans');

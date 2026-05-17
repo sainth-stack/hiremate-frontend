@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { getChatHistoryAPI, sendChatMessageAPI } from '../../services/chatService';
-import brain_logo from '../../assets/brain_logo.png';
+import chatBotLogo from '../../assets/title_logo.png';
 
 const STARTERS = [
   { icon: '📭', text: "Which companies haven't replied?" },
@@ -15,18 +15,34 @@ const STARTERS = [
 /* ─────────────────────────────────────────────────────────────────────────────
    Inline SVG icons (no external dependency)
 ───────────────────────────────────────────────────────────────────────────── */
-const IconBot = () => (
-  <img 
-    src={brain_logo} 
-    alt="AI" 
-    style={{ 
-      width: '100%', 
-      height: '100%', 
-      objectFit: 'contain',
-      display: 'block' 
-    }} 
-  />
+const BotLogoMark = ({ alt }) => (
+  <div
+    style={{
+      width: '100%',
+      height: '100%',
+      borderRadius: 8,
+      overflow: 'hidden',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#ffffff',
+    }}
+  >
+    <img
+      src={chatBotLogo}
+      alt={alt}
+      style={{
+        width: '88%',
+        height: '88%',
+        objectFit: 'cover',
+        transform: 'scale(1.08)',
+        display: 'block',
+      }}
+    />
+  </div>
 );
+
+const IconBot = () => <BotLogoMark alt="OpsBrain AI" />;
 
 const IconSend = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -42,18 +58,7 @@ const IconX = () => (
   </svg>
 );
 
-const IconChat = () => (
-  <img 
-    src={brain_logo} 
-    alt="Chat" 
-    style={{ 
-      width: '100%', 
-      height: '100%', 
-      objectFit: 'contain',
-      display: 'block' 
-    }} 
-  />
-);
+const IconChat = () => <BotLogoMark alt="OpsBrain Chat" />;
 
 const IconUser = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -158,11 +163,12 @@ function ThinkingBubble() {
 const aiBotAvatar = {
   width: 32, height: 32,
   borderRadius: 10,
-  background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-  color: 'white',
+  background: '#ffffff',
+  border: '1px solid rgba(148, 163, 184, 0.35)',
   display: 'flex', alignItems: 'center', justifyContent: 'center',
   flexShrink: 0,
-  boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
+  padding: 2.5,
+  boxShadow: '0 3px 10px rgba(15, 23, 42, 0.12)',
 };
 
 const userAvatar = {

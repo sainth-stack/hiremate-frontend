@@ -35,11 +35,14 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 /* ─── Defaults (fallback if navigation state missing) ───────────────── */
 
 const THEME = {
-  primary: 'var(--primary, #335ede)',
-  primarySoft: 'rgba(51, 94, 222, 0.08)',
-  border: 'var(--divider, rgba(0,0,0,0.08))',
+  primary: 'var(--primary)',
+  primarySoft: 'var(--light-blue-bg)',
+  border: 'var(--divider)',
   textPrimary: 'var(--text-primary)',
   textSecondary: 'var(--text-secondary)',
+  pageBg: 'var(--bg-main)',
+  surface: 'var(--bg-paper)',
+  previewCanvas: 'var(--bg-light)',
 };
 
 const TOP_FIXES = [
@@ -138,12 +141,12 @@ function ScoreCircle({ score, max = 100, size = 90 }) {
   const r = (size - 12) / 2;
   const circumference = 2 * Math.PI * r;
   const filled = (score / max) * circumference;
-  const color = score < 40 ? '#ef4444' : score < 70 ? '#f59e0b' : '#22c55e';
+  const color = score < 40 ? 'var(--error)' : score < 70 ? 'var(--warning)' : 'var(--success)';
 
   return (
     <Box sx={{ position: 'relative', width: size, height: size, mx: 'auto' }}>
       <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#f3f4f6" strokeWidth={7} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--bg-light)" strokeWidth={7} />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -178,7 +181,7 @@ function IssueCard({ card, onFix }) {
   return (
     <Box
       sx={{
-        bgcolor: '#fff',
+        bgcolor: THEME.surface,
         borderRadius: 2,
         p: 2.5,
         mb: 2,
@@ -192,7 +195,7 @@ function IssueCard({ card, onFix }) {
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, minWidth: 0 }}>
-        <CancelRoundedIcon sx={{ color: '#ef4444', fontSize: 22, mt: 0.15, flexShrink: 0 }} />
+        <CancelRoundedIcon sx={{ color: 'var(--error)', fontSize: 22, mt: 0.15, flexShrink: 0 }} />
         <Box>
           <Typography sx={{ fontWeight: 600, fontSize: '0.9375rem', color: THEME.textPrimary, mb: 0.5 }}>
             {card.title}
@@ -207,8 +210,8 @@ function IssueCard({ card, onFix }) {
           label={card.badge}
           size="small"
           sx={{
-            bgcolor: '#1e293b',
-            color: '#fff',
+            bgcolor: 'var(--text-primary)',
+            color: 'var(--bg-paper)',
             fontWeight: 700,
             fontSize: '0.65rem',
             letterSpacing: 0.06,
@@ -225,7 +228,7 @@ function IssueCard({ card, onFix }) {
           onClick={onFix}
           sx={{
             bgcolor: THEME.primary,
-            color: '#fff',
+            color: 'var(--button-primary-text)',
             fontWeight: 600,
             fontSize: '0.8125rem',
             borderRadius: 1,
@@ -233,7 +236,7 @@ function IssueCard({ card, onFix }) {
             py: 0.5,
             textTransform: 'none',
             whiteSpace: 'nowrap',
-            '&:hover': { bgcolor: 'var(--primary-dark, #2a4bc4)' },
+            '&:hover': { bgcolor: 'var(--primary-dark)' },
           }}
         >
           Fix
@@ -253,7 +256,7 @@ function ReportAnalytics({ analytics }) {
         p: { xs: 2, sm: 2.5 },
         borderRadius: 2,
         border: `1px solid ${THEME.border}`,
-        bgcolor: '#fff',
+        bgcolor: THEME.surface,
         boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
         scrollMarginTop: 24,
       }}
@@ -293,7 +296,7 @@ function ReportAnalytics({ analytics }) {
             sx={{
               p: 1.75,
               borderRadius: 1.5,
-              bgcolor: '#f8fafc',
+              bgcolor: THEME.pageBg,
               border: `1px solid ${THEME.border}`,
             }}
           >
@@ -332,7 +335,7 @@ function ReportAnalytics({ analytics }) {
             sx={{
               height: 8,
               borderRadius: 1,
-              bgcolor: '#f1f5f9',
+              bgcolor: THEME.previewCanvas,
               '& .MuiLinearProgress-bar': { bgcolor: THEME.primary, borderRadius: 1 },
             }}
           />
@@ -348,8 +351,8 @@ function ReportAnalytics({ analytics }) {
             sx={{
               height: 8,
               borderRadius: 1,
-              bgcolor: '#f1f5f9',
-              '& .MuiLinearProgress-bar': { bgcolor: '#0d9488', borderRadius: 1 },
+              bgcolor: THEME.previewCanvas,
+              '& .MuiLinearProgress-bar': { bgcolor: 'var(--accent-cyan)', borderRadius: 1 },
             }}
           />
         </Box>
@@ -448,7 +451,7 @@ export default function ResumeAnalyzeScore() {
         height: '100vh',
         maxHeight: '100vh',
         overflow: 'hidden',
-        bgcolor: '#fafbfc',
+        bgcolor: THEME.pageBg,
         fontFamily: 'var(--font-family)',
         boxSizing: 'border-box',
       }}
@@ -458,7 +461,7 @@ export default function ResumeAnalyzeScore() {
         sx={{
           width: 240,
           minWidth: 240,
-          bgcolor: '#fff',
+          bgcolor: THEME.surface,
           borderRight: `1px solid ${THEME.border}`,
           display: 'flex',
           flexDirection: 'column',
@@ -534,8 +537,8 @@ export default function ResumeAnalyzeScore() {
                 sx={{
                   height: 22,
                   minWidth: 28,
-                  bgcolor: '#fef2f2',
-                  color: '#dc2626',
+                  bgcolor: 'var(--error-bg)',
+                  color: 'var(--error)',
                   fontWeight: 700,
                   fontSize: '0.7rem',
                   '& .MuiChip-label': { px: 0.75 },
@@ -583,8 +586,8 @@ export default function ResumeAnalyzeScore() {
                 sx={{
                   height: 19,
                   minWidth: 24,
-                  bgcolor: '#d1fae5',
-                  color: '#059669',
+                  bgcolor: 'var(--success-bg)',
+                  color: 'var(--success)',
                   fontWeight: 700,
                   fontSize: '0.72rem',
                   '& .MuiChip-label': { px: 0.8 },
@@ -682,7 +685,7 @@ export default function ResumeAnalyzeScore() {
           <Box
             sx={{
               display: 'inline-flex',
-              bgcolor: '#fff',
+              bgcolor: THEME.surface,
               borderRadius: 2,
               p: 0.5,
               border: `1px solid ${THEME.border}`,
@@ -701,7 +704,7 @@ export default function ResumeAnalyzeScore() {
                 onClick={() => setActiveTab(tab.id)}
                 sx={{
                   bgcolor: activeTab === tab.id ? THEME.primary : 'transparent',
-                  color: activeTab === tab.id ? '#fff' : THEME.textSecondary,
+                  color: activeTab === tab.id ? 'var(--button-primary-text)' : THEME.textSecondary,
                   fontWeight: 600,
                   fontSize: '0.8125rem',
                   px: 1.75,
@@ -710,7 +713,7 @@ export default function ResumeAnalyzeScore() {
                   textTransform: 'none',
                   transition: 'all 0.2s',
                   '&:hover': {
-                    bgcolor: activeTab === tab.id ? 'var(--primary-dark, #2a4bc4)' : THEME.primarySoft,
+                    bgcolor: activeTab === tab.id ? 'var(--primary-dark)' : THEME.primarySoft,
                   },
                 }}
               >
@@ -770,7 +773,7 @@ export default function ResumeAnalyzeScore() {
               p: 2,
               borderRadius: 2,
               border: `1px solid ${THEME.border}`,
-              bgcolor: '#fff',
+              bgcolor: THEME.surface,
             }}
           >
             <Typography sx={{ fontSize: '0.875rem', color: THEME.textSecondary }}>
@@ -799,7 +802,7 @@ export default function ResumeAnalyzeScore() {
         {/* Score summary card */}
         <Box
           sx={{
-            bgcolor: '#fff',
+            bgcolor: THEME.surface,
             borderRadius: 2,
             p: 3,
             mb: 3,
@@ -828,7 +831,7 @@ export default function ResumeAnalyzeScore() {
             <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: THEME.textSecondary, letterSpacing: 0.06 }}>
               YOUR RESUME
             </Typography>
-            <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#16a34a', letterSpacing: 0.06 }}>
+            <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--success)', letterSpacing: 0.06 }}>
               STRONG RESUMES (BENCHMARK)
             </Typography>
           </Box>
@@ -840,9 +843,9 @@ export default function ResumeAnalyzeScore() {
               sx={{
                 height: 18,
                 borderRadius: 10,
-                bgcolor: '#f1f5f9',
+                bgcolor: THEME.previewCanvas,
                 '& .MuiLinearProgress-bar': {
-                  background: `linear-gradient(90deg, ${THEME.primary}, #1e40af)`,
+                  background: `linear-gradient(90deg, ${THEME.primary}, var(--primary-dark))`,
                   borderRadius: 10,
                 },
               }}
@@ -855,30 +858,30 @@ export default function ResumeAnalyzeScore() {
                 top: -3,
                 height: 24,
                 width: 3,
-                bgcolor: '#22c55e',
+                bgcolor: 'var(--success)',
                 borderRadius: 2,
               }}
             />
           </Box>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
-            <Typography sx={{ fontSize: '0.72rem', color: '#9ca3af' }}>0</Typography>
-            <Typography sx={{ fontSize: '0.72rem', color: '#9ca3af' }}>100</Typography>
+            <Typography sx={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>0</Typography>
+            <Typography sx={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>100</Typography>
           </Box>
 
           <Box
             sx={{
               mt: 2.5,
               p: 2,
-              bgcolor: '#fffbeb',
+              bgcolor: 'var(--warning-bg)',
               borderRadius: 2,
-              border: '1px solid #fef3c7',
+              border: '1px solid var(--warning-light)',
               display: 'flex',
               gap: 1.5,
             }}
           >
             <Typography sx={{ fontSize: '1rem' }}>💡</Typography>
-            <Typography sx={{ fontSize: '0.84rem', color: '#92400e', lineHeight: 1.6, fontFamily: 'var(--font-family)' }}>
+            <Typography sx={{ fontSize: '0.84rem', color: 'var(--warning)', lineHeight: 1.6, fontFamily: 'var(--font-family)' }}>
               Use the feedback to find and fix errors in your resume, then reupload it to get a new
               score. <strong>80% of people increase their score by over 20 points</strong> with just
               three uploads and revisions.
@@ -939,14 +942,14 @@ export default function ResumeAnalyzeScore() {
               alignItems: 'flex-start',
               gap: 2,
               mb: 2,
-              bgcolor: '#fff',
+              bgcolor: THEME.surface,
               borderRadius: 2,
               p: 2.5,
               boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
               border: `1px solid ${THEME.border}`,
             }}
           >
-            <CheckCircleRoundedIcon sx={{ color: '#16a34a', fontSize: 22, mt: 0.15, flexShrink: 0 }} />
+            <CheckCircleRoundedIcon sx={{ color: 'var(--success)', fontSize: 22, mt: 0.15, flexShrink: 0 }} />
             <Box>
               <Typography sx={{ fontWeight: 600, fontSize: '0.9375rem', color: THEME.textPrimary, mb: 0.35 }}>
                 {item.title}
@@ -967,7 +970,7 @@ export default function ResumeAnalyzeScore() {
         sx={{
           width: { xs: '0%', md: '40%' },
           minWidth: { md: 360 },
-          bgcolor: '#fafbfc',
+          bgcolor: THEME.pageBg,
           borderLeft: `1px solid ${THEME.border}`,
           display: { xs: 'none', md: 'flex' },
           flexDirection: 'column',
@@ -979,7 +982,7 @@ export default function ResumeAnalyzeScore() {
           sx={{
             px: 2.5,
             py: 1.5,
-            bgcolor: '#fff',
+            bgcolor: THEME.surface,
             borderBottom: `1px solid ${THEME.border}`,
             display: 'flex',
             alignItems: 'flex-start',
@@ -1019,7 +1022,7 @@ export default function ResumeAnalyzeScore() {
             flex: 1,
             overflow: 'auto',
             position: 'relative',
-            bgcolor: '#eef1f4',
+            bgcolor: THEME.previewCanvas,
             px: 2,
             py: 2,
             minHeight: 0,
@@ -1035,7 +1038,7 @@ export default function ResumeAnalyzeScore() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    bgcolor: 'rgba(238, 241, 244, 0.92)',
+                    bgcolor: 'rgba(15, 23, 42, 0.08)',
                     backdropFilter: 'blur(4px)',
                     zIndex: 10,
                   }}
@@ -1060,7 +1063,7 @@ export default function ResumeAnalyzeScore() {
                       borderRadius: 1,
                       overflow: 'hidden',
                       boxShadow: '0 4px 24px rgba(15, 23, 42, 0.12)',
-                      bgcolor: '#fff',
+                      bgcolor: THEME.surface,
                       display: 'block',
                       width: '100%',
                     }}

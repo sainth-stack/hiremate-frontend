@@ -14,7 +14,7 @@ import SkillsTab from './tabs/SkillsTab';
 import ProjectsTab from './tabs/ProjectsTab';
 import PreferencesTab from './tabs/PreferencesTab';
 import LinksTab from './tabs/LinksTab';
-import logoImg from '../../assets/logo.png';
+import logoImg from '../../assets/opsbrain-logo-full.png';
 
 const STEPS = [
   {
@@ -127,7 +127,7 @@ export default function OnboardingProfile() {
             justifyContent: 'space-between',
           }}
         >
-          <Box component="img" src={logoImg} alt="HireMate" sx={{ height: 28, objectFit: 'contain' }} />
+          <Box component="img" src={logoImg} alt="OpsBrain" sx={{ height: 28, objectFit: 'contain' }} />
           <Typography
             sx={{
               fontSize: 13,

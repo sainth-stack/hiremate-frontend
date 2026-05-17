@@ -81,10 +81,10 @@ export default function Home() {
         '--dashboard-label-gap': '4px',
         '--dashboard-row-min-height': '48px',
         '--heat-0': 'var(--grey-5)',
-        '--heat-1': '#dbeafe',
-        '--heat-2': '#bfdbfe',
-        '--heat-3': '#60a5fa',
-        '--heat-4': '#1E3A8A',
+        '--heat-1': 'var(--light-blue-bg)',
+        '--heat-2': 'var(--light-blue-bg-08)',
+        '--heat-3': 'var(--primary-light)',
+        '--heat-4': 'var(--primary)',
       }}
     >
       {error && (
@@ -93,10 +93,10 @@ export default function Home() {
             mb: 2,
             px: 2,
             py: 1.5,
-            bgcolor: 'rgba(220, 38, 38, 0.06)',
+            bgcolor: 'var(--error-bg)',
             color: 'var(--text-primary)',
             borderRadius: '12px',
-            border: '1px solid rgba(220, 38, 38, 0.12)',
+            border: '1px solid var(--error-bk)',
           }}
         >
           <Typography variant="body2" sx={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
@@ -190,7 +190,7 @@ export default function Home() {
               fontWeight: 600,
               transition: 'all 0.2s ease',
               '&:hover': {
-                borderColor: 'rgba(37, 99, 235, 0.3)',
+                borderColor: 'var(--primary)',
                 bgcolor: 'var(--light-blue-bg-08)',
                 color: 'var(--primary)',
                 transform: 'translateY(-1px)',

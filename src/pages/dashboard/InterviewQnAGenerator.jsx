@@ -27,18 +27,18 @@ import { Target, Settings, Users } from 'lucide-react';
 import PageContainer from '../../components/common/PageContainer';
 
 const THEME = {
-  primary: 'var(--primary, #335ede)',
-  primarySoft: 'var(--light-blue-bg, rgba(51, 94, 222, 0.08))',
-  border: 'var(--divider, rgba(0, 0, 0, 0.08))',
-  textPrimary: 'var(--text-primary, #1e293b)',
-  textSecondary: 'var(--text-secondary, #64748b)',
+  primary: 'var(--primary)',
+  primarySoft: 'var(--light-blue-bg)',
+  border: 'var(--divider)',
+  textPrimary: 'var(--text-primary)',
+  textSecondary: 'var(--text-secondary)',
 };
 
 const STAR_COLORS = { 
-  s: '#3b82f6', 
-  t: '#2563eb', 
-  a: '#335ede', 
-  r: '#10b981' 
+  s: 'var(--primary-light)', 
+  t: 'var(--primary)', 
+  a: 'var(--primary)', 
+  r: 'var(--success)' 
 };
 
 const STAR_LABELS = { 
@@ -108,7 +108,7 @@ export default function InterviewQnAGenerator() {
 
       {/* ── Top bar ── */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 3, py: 1.5, bgcolor: 'background.paper', borderBottom: `1px solid ${THEME.border}` }}>
-        <IconButton size="small" onClick={() => navigate('/interview-practice')} sx={{ color: THEME.textSecondary, bgcolor: isDark ? alpha('#fff', 0.05) : alpha('#000', 0.04), borderRadius: 1.5, '&:hover': { bgcolor: THEME.primarySoft, color: THEME.primary } }}>
+        <IconButton size="small" onClick={() => navigate('/interview-practice')} sx={{ color: THEME.textSecondary, bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'var(--sidebar-item-hover-bg)', borderRadius: 1.5, '&:hover': { bgcolor: THEME.primarySoft, color: THEME.primary } }}>
           <ArrowBackRoundedIcon sx={{ fontSize: 18 }} />
         </IconButton>
         <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -118,7 +118,7 @@ export default function InterviewQnAGenerator() {
         <Chip 
           label={`${filtered.length} curated questions`} 
           size="small" 
-          sx={{ fontWeight: 700, fontSize: '0.6875rem', bgcolor: THEME.primarySoft, color: THEME.primary, border: `1px solid ${alpha('#335ede', 0.12)}` }} 
+          sx={{ fontWeight: 700, fontSize: '0.6875rem', bgcolor: THEME.primarySoft, color: THEME.primary, border: `1px solid var(--light-blue-bg-08)` }} 
         />
       </Box>
 
@@ -180,8 +180,8 @@ export default function InterviewQnAGenerator() {
             <Box sx={{ 
               display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, 
               borderRadius: 2, border: `1px solid ${THEME.border}`, 
-              bgcolor: isDark ? alpha('#fff', 0.03) : '#f8fafc',
-              '&:focus-within': { borderColor: THEME.primary, bgcolor: isDark ? alpha('#fff', 0.05) : '#fff' },
+              bgcolor: isDark ? 'rgba(255,255,255,0.03)' : 'var(--bg-light)',
+              '&:focus-within': { borderColor: THEME.primary, bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'var(--bg-paper)' },
               transition: 'all 0.2s'
             }}>
               <SearchRoundedIcon sx={{ fontSize: 18, color: THEME.textSecondary }} />
@@ -203,19 +203,19 @@ export default function InterviewQnAGenerator() {
                     onClick={() => setSelectedIdx(idx)} 
                     sx={{ 
                       p: 2, mb: 1, borderRadius: 2, cursor: 'pointer', border: '1px solid', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)', 
-                      borderColor: isActive ? alpha('#335ede', 0.2) : 'transparent', 
+                      borderColor: isActive ? THEME.primary : 'transparent', 
                       bgcolor: isActive ? THEME.primarySoft : 'transparent', 
                       '&:hover': { 
-                        bgcolor: isActive ? alpha('#335ede', 0.12) : alpha('#000', 0.03),
+                        bgcolor: isActive ? 'var(--light-blue-bg-12)' : 'var(--sidebar-item-hover-bg)',
                         transform: isActive ? 'none' : 'translateX(4px)'
                       }, 
-                      boxShadow: isActive ? `0 4px 12px ${alpha('#335ede', 0.1)}` : 'none' 
+                      boxShadow: isActive ? '0 4px 12px rgba(51,94,222,0.1)' : 'none' 
                     }}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                       <Typography sx={{ fontWeight: 800, color: isActive ? THEME.primary : THEME.textSecondary, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Question {idx + 1}</Typography>
                       <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: q.complexity === 'Easy' ? '#10b981' : q.complexity === 'Medium' ? '#335ede' : '#7c3aed' }} />
+                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: q.complexity === 'Easy' ? 'var(--success)' : q.complexity === 'Medium' ? 'var(--primary)' : 'var(--accent-indigo)' }} />
                         <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: THEME.textSecondary }}>{q.duration}</Typography>
                       </Box>
                     </Box>
@@ -245,10 +245,10 @@ export default function InterviewQnAGenerator() {
                   gap: 1.5,
                   cursor: isGenerating ? 'wait' : 'pointer',
                   bgcolor: THEME.primarySoft,
-                  border: `1px dashed ${alpha('#335ede', 0.3)}`,
+                  border: `1px dashed var(--primary)`,
                   transition: 'all 0.2s',
                   '&:hover': {
-                    bgcolor: alpha('#335ede', 0.12),
+                    bgcolor: 'var(--light-blue-bg-12)',
                     borderStyle: 'solid',
                     borderColor: THEME.primary
                   }
@@ -277,7 +277,7 @@ export default function InterviewQnAGenerator() {
                   {/* Question hero */}
                   <Box sx={{ 
                     p: { xs: 3, md: 4.5 }, borderRadius: 3, mb: 4, position: 'relative', overflow: 'hidden', 
-                    bgcolor: isDark ? alpha(theme.palette.background.paper, 0.5) : '#fff', 
+                    bgcolor: isDark ? alpha(theme.palette.background.paper, 0.5) : 'var(--bg-paper)', 
                     border: `1px solid ${THEME.border}`,
                     boxShadow: isDark ? 'none' : '0 1px 3px rgba(15, 23, 42, 0.04)' 
                   }}>
@@ -287,17 +287,17 @@ export default function InterviewQnAGenerator() {
                         size="small" 
                         sx={{ 
                           fontWeight: 800, fontSize: '0.65rem', 
-                          color: selected.complexity === 'Easy' ? '#10b981' : selected.complexity === 'Medium' ? THEME.primary : '#7c3aed', 
-                          bgcolor: alpha(selected.complexity === 'Easy' ? '#10b981' : selected.complexity === 'Medium' ? '#335ede' : '#7c3aed', 0.08), 
+                          color: selected.complexity === 'Easy' ? 'var(--success)' : selected.complexity === 'Medium' ? THEME.primary : 'var(--accent-indigo)', 
+                          bgcolor: selected.complexity === 'Easy' ? 'var(--success-bg)' : selected.complexity === 'Medium' ? 'var(--light-blue-bg)' : 'var(--light-blue-bg)', 
                           height: 22 
                         }} 
                       />
-                      <Chip label={selected.duration} size="small" sx={{ fontWeight: 700, fontSize: '0.65rem', color: THEME.textSecondary, bgcolor: alpha('#000', 0.04), height: 22 }} />
+                      <Chip label={selected.duration} size="small" sx={{ fontWeight: 700, fontSize: '0.65rem', color: THEME.textSecondary, bgcolor: 'var(--sidebar-item-hover-bg)', height: 22 }} />
                     </Box>
                     <Typography variant="h4" sx={{ fontWeight: 800, lineHeight: 1.3, mb: 2.5, fontSize: { xs: '1.5rem', md: '1.85rem' }, color: THEME.textPrimary, letterSpacing: '-0.02em' }}>
                       {selected.question_text}
                     </Typography>
-                    <Box sx={{ display: 'flex', gap: 2, p: 2, borderRadius: 2, bgcolor: isDark ? alpha('#fff', 0.02) : '#f8fafc' }}>
+                    <Box sx={{ display: 'flex', gap: 2, p: 2, borderRadius: 2, bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'var(--bg-light)' }}>
                       <PsychologyRoundedIcon sx={{ color: THEME.primary, mt: 0.25 }} />
                       <Typography sx={{ color: THEME.textSecondary, lineHeight: 1.7, fontSize: '0.9375rem', fontWeight: 500 }}>{selected.overview}</Typography>
                     </Box>
@@ -343,20 +343,20 @@ export default function InterviewQnAGenerator() {
                           <Grid item xs={12} md={6}>
                             <Box sx={{ p: 3, height: '100%', borderRadius: 2, bgcolor: 'background.paper', border: `1px solid ${THEME.border}`, boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)' }}>
                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 2 }}>
-                                <Box sx={{ p: 0.75, borderRadius: 1, bgcolor: alpha('#7c3aed', 0.08), color: '#7c3aed' }}>
+                                <Box sx={{ p: 0.75, borderRadius: 1, bgcolor: 'var(--light-blue-bg)', color: 'var(--accent-indigo)' }}>
                                   <ChecklistRoundedIcon sx={{ fontSize: 18 }} />
                                 </Box>
                                 <Typography sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', color: THEME.textPrimary, letterSpacing: 0.5 }}>Success Criteria</Typography>
                               </Box>
                               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                                 {selected.expectations.map((e) => (
-                                  <Chip key={e} label={e} size="small" sx={{ fontWeight: 700, fontSize: '0.75rem', bgcolor: alpha('#7c3aed', 0.1), color: '#7c3aed', borderRadius: 1, border: '1px solid transparent' }} />
+                                  <Chip key={e} label={e} size="small" sx={{ fontWeight: 700, fontSize: '0.75rem', bgcolor: 'var(--light-blue-bg)', color: 'var(--accent-indigo)', borderRadius: 1, border: '1px solid transparent' }} />
                                 ))}
                               </Box>
                             </Box>
                           </Grid>
                           <Grid item xs={12}>
-                            <Box sx={{ p: 3, borderRadius: 2, bgcolor: THEME.primarySoft, border: `1px solid ${alpha('#335ede', 0.12)}`, display: 'flex', gap: 2.5 }}>
+                            <Box sx={{ p: 3, borderRadius: 2, bgcolor: THEME.primarySoft, border: '1px solid var(--light-blue-bg-08)', display: 'flex', gap: 2.5 }}>
                               <Box sx={{ flexShrink: 0 }}>
                                 <AutoAwesomeRoundedIcon sx={{ fontSize: 24, color: THEME.primary }} />
                               </Box>
@@ -384,8 +384,8 @@ export default function InterviewQnAGenerator() {
                                     <Box sx={{ 
                                       width: 36, height: 36, borderRadius: '50%', 
                                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                      bgcolor: covered ? color : isDark ? alpha('#fff', 0.05) : '#f1f5f9',
-                                      color: covered ? '#fff' : THEME.textSecondary,
+                                      bgcolor: covered ? color : isDark ? 'rgba(255,255,255,0.05)' : 'var(--bg-light)',
+                                      color: covered ? 'var(--button-primary-text)' : THEME.textSecondary,
                                       fontWeight: 800, fontSize: '0.8125rem',
                                       transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                                       boxShadow: covered ? `0 0 16px ${alpha(color, 0.4)}` : 'none',
@@ -395,7 +395,7 @@ export default function InterviewQnAGenerator() {
                                     </Box>
                                   </Tooltip>
                                   {i < 3 && (
-                                    <Box sx={{ flex: 1, height: 3, bgcolor: covered && selected.starBreakdown?.[['s','t','a','r'][i+1].toLowerCase()] ? STAR_COLORS[['s','t','a','r'][i+1].toLowerCase()] : isDark ? alpha('#fff', 0.05) : '#f1f5f9', mx: 1.5, borderRadius: 1 }} />
+                                    <Box sx={{ flex: 1, height: 3, bgcolor: covered && selected.starBreakdown?.[['s','t','a','r'][i+1].toLowerCase()] ? STAR_COLORS[['s','t','a','r'][i+1].toLowerCase()] : isDark ? 'rgba(255,255,255,0.05)' : 'var(--bg-light)', mx: 1.5, borderRadius: 1 }} />
                                   )}
                                 </Box>
                               );
@@ -409,7 +409,7 @@ export default function InterviewQnAGenerator() {
                             <Typography sx={{ fontWeight: 800, color: THEME.textPrimary, textTransform: 'uppercase', letterSpacing: 1, fontSize: '0.72rem' }}>Master Model Answer</Typography>
                           </Box>
                           
-                          <Typography variant="body1" sx={{ lineHeight: 2, fontSize: '1rem', color: THEME.textPrimary, whiteSpace: 'pre-line', fontWeight: 500, p: 3, borderRadius: 2, bgcolor: isDark ? alpha('#fff', 0.01) : '#fafbfc', border: `1px solid ${THEME.border}` }}>
+                          <Typography variant="body1" sx={{ lineHeight: 2, fontSize: '1rem', color: THEME.textPrimary, whiteSpace: 'pre-line', fontWeight: 500, p: 3, borderRadius: 2, bgcolor: isDark ? 'rgba(255,255,255,0.01)' : 'var(--bg-main)', border: `1px solid ${THEME.border}` }}>
                             {selected.sampleAnswer}
                           </Typography>
                         </Box>
@@ -418,7 +418,7 @@ export default function InterviewQnAGenerator() {
                   </AnimatePresence>
 
                   {/* Pagination Control */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 3, p: 2, borderRadius: 2, bgcolor: isDark ? alpha('#fff', 0.02) : '#f8fafc', border: `1px solid ${THEME.border}` }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 3, p: 2, borderRadius: 2, bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'var(--bg-light)', border: `1px solid ${THEME.border}` }}>
                     <Button 
                       startIcon={<ChevronLeftRoundedIcon />} 
                       onClick={prev} 

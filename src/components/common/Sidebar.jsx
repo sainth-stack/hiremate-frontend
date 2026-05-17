@@ -12,26 +12,27 @@ import {
   ListItemText,
 } from '@mui/material';
 import SpaceDashboardRoundedIcon from '@mui/icons-material/SpaceDashboardRounded';
-import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
-import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
+import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
+import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
-import ViewKanbanRoundedIcon from '@mui/icons-material/ViewKanbanRounded';
-import MicRoundedIcon from '@mui/icons-material/MicRounded';
+import AssignmentTurnedInRoundedIcon from '@mui/icons-material/AssignmentTurnedInRounded';
+import RecordVoiceOverRoundedIcon from '@mui/icons-material/RecordVoiceOverRounded';
 import WbSunnyRoundedIcon from '@mui/icons-material/WbSunnyRounded';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
-import AutoFixHighRoundedIcon from '@mui/icons-material/AutoFixHighRounded';
+import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
 import AdminPanelSettingsRoundedIcon from '@mui/icons-material/AdminPanelSettingsRounded';
 import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
 import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
-import BugReportRoundedIcon from '@mui/icons-material/BugReportRounded';
+import SupportAgentRoundedIcon from '@mui/icons-material/SupportAgentRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import ExtensionRoundedIcon from '@mui/icons-material/ExtensionRounded';
 import BoltRoundedIcon from '@mui/icons-material/BoltRounded';
-import RecommendRoundedIcon from '@mui/icons-material/RecommendRounded';
+import WorkOutlineRoundedIcon from '@mui/icons-material/WorkOutlineRounded';
 import DataUsageRoundedIcon from '@mui/icons-material/DataUsageRounded';
 import { logout } from '../../store/auth/authSlice';
 import { toggleTheme } from '../../store/theme/themeSlice';
 import { getProfileCompletion } from '../../pages/profile/utils/profileCompletion';
+import { CHROME_EXTENSION_WEBSTORE_URL } from '../../utilities/const';
 import SignOutConfirmDialog from './SignOutConfirmDialog';
 import OpsBrainLogo from '../ui/OpsBrainLogo';
 
@@ -43,7 +44,6 @@ const BRAND_COLORS = {
   SECONDARY_BLUE: '#1E3A8A',
   ACCENT_CYAN: '#06B6D4',
   ACCENT_GREEN: '#10B981',
-  NEUTRAL_LIGHT: '#F3F4F6',
   ERROR: '#dc2626',
 };
 
@@ -55,41 +55,35 @@ const NAV_CONFIG = {
     { 
       label: 'Dashboard', 
       path: '/', 
-      icon: SpaceDashboardRoundedIcon, 
-      color: BRAND_COLORS.SECONDARY_BLUE 
+      icon: SpaceDashboardRoundedIcon 
     },
     { 
       label: 'Job Recommendation', 
       path: '/job-recommendation', 
-      icon: RecommendRoundedIcon, 
-      color: BRAND_COLORS.SECONDARY_BLUE 
+      icon: WorkOutlineRoundedIcon 
     },
     { 
       label: 'Application Tracker', 
       path: '/application-tracker', 
-      icon: ViewKanbanRoundedIcon, 
-      color: BRAND_COLORS.ACCENT_CYAN 
+      icon: AssignmentTurnedInRoundedIcon
     },
     { 
       label: 'AI Resume Studio', 
       path: '/ai-resume-studio', 
-      icon: AutoFixHighRoundedIcon, 
-      color: BRAND_COLORS.SECONDARY_BLUE,
+      icon: DescriptionRoundedIcon,
       badge: { label: 'AI', color: BRAND_COLORS.ACCENT_CYAN }
     },
     { 
       label: 'Interview Practice', 
       path: '/interview-practice', 
-      icon: MicRoundedIcon, 
-      color: BRAND_COLORS.ACCENT_GREEN 
+      icon: RecordVoiceOverRoundedIcon
     },
   ],
   account: [
     { 
       label: 'Profile', 
       path: '/profile', 
-      icon: AccountCircleRoundedIcon, 
-      color: BRAND_COLORS.ACCENT_CYAN,
+      icon: PersonOutlineRoundedIcon,
       showIncompleteIndicator: true
     },
     { 
@@ -101,23 +95,20 @@ const NAV_CONFIG = {
     { 
       label: 'Settings', 
       path: '/settings', 
-      icon: TuneRoundedIcon, 
-      color: '#475569' 
+      icon: SettingsRoundedIcon
     },
   ],
   admin: [
     { 
       label: 'Admin', 
       path: '/admin', 
-      icon: AdminPanelSettingsRoundedIcon, 
-      color: BRAND_COLORS.ERROR,
+      icon: AdminPanelSettingsRoundedIcon,
       requiresAdmin: true
     },
     { 
       label: 'Token Usage', 
       path: '/admin/token-usage', 
-      icon: DataUsageRoundedIcon, 
-      color: BRAND_COLORS.ACCENT_GREEN,
+      icon: DataUsageRoundedIcon,
       requiresAdmin: true
     },
   ],
@@ -125,8 +116,7 @@ const NAV_CONFIG = {
     { 
       label: 'Report an Issue', 
       path: '/report-issue', 
-      icon: BugReportRoundedIcon, 
-      color: BRAND_COLORS.ACCENT_CYAN 
+      icon: SupportAgentRoundedIcon 
     },
   ],
 };
@@ -135,7 +125,7 @@ const USER_MENU_CONFIG = [
   { label: 'Profile', path: '/profile', icon: AccountCircleRoundedIcon },
   { label: 'Usage & Limits', path: '/usage', icon: DataUsageRoundedIcon },
   { label: 'Subscription & Billing', path: '/pricing', icon: CreditCardRoundedIcon },
-  { label: 'Settings', path: '/settings', icon: TuneRoundedIcon },
+  { label: 'Settings', path: '/settings', icon: SettingsRoundedIcon },
   { label: 'Help & Support', path: '/help', icon: HelpOutlineRoundedIcon },
 ];
 
@@ -171,7 +161,7 @@ function NavItem({
   label, 
   path, 
   icon: Icon, 
-  color, 
+  danger = false,
   badge, 
   location, 
   incomplete,
@@ -179,7 +169,7 @@ function NavItem({
 }) {
   const exact = path === '/';
   const isActive = exact ? location.pathname === '/' : location.pathname.startsWith(path);
-  const iconColor = color || BRAND_COLORS.SECONDARY_BLUE;
+  const activeColor = danger ? 'var(--error)' : 'var(--sidebar-item-active-color)';
 
   const content = (
     <>
@@ -188,20 +178,20 @@ function NavItem({
         sx={{
           width: 34,
           height: 34,
-          borderRadius: '10px',
+          borderRadius: '9px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
-          bgcolor: isActive ? `${iconColor}1f` : 'rgba(0,0,0,0.025)',
-          border: isActive ? `1px solid ${iconColor}26` : '1px solid transparent',
+          bgcolor: isActive ? 'var(--sidebar-item-active-bg)' : 'transparent',
+          border: isActive ? '1px solid var(--border-color)' : '1px solid transparent',
           transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         <Icon
           sx={{
-            fontSize: 18,
-            color: isActive ? iconColor : 'var(--text-muted)',
+            fontSize: 19,
+            color: isActive ? activeColor : 'var(--text-muted)',
             transition: 'color 0.18s',
           }}
         />
@@ -245,7 +235,7 @@ function NavItem({
       )}
 
       {/* Incomplete indicator - brand consistent */}
-      {incomplete && !isActive && (
+      {incomplete && !isActive && !danger && (
         <Box
           sx={{
             width: 7,
@@ -270,14 +260,27 @@ function NavItem({
     mb: 0.5,
     textDecoration: 'none',
     position: 'relative',
-    color: isActive ? iconColor : 'var(--text-secondary)',
-    bgcolor: isActive ? `${iconColor}12` : 'transparent',
+    color: isActive ? activeColor : 'var(--text-secondary)',
+    bgcolor: isActive ? 'var(--sidebar-item-active-bg)' : 'transparent',
+    border: `1px solid ${isActive ? 'rgba(30, 58, 138, 0.18)' : 'transparent'}`,
     transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
     cursor: 'pointer',
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      left: -6,
+      top: 8,
+      bottom: 8,
+      width: 3,
+      borderRadius: 999,
+      background: isActive ? 'linear-gradient(180deg, #1E3A8A 0%, #3B82F6 100%)' : 'transparent',
+      opacity: isActive ? 1 : 0,
+      transition: 'opacity 0.18s ease',
+    },
     '&:hover': {
-      bgcolor: isActive ? `${iconColor}18` : 'rgba(0,0,0,0.03)',
-      color: isActive ? iconColor : 'var(--text-primary)',
-      transform: 'translateX(2px)',
+      bgcolor: isActive ? 'var(--sidebar-item-active-bg)' : 'var(--sidebar-item-hover-bg)',
+      color: isActive ? activeColor : 'var(--text-primary)',
+      transform: 'translateX(1px)',
     },
     '&:active': {
       transform: 'scale(0.98)',
@@ -327,6 +330,10 @@ export default function Sidebar() {
   const userMenuOpen = Boolean(userMenuAnchor);
 
   // ─── Handlers ─────────────────────────────────────────────────────────────
+  const openExtensionStore = () => {
+    window.open(CHROME_EXTENSION_WEBSTORE_URL, '_blank', 'noopener,noreferrer');
+  };
+
   const confirmSignOut = () => {
     dispatch(logout());
     navigate('/login', { replace: true });
@@ -350,35 +357,21 @@ export default function Sidebar() {
         top: 0,
         zIndex: 100,
         overflow: 'hidden',
-        // Subtle gradient overlay for depth
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: darkMode 
-            ? 'none'
-            : 'linear-gradient(180deg, rgba(255,255,255,0.5) 0%, transparent 100%)',
-          pointerEvents: 'none',
-          zIndex: 0,
-        },
       }}
     >
       {/* ── Logo Section ── */}
       <Box
         sx={{
           px: 2.75,
-          height: 64,
+          height: 72,
           display: 'flex',
           alignItems: 'center',
           flexShrink: 0,
           borderBottom: '1px solid var(--border-color)',
-          bgcolor: 'var(--bg-paper)',
+          bgcolor: 'var(--sidebar-bg)',
         }}
       >
-        <OpsBrainLogo variant="full" height={36} darkMode={darkMode} />
+        <OpsBrainLogo variant="full" height={44} darkMode={darkMode} />
       </Box>
 
       {/* ── Scrollable Nav ── */}
@@ -447,7 +440,7 @@ export default function Sidebar() {
           label="Sign Out"
           path="/logout"
           icon={LogoutRoundedIcon}
-          color={BRAND_COLORS.ERROR}
+          danger
           location={location}
           onClick={() => setSignOutDialogOpen(true)}
         />
@@ -461,7 +454,7 @@ export default function Sidebar() {
           pb: 1.75,
           pt: 1.25,
           borderTop: '1px solid var(--border-color)',
-          bgcolor: 'var(--bg-paper)',
+          bgcolor: '#f8fafc',
         }}
       >
         {/* Theme toggle - streamlined */}
@@ -476,12 +469,12 @@ export default function Sidebar() {
             borderRadius: '11px',
             mb: 1.25,
             cursor: 'pointer',
-            bgcolor: 'rgba(0,0,0,0.018)',
+            bgcolor: 'var(--bg-paper)',
             border: '1px solid var(--border-color)',
             transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
-              bgcolor: 'rgba(0,0,0,0.035)',
-              borderColor: `${BRAND_COLORS.ACCENT_CYAN}40`,
+              bgcolor: 'var(--sidebar-item-hover-bg)',
+              borderColor: 'var(--border-color)',
             },
           }}
         >
@@ -509,7 +502,7 @@ export default function Sidebar() {
               width: 38,
               height: 20,
               borderRadius: '10px',
-              bgcolor: darkMode ? BRAND_COLORS.SECONDARY_BLUE : '#d1d5db',
+              bgcolor: darkMode ? 'var(--primary)' : 'var(--border-color)',
               position: 'relative',
               transition: 'background 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
               flexShrink: 0,
@@ -534,13 +527,14 @@ export default function Sidebar() {
         {/* Chrome Extension CTA - refined */}
         <Box
           sx={{
-            p: 1.75,
+            p: 1.5,
             borderRadius: '12px',
-            background: `linear-gradient(135deg, ${BRAND_COLORS.SECONDARY_BLUE}08 0%, ${BRAND_COLORS.ACCENT_CYAN}08 100%)`,
-            border: `1px solid ${BRAND_COLORS.SECONDARY_BLUE}18`,
+            background: 'linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)',
+            border: '1px solid #dbe3f2',
             mb: 1.25,
             position: 'relative',
             overflow: 'hidden',
+            boxShadow: '0 8px 20px rgba(15, 23, 42, 0.06)',
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.875, mb: 0.75 }}>
@@ -599,6 +593,7 @@ export default function Sidebar() {
           </Typography>
           <Box
             component="button"
+            onClick={openExtensionStore}
             sx={{
               width: '100%',
               py: 0.875,
@@ -644,10 +639,10 @@ export default function Sidebar() {
             bgcolor: 'var(--bg-paper)',
             transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
-              bgcolor: 'rgba(0,0,0,0.025)',
-              borderColor: `${BRAND_COLORS.ACCENT_CYAN}30`,
+              bgcolor: 'var(--sidebar-item-hover-bg)',
+              borderColor: 'var(--border-color)',
               transform: 'translateY(-1px)',
-              boxShadow: `0 2px 8px ${BRAND_COLORS.SECONDARY_BLUE}10`,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
             },
           }}
         >

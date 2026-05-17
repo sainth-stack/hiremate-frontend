@@ -20,10 +20,10 @@ export function ResumeSectionCard({ title, defaultOpen = false, badge, children 
   const isStringTitle = typeof title === 'string';
   
   return (
-    <Card sx={{ mb: 2, borderRadius: 1.5, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', overflow: 'visible', border: '1px solid var(--border-color)' }}>
+    <Card sx={{ mb: 2, borderRadius: 1.5, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', overflow: 'visible', border: '1px solid var(--border-color)', bgcolor: 'var(--bg-paper)' }}>
       <Box
         onClick={() => setOpen((o) => !o)}
-        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, py: 1.75, cursor: 'pointer', '&:hover': { bgcolor: 'rgba(0,0,0,0.02)' } }}
+        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, py: 1.75, cursor: 'pointer', '&:hover': { bgcolor: 'var(--sidebar-item-hover-bg)' } }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0, flex: 1 }}>
           {isStringTitle ? (
@@ -62,7 +62,7 @@ export function TemplateThumbnail({ id, label, img, selected, onSelect, ats }) {
         cursor: 'pointer',
         border: 2,
         borderColor: selected ? 'var(--primary)' : 'var(--border-color)',
-        bgcolor: selected ? 'rgba(51, 94, 222, 0.04)' : 'white',
+        bgcolor: selected ? 'var(--light-blue-bg)' : 'var(--bg-paper)',
         boxShadow: selected ? '0 2px 12px rgba(51, 94, 222, 0.2)' : '0 1px 4px rgba(0,0,0,0.06)',
         transition: 'border-color 0.2s, box-shadow 0.2s, transform 0.15s',
         '&:hover': {
@@ -81,13 +81,13 @@ export function TemplateThumbnail({ id, label, img, selected, onSelect, ats }) {
             alt={label}
             loading="eager"
             onError={() => setImgErr(true)}
-            sx={{ width: '100%', height: 'auto', objectFit: 'contain', flex: 1, p: 0.75, bgcolor: '#fafafa', display: 'block' }}
+            sx={{ width: '100%', height: 'auto', objectFit: 'contain', flex: 1, p: 0.75, bgcolor: 'var(--bg-light)', display: 'block' }}
           />
         ) : (
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: '#fafafa', gap: 0.5, p: 1 }}>
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: 'var(--bg-light)', gap: 0.5, p: 1 }}>
             <Box sx={{ width: '80%', height: 6, bgcolor: bg, borderRadius: 0.5, mb: 0.5 }} />
             {[1, 0.7, 0.7, 0.5, 0.5, 0.5, 0.5].map((w, i) => (
-              <Box key={i} sx={{ width: `${w * 80}%`, height: 3, bgcolor: '#d1d5db', borderRadius: 0.5, mt: i === 2 ? 0.75 : 0 }} />
+              <Box key={i} sx={{ width: `${w * 80}%`, height: 3, bgcolor: 'var(--border-hover)', borderRadius: 0.5, mt: i === 2 ? 0.75 : 0 }} />
             ))}
           </Box>
         )}
@@ -97,7 +97,7 @@ export function TemplateThumbnail({ id, label, img, selected, onSelect, ats }) {
               {label}
             </Typography>
             {ats && (
-              <Typography sx={{ fontSize: '0.6rem', color: '#059669', fontWeight: 600, fontFamily: 'var(--font-family)' }}>ATS</Typography>
+              <Typography sx={{ fontSize: '0.6rem', color: 'var(--success)', fontWeight: 600, fontFamily: 'var(--font-family)' }}>ATS</Typography>
             )}
           </Box>
           {selected ? <CheckCircleRoundedIcon sx={{ color: 'var(--primary)', fontSize: 18, flexShrink: 0 }} /> : null}
@@ -179,13 +179,13 @@ export function BulletEditor({ value, onChange, bulletChar = '•' }) {
   };
 
   return (
-    <Box sx={{ border: '1px solid #D1D5DB', borderRadius: 1, bgcolor: 'white', overflow: 'hidden', '&:focus-within': { borderColor: '#2563EB', boxShadow: '0 0 0 2px rgba(37,99,235,0.1)' } }}>
+    <Box sx={{ border: '1px solid var(--border-hover)', borderRadius: 1, bgcolor: 'var(--bg-paper)', overflow: 'hidden', '&:focus-within': { borderColor: 'var(--primary)', boxShadow: '0 0 0 2px rgba(37,99,235,0.1)' } }}>
       {lines.map((line, i) => (
         <Box
           key={i}
-          sx={{ display: 'flex', alignItems: 'flex-start', borderBottom: '1px solid #F9FAFB', '&:last-of-type': { borderBottom: 'none' }, '&:hover': { bgcolor: '#FAFAFA' }, '&:hover .bdel': { opacity: 1 } }}
+          sx={{ display: 'flex', alignItems: 'flex-start', borderBottom: '1px solid var(--bg-light)', '&:last-of-type': { borderBottom: 'none' }, '&:hover': { bgcolor: 'var(--bg-light)' }, '&:hover .bdel': { opacity: 1 } }}
         >
-          <Box sx={{ px: 1.5, pt: '10px', color: '#9CA3AF', fontSize: '0.875rem', flexShrink: 0, userSelect: 'none', lineHeight: 1, fontWeight: 500 }}>
+          <Box sx={{ px: 1.5, pt: '10px', color: 'var(--text-muted)', fontSize: '0.875rem', flexShrink: 0, userSelect: 'none', lineHeight: 1, fontWeight: 500 }}>
             {bulletChar}
           </Box>
           <TextField
@@ -200,9 +200,9 @@ export function BulletEditor({ value, onChange, bulletChar = '•' }) {
             InputProps={{ disableUnderline: true }}
             sx={{
               flex: 1,
-              '& .MuiInputBase-root': { px: 0, py: '8px', fontSize: '0.875rem', lineHeight: 1.55, fontFamily: 'var(--font-family)', color: '#111827', bgcolor: 'transparent' },
+              '& .MuiInputBase-root': { px: 0, py: '8px', fontSize: '0.875rem', lineHeight: 1.55, fontFamily: 'var(--font-family)', color: 'var(--text-primary)', bgcolor: 'transparent' },
               '& textarea': { resize: 'none' },
-              '& .MuiInputBase-input::placeholder': { color: '#C4C9D4', opacity: 1, fontSize: '0.8rem' },
+              '& .MuiInputBase-input::placeholder': { color: 'var(--placeholder)', opacity: 1, fontSize: '0.8rem' },
             }}
           />
           <IconButton
@@ -210,7 +210,7 @@ export function BulletEditor({ value, onChange, bulletChar = '•' }) {
             size="small"
             tabIndex={-1}
             onClick={() => removeLine(i)}
-            sx={{ opacity: 0, transition: 'opacity 0.12s', color: '#E5E7EB', '&:hover': { color: '#EF4444', bgcolor: 'transparent' }, m: '4px', flexShrink: 0 }}
+            sx={{ opacity: 0, transition: 'opacity 0.12s', color: 'var(--border-hover)', '&:hover': { color: 'var(--error)', bgcolor: 'transparent' }, m: '4px', flexShrink: 0 }}
           >
             <DeleteOutlinedIcon sx={{ fontSize: 14 }} />
           </IconButton>
@@ -218,7 +218,7 @@ export function BulletEditor({ value, onChange, bulletChar = '•' }) {
       ))}
       <Box
         onClick={addLine}
-        sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 1.5, py: 0.75, cursor: 'pointer', bgcolor: '#F9FAFB', color: '#9CA3AF', fontSize: '0.75rem', fontFamily: 'var(--font-family)', borderTop: '1px dashed #E5E7EB', '&:hover': { bgcolor: '#F3F4F6', color: '#374151' } }}
+        sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 1.5, py: 0.75, cursor: 'pointer', bgcolor: 'var(--bg-light)', color: 'var(--text-muted)', fontSize: '0.75rem', fontFamily: 'var(--font-family)', borderTop: '1px dashed var(--border-hover)', '&:hover': { bgcolor: 'var(--sidebar-item-hover-bg)', color: 'var(--text-secondary)' } }}
       >
         <AddRoundedIcon sx={{ fontSize: 14 }} /> Add bullet point
       </Box>
@@ -229,9 +229,9 @@ export function BulletEditor({ value, onChange, bulletChar = '•' }) {
 export function KeywordMatchCompact({ keywordCount = 0, totalKeywords = 0, matchPct = 0 }) {
   const pct = totalKeywords > 0 ? Math.round((keywordCount / totalKeywords) * 100) : matchPct;
   if (totalKeywords === 0 && matchPct === 0) return null;
-  const color = pct >= 85 ? '#059669' : pct >= 65 ? '#D97706' : '#DC2626';
-  const bgColor = pct >= 85 ? '#ECFDF5' : pct >= 65 ? '#FFFBEB' : '#FEF2F2';
-  const borderColor = pct >= 85 ? '#A7F3D0' : pct >= 65 ? '#FDE68A' : '#FECACA';
+  const color = pct >= 85 ? 'var(--success)' : pct >= 65 ? 'var(--warning)' : 'var(--error)';
+  const bgColor = pct >= 85 ? 'var(--success-bg)' : pct >= 65 ? 'var(--warning-bg)' : 'var(--error-bg)';
+  const borderColor = pct >= 85 ? 'var(--success-bk)' : pct >= 65 ? 'var(--warning-light)' : 'var(--error-bk)';
   const circumference = 2 * Math.PI * 13;
   const dash = (pct / 100) * circumference;
   return (
@@ -267,7 +267,7 @@ export function KeywordMatchCompact({ keywordCount = 0, totalKeywords = 0, match
         <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color, lineHeight: 1, fontFamily: 'var(--font-family)' }}>
           {pct}% match
         </Typography>
-        <Typography sx={{ fontSize: '0.65rem', color: '#6B7280', lineHeight: 1.2, mt: 0.25, fontFamily: 'var(--font-family)' }}>
+        <Typography sx={{ fontSize: '0.65rem', color: 'var(--text-muted)', lineHeight: 1.2, mt: 0.25, fontFamily: 'var(--font-family)' }}>
           {keywordCount}/{totalKeywords} keywords
         </Typography>
       </Box>
@@ -333,7 +333,7 @@ export function SkillCategoryEditor({ categoryName, skills = [], onChange, onRem
         gap: 1.5,
         p: 2.5,
         borderRadius: 2,
-        bgcolor: '#fff',
+        bgcolor: 'var(--bg-paper)',
         border: '1px solid var(--border-color)',
         boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
       }}
@@ -356,7 +356,7 @@ export function SkillCategoryEditor({ categoryName, skills = [], onChange, onRem
                 borderRadius: 1,
                 px: 1.5,
                 py: 0.75,
-                bgcolor: 'rgba(51, 94, 222, 0.04)',
+                bgcolor: 'var(--light-blue-bg)',
                 width: '100%',
               }}
             />
@@ -373,7 +373,7 @@ export function SkillCategoryEditor({ categoryName, skills = [], onChange, onRem
                 borderRadius: 1,
                 transition: 'all 0.15s',
                 '&:hover': {
-                  bgcolor: 'rgba(51, 94, 222, 0.06)',
+                  bgcolor: 'var(--light-blue-bg)',
                 },
               }}
             >
@@ -394,7 +394,7 @@ export function SkillCategoryEditor({ categoryName, skills = [], onChange, onRem
                   height: 20,
                   fontSize: '0.6875rem',
                   fontWeight: 600,
-                  bgcolor: 'rgba(51, 94, 222, 0.08)',
+                  bgcolor: 'var(--light-blue-bg-08)',
                   color: 'var(--primary)',
                   '& .MuiChip-label': { px: 0.75, py: 0 }
                 }}
@@ -410,8 +410,8 @@ export function SkillCategoryEditor({ categoryName, skills = [], onChange, onRem
             color: 'var(--text-muted)',
             flexShrink: 0,
             '&:hover': {
-              color: '#DC2626',
-              bgcolor: 'rgba(220, 38, 38, 0.08)',
+              color: 'var(--error)',
+              bgcolor: 'var(--error-bg)',
             },
             '&:disabled': {
               opacity: 0.3,
@@ -434,8 +434,8 @@ export function SkillCategoryEditor({ categoryName, skills = [], onChange, onRem
               fontFamily: 'var(--font-family)',
               fontSize: '0.8125rem',
               height: 28,
-              bgcolor: 'rgba(51, 94, 222, 0.06)',
-              border: '1px solid rgba(51, 94, 222, 0.2)',
+              bgcolor: 'var(--light-blue-bg)',
+              border: '1px solid var(--light-blue-bg-08)',
               color: 'var(--text-primary)',
               '& .MuiChip-label': {
                 px: 1.25
@@ -444,7 +444,7 @@ export function SkillCategoryEditor({ categoryName, skills = [], onChange, onRem
                 color: 'var(--text-muted)',
                 fontSize: 14,
                 '&:hover': {
-                  color: '#DC2626',
+                  color: 'var(--error)',
                 },
               },
             }}
@@ -464,13 +464,13 @@ export function SkillCategoryEditor({ categoryName, skills = [], onChange, onRem
               height: 28,
               fontSize: '0.8125rem',
               fontFamily: 'var(--font-family)',
-              bgcolor: 'white',
+              bgcolor: 'var(--bg-paper)',
               borderRadius: 1,
               '& fieldset': {
-                borderColor: 'rgba(0, 0, 0, 0.12)',
+                borderColor: 'var(--border-color)',
               },
               '&:hover fieldset': {
-                borderColor: 'rgba(51, 94, 222, 0.4)',
+                borderColor: 'var(--primary)',
               },
               '&.Mui-focused fieldset': {
                 borderWidth: 1.5,

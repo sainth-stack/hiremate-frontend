@@ -45,7 +45,7 @@ const tableCellHeadSx = {
   letterSpacing: '0.02em', py: 1.5,
 };
 
-const inputSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px', bgcolor: '#fff' } };
+const inputSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px', bgcolor: 'var(--bg-paper)' } };
 
 // ─── Plan Form Dialog ─────────────────────────────────────────────────────────
 // Uses UNCONTROLLED inputs (inputRef + defaultValue) so keystrokes cause
@@ -145,26 +145,26 @@ const PlanFormDialog = ({ open, isNewPlan, initialValues, onClose }) => {
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth
       PaperProps={{ sx: { borderRadius: '16px', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' } }}
     >
-      <DialogTitle sx={{ px: 4, py: 3, borderBottom: '1px solid #e2e8f0', bgcolor: '#fff' }}>
+      <DialogTitle sx={{ px: 4, py: 3, borderBottom: '1px solid var(--divider)', bgcolor: 'var(--bg-paper)' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Box sx={{ width: 48, height: 48, borderRadius: '12px', bgcolor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>
+          <Box sx={{ width: 48, height: 48, borderRadius: '12px', bgcolor: 'var(--bg-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
             <SubscriptionsRoundedIcon />
           </Box>
           <Box>
-            <Typography sx={{ fontSize: 18, fontWeight: 700, color: '#1e293b' }}>
+            <Typography sx={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>
               {isNewPlan ? 'Add New Plan' : 'Edit Plan Details'}
             </Typography>
-            <Typography variant="caption" sx={{ color: '#64748b', display: 'block' }}>
+            <Typography variant="caption" sx={{ color: 'var(--text-secondary)', display: 'block' }}>
               {isNewPlan ? 'Configure a new subscription tier.' : `Editing "${initialValues?.name}" plan.`}
             </Typography>
           </Box>
-          <IconButton onClick={handleClose} size="small" sx={{ ml: 'auto', color: '#94a3b8', '&:hover': { color: '#ef4444' } }}>
+          <IconButton onClick={handleClose} size="small" sx={{ ml: 'auto', color: 'var(--text-muted)', '&:hover': { color: 'var(--error)' } }}>
             <CloseRoundedIcon />
           </IconButton>
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ p: 0, bgcolor: '#fff' }}>
+      <DialogContent sx={{ p: 0, bgcolor: 'var(--bg-paper)' }}>
         <Box sx={{ p: 4 }}>
           <Stack spacing={4}>
 
@@ -172,7 +172,7 @@ const PlanFormDialog = ({ open, isNewPlan, initialValues, onClose }) => {
             <Box>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={4}>
-                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#334155', mb: 1 }}>Plan Name</Typography>
+                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: 'var(--text-label)', mb: 1 }}>Plan Name</Typography>
                   <TextField
                     fullWidth size="small"
                     inputRef={refs.name}
@@ -185,7 +185,7 @@ const PlanFormDialog = ({ open, isNewPlan, initialValues, onClose }) => {
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#334155', mb: 1 }}>Pricing (paise)</Typography>
+                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: 'var(--text-label)', mb: 1 }}>Pricing (paise)</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <TextField
                       type="number" size="small"
@@ -194,7 +194,7 @@ const PlanFormDialog = ({ open, isNewPlan, initialValues, onClose }) => {
                       error={Boolean(errors.amount)}
                       helperText={errors.amount}
                       sx={{ flex: 1, ...inputSx }}
-                      InputProps={{ startAdornment: <Typography variant="caption" sx={{ color: '#94a3b8', mr: 1, fontWeight: 600 }}>₹</Typography> }}
+                      InputProps={{ startAdornment: <Typography variant="caption" sx={{ color: 'var(--text-muted)', mr: 1, fontWeight: 600 }}>₹</Typography> }}
                     />
                     <Typography sx={{ fontSize: 14, fontWeight: 700, color: 'var(--primary)', minWidth: 80, whiteSpace: 'nowrap' }}>
                       = ₹{(Number(amount) / 100).toFixed(2)}
@@ -203,21 +203,21 @@ const PlanFormDialog = ({ open, isNewPlan, initialValues, onClose }) => {
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#334155', mb: 1 }}>Visibility</Typography>
-                  <Box sx={{ height: 40, display: 'flex', alignItems: 'center', px: 2, borderRadius: '8px', border: '1px solid #e2e8f0', bgcolor: isActive ? '#f0fdf4' : '#fff' }}>
+                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: 'var(--text-label)', mb: 1 }}>Visibility</Typography>
+                  <Box sx={{ height: 40, display: 'flex', alignItems: 'center', px: 2, borderRadius: '8px', border: '1px solid var(--divider)', bgcolor: isActive ? 'var(--success-bg)' : 'var(--bg-paper)' }}>
                     <FormControlLabel
                       control={<Checkbox checked={isActive} onChange={(e) => setIsActive(e.target.checked)} color="success" size="small" />}
-                      label={<Typography sx={{ fontSize: 13, fontWeight: 600, color: isActive ? '#15803d' : '#64748b' }}>{isActive ? 'Active & visible' : 'Hidden from users'}</Typography>}
+                      label={<Typography sx={{ fontSize: 13, fontWeight: 600, color: isActive ? 'var(--success-dark)' : 'var(--text-secondary)' }}>{isActive ? 'Active & visible' : 'Hidden from users'}</Typography>}
                     />
                   </Box>
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#334155', mb: 1 }}>Featured Plan</Typography>
-                  <Box sx={{ height: 40, display: 'flex', alignItems: 'center', px: 2, borderRadius: '8px', border: '1px solid #e2e8f0', bgcolor: isFeatured ? 'var(--light-blue-bg-08)' : '#fff' }}>
+                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: 'var(--text-label)', mb: 1 }}>Featured Plan</Typography>
+                  <Box sx={{ height: 40, display: 'flex', alignItems: 'center', px: 2, borderRadius: '8px', border: '1px solid var(--divider)', bgcolor: isFeatured ? 'var(--light-blue-bg-08)' : 'var(--bg-paper)' }}>
                     <FormControlLabel
                       control={<Checkbox checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} color="primary" size="small" />}
-                      label={<Typography sx={{ fontSize: 13, fontWeight: 600, color: isFeatured ? 'var(--primary)' : '#64748b' }}>{isFeatured ? 'Most Popular' : 'Standard Plan'}</Typography>}
+                      label={<Typography sx={{ fontSize: 13, fontWeight: 600, color: isFeatured ? 'var(--primary)' : 'var(--text-secondary)' }}>{isFeatured ? 'Most Popular' : 'Standard Plan'}</Typography>}
                     />
                   </Box>
                 </Grid>
@@ -247,11 +247,11 @@ const PlanFormDialog = ({ open, isNewPlan, initialValues, onClose }) => {
 
             {/* Marketing Details */}
             <Box>
-              <Typography sx={{ fontSize: 15, fontWeight: 700, color: '#1e293b', mb: 0.5 }}>Marketing Details</Typography>
-              <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mb: 2 }}>Describe the plan for your users.</Typography>
+              <Typography sx={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', mb: 0.5 }}>Marketing Details</Typography>
+              <Typography variant="caption" sx={{ color: 'var(--text-secondary)', display: 'block', mb: 2 }}>Describe the plan for your users.</Typography>
               <Stack spacing={3}>
                 <Box>
-                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#334155', mb: 1 }}>Short Summary</Typography>
+                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: 'var(--text-label)', mb: 1 }}>Short Summary</Typography>
                   <TextField
                     fullWidth multiline rows={2}
                     inputRef={refs.description}
@@ -263,13 +263,13 @@ const PlanFormDialog = ({ open, isNewPlan, initialValues, onClose }) => {
                   />
                 </Box>
                 <Box>
-                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#334155', mb: 1 }}>Marketing Bullet Points</Typography>
+                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: 'var(--text-label)', mb: 1 }}>Marketing Bullet Points</Typography>
                   <TextField
                     fullWidth multiline rows={5}
                     inputRef={refs.features_str}
                     defaultValue={initialValues?.features_str || ''}
                     placeholder={'Feature 1\nFeature 2\n...'}
-                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', bgcolor: '#fff', fontSize: 14 } }}
+                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', bgcolor: 'var(--bg-paper)', fontSize: 14 } }}
                   />
                 </Box>
               </Stack>
@@ -279,8 +279,8 @@ const PlanFormDialog = ({ open, isNewPlan, initialValues, onClose }) => {
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 4, pt: 0, gap: 2, justifyContent: 'flex-end', bgcolor: '#fff' }}>
-        <Button onClick={handleClose} sx={{ textTransform: 'none', fontWeight: 600, color: '#64748b', '&:hover': { bgcolor: '#f1f5f9' } }}>
+      <DialogActions sx={{ p: 4, pt: 0, gap: 2, justifyContent: 'flex-end', bgcolor: 'var(--bg-paper)' }}>
+        <Button onClick={handleClose} sx={{ textTransform: 'none', fontWeight: 600, color: 'var(--text-secondary)', '&:hover': { bgcolor: 'var(--bg-light)' } }}>
           Cancel
         </Button>
         <Button
@@ -409,7 +409,7 @@ const PlanManagement = () => {
                         <IconButton size="small" onClick={() => handleEditClick(plan)} sx={{ color: 'var(--text-muted)', '&:hover': { color: 'var(--primary)', bgcolor: 'var(--light-blue-bg-08)' } }}>
                           <EditRoundedIcon fontSize="small" />
                         </IconButton>
-                        <IconButton size="small" onClick={() => setConfirmDelete(plan)} sx={{ color: 'var(--text-muted)', '&:hover': { color: '#ef4444', bgcolor: '#fff1f2' } }}>
+                        <IconButton size="small" onClick={() => setConfirmDelete(plan)} sx={{ color: 'var(--text-muted)', '&:hover': { color: 'var(--error)', bgcolor: 'var(--error-bg)' } }}>
                           <DeleteOutlineRoundedIcon fontSize="small" />
                         </IconButton>
                       </Box>
@@ -438,10 +438,10 @@ const PlanManagement = () => {
         PaperProps={{ sx: { borderRadius: '16px' } }}
       >
         <DialogTitle sx={{ px: 3, pt: 3, pb: 1 }}>
-          <Typography sx={{ fontSize: 17, fontWeight: 700, color: '#1e293b' }}>Delete Plan?</Typography>
+          <Typography sx={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)' }}>Delete Plan?</Typography>
         </DialogTitle>
         <DialogContent sx={{ px: 3, pb: 2 }}>
-          <Typography sx={{ fontSize: 14, color: '#64748b', lineHeight: 1.7 }}>
+          <Typography sx={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
             You are about to permanently delete the <strong>{confirmDelete?.name}</strong> plan.
             This cannot be undone and may affect existing subscribers.
           </Typography>
@@ -449,7 +449,7 @@ const PlanManagement = () => {
         <DialogActions sx={{ px: 3, pb: 3, gap: 1.5 }}>
           <Button
             onClick={() => setConfirmDelete(null)}
-            sx={{ textTransform: 'none', fontWeight: 600, color: '#64748b', '&:hover': { bgcolor: '#f1f5f9' } }}
+            sx={{ textTransform: 'none', fontWeight: 600, color: 'var(--text-secondary)', '&:hover': { bgcolor: 'var(--bg-light)' } }}
           >
             Cancel
           </Button>
@@ -458,7 +458,7 @@ const PlanManagement = () => {
             onClick={() => deleteMutation.mutate(confirmDelete?.id)}
             disabled={deleteMutation.isPending}
             startIcon={deleteMutation.isPending ? <CircularProgress size={16} color="inherit" /> : <DeleteOutlineRoundedIcon />}
-            sx={{ textTransform: 'none', fontWeight: 700, bgcolor: '#ef4444', borderRadius: '10px', px: 3, boxShadow: 'none', '&:hover': { bgcolor: '#dc2626', boxShadow: 'none' } }}
+            sx={{ textTransform: 'none', fontWeight: 700, bgcolor: 'var(--error)', borderRadius: '10px', px: 3, boxShadow: 'none', '&:hover': { bgcolor: 'var(--error-dark)', boxShadow: 'none' } }}
           >
             {deleteMutation.isPending ? 'Deleting...' : 'Delete Plan'}
           </Button>
