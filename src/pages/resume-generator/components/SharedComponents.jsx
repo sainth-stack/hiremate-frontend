@@ -276,214 +276,133 @@ export function KeywordMatchCompact({ keywordCount = 0, totalKeywords = 0, match
 }
 
 /**
- * SkillCategoryEditor - Simplified chip-based skill editor
- * categoryName: string - name of the skill category (left side label)
- * skills: string[] - array of skill names
- * onChange: (categoryName: string, skills: string[]) => void
- * onRemove: () => void - callback to remove entire category
- * canRemove: boolean - whether the remove button should be enabled
+ * SkillRowEditor — simple category + comma-separated skills (matches resume preview format).
  */
-export function SkillCategoryEditor({ categoryName, skills = [], onChange, onRemove, canRemove = true }) {
-  const [inputValue, setInputValue] = useState('');
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [tempCategoryName, setTempCategoryName] = useState(categoryName);
+export function SkillRowEditor({ categoryName, skills = [], onChange, onRemove, canRemove = true }) {
+  const [skillsText, setSkillsText] = React.useState(() => (skills || []).join(', '));
 
-  const handleAddSkill = () => {
-    const trimmed = inputValue.trim();
-    if (trimmed && !skills.includes(trimmed)) {
-      onChange(categoryName, [...skills, trimmed]);
-      setInputValue('');
-    }
-  };
+  React.useEffect(() => {
+    setSkillsText((skills || []).join(', '));
+  }, [skills]);
 
-  const handleRemoveSkill = (skillToRemove) => {
-    onChange(categoryName, skills.filter(s => s !== skillToRemove));
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddSkill();
-    }
-  };
-
-  const handleSaveCategoryName = () => {
-    const trimmed = tempCategoryName.trim();
-    if (trimmed) {
-      onChange(trimmed, skills);
-      setIsEditingName(false);
-    }
-  };
-
-  const handleCategoryNameKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleSaveCategoryName();
-    } else if (e.key === 'Escape') {
-      setTempCategoryName(categoryName);
-      setIsEditingName(false);
-    }
+  const commitSkills = (text) => {
+    const parsed = text
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    onChange(categoryName, parsed);
   };
 
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 1.5,
-        p: 2.5,
-        borderRadius: 2,
-        bgcolor: 'var(--bg-paper)',
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', sm: 'minmax(120px, 28%) 1fr auto' },
+        gap: 1.25,
+        alignItems: 'start',
+        p: 1.5,
+        borderRadius: 1.5,
         border: '1px solid var(--border-color)',
-        boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
+        bgcolor: 'var(--bg-light)',
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box sx={{ flex: 1, minWidth: 0, mr: 2 }}>
-          {isEditingName ? (
-            <InputBase
-              autoFocus
-              value={tempCategoryName}
-              onChange={(e) => setTempCategoryName(e.target.value)}
-              onKeyDown={handleCategoryNameKeyDown}
-              onBlur={handleSaveCategoryName}
-              sx={{
-                fontFamily: 'var(--font-family)',
-                fontWeight: 600,
-                fontSize: '0.9375rem',
-                color: 'var(--text-primary)',
-                border: '1.5px solid var(--primary)',
-                borderRadius: 1,
-                px: 1.5,
-                py: 0.75,
-                bgcolor: 'var(--light-blue-bg)',
-                width: '100%',
-              }}
-            />
-          ) : (
-            <Box 
-              onClick={() => setIsEditingName(true)}
-              sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 1,
-                cursor: 'pointer',
-                px: 1.5,
-                py: 0.75,
-                borderRadius: 1,
-                transition: 'all 0.15s',
-                '&:hover': {
-                  bgcolor: 'var(--light-blue-bg)',
-                },
-              }}
-            >
-              <Typography
-                sx={{
-                  fontFamily: 'var(--font-family)',
-                  fontWeight: 600,
-                  fontSize: '0.9375rem',
-                  color: 'var(--text-primary)',
-                }}
-              >
-                {categoryName}
-              </Typography>
-              <Chip
-                label={`${skills.length} skill${skills.length !== 1 ? 's' : ''}`}
-                size="small"
-                sx={{
-                  height: 20,
-                  fontSize: '0.6875rem',
-                  fontWeight: 600,
-                  bgcolor: 'var(--light-blue-bg-08)',
-                  color: 'var(--primary)',
-                  '& .MuiChip-label': { px: 0.75, py: 0 }
-                }}
-              />
-            </Box>
-          )}
-        </Box>
-        <IconButton
-          size="small"
-          onClick={onRemove}
-          disabled={!canRemove}
-          sx={{
-            color: 'var(--text-muted)',
-            flexShrink: 0,
-            '&:hover': {
-              color: 'var(--error)',
-              bgcolor: 'var(--error-bg)',
-            },
-            '&:disabled': {
-              opacity: 0.3,
-            },
-          }}
-        >
-          <DeleteOutlinedIcon fontSize="small" />
-        </IconButton>
-      </Box>
+      <TextField
+        size="small"
+        label="Category"
+        placeholder="Languages"
+        value={categoryName || ''}
+        onChange={(e) => onChange(e.target.value, skills)}
+        sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'var(--bg-paper)', fontFamily: 'var(--font-family)' } }}
+      />
+      <TextField
+        size="small"
+        label="Skills (comma-separated)"
+        placeholder="JavaScript, Python, SQL"
+        value={skillsText}
+        onChange={(e) => setSkillsText(e.target.value)}
+        onBlur={() => commitSkills(skillsText)}
+        sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'var(--bg-paper)', fontFamily: 'var(--font-family)' } }}
+      />
+      <IconButton
+        size="small"
+        onClick={onRemove}
+        disabled={!canRemove}
+        sx={{ mt: { sm: 0.5 }, color: 'var(--text-muted)', '&:hover': { color: 'var(--error)' } }}
+      >
+        <DeleteOutlinedIcon fontSize="small" />
+      </IconButton>
+    </Box>
+  );
+}
 
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, alignItems: 'center', minHeight: 32 }}>
-        {skills.map((skill, idx) => (
-          <Chip
-            key={idx}
-            label={skill}
-            onDelete={() => handleRemoveSkill(skill)}
-            deleteIcon={<CloseRoundedIcon sx={{ fontSize: '14px !important' }} />}
-            size="small"
+/** @deprecated Use SkillRowEditor */
+export function SkillCategoryEditor(props) {
+  return <SkillRowEditor {...props} />;
+}
+
+/**
+ * EditableSectionCard — collapsible section with renameable header and optional remove.
+ */
+export function EditableSectionCard({
+  label,
+  onLabelChange,
+  onRemove,
+  canRemove = true,
+  badge,
+  defaultOpen = false,
+  children,
+}) {
+  return (
+    <ResumeSectionCard
+      defaultOpen={defaultOpen}
+      title={
+        <Box
+          onClick={(e) => e.stopPropagation()}
+          sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, minWidth: 0 }}
+        >
+          <InputBase
+            value={label || ''}
+            onChange={(e) => onLabelChange?.(e.target.value)}
+            placeholder="Section name"
             sx={{
+              flex: 1,
+              minWidth: 0,
               fontFamily: 'var(--font-family)',
-              fontSize: '0.8125rem',
-              height: 28,
-              bgcolor: 'var(--light-blue-bg)',
-              border: '1px solid var(--light-blue-bg-08)',
+              fontWeight: 600,
+              fontSize: '0.9375rem',
               color: 'var(--text-primary)',
-              '& .MuiChip-label': {
-                px: 1.25
-              },
-              '& .MuiChip-deleteIcon': {
-                color: 'var(--text-muted)',
-                fontSize: 14,
-                '&:hover': {
-                  color: 'var(--error)',
-                },
+              '& input': {
+                padding: '2px 6px',
+                borderRadius: 1,
+                '&:focus': { bgcolor: 'rgba(51, 94, 222, 0.06)', outline: '1.5px solid var(--primary)' },
               },
             }}
           />
-        ))}
-        <TextField
-          size="small"
-          placeholder={skills.length === 0 ? "Type a skill and press Enter..." : "Add another..."}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={handleAddSkill}
-          sx={{
-            minWidth: 140,
-            flex: '0 1 auto',
-            '& .MuiOutlinedInput-root': {
-              height: 28,
-              fontSize: '0.8125rem',
-              fontFamily: 'var(--font-family)',
-              bgcolor: 'var(--bg-paper)',
-              borderRadius: 1,
-              '& fieldset': {
-                borderColor: 'var(--border-color)',
-              },
-              '&:hover fieldset': {
-                borderColor: 'var(--primary)',
-              },
-              '&.Mui-focused fieldset': {
-                borderWidth: 1.5,
-                borderColor: 'var(--primary)',
-              },
-            },
-            '& input::placeholder': {
-              fontSize: '0.8125rem',
-              opacity: 0.6
-            }
-          }}
-        />
-      </Box>
-    </Box>
+        </Box>
+      }
+      badge={
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }} onClick={(e) => e.stopPropagation()}>
+          {typeof badge === 'string' ? (
+            <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontFamily: 'var(--font-family)', mr: 0.5 }}>
+              {badge}
+            </Typography>
+          ) : (
+            badge
+          )}
+          {canRemove && onRemove && (
+            <IconButton
+              size="small"
+              onClick={onRemove}
+              title="Remove section"
+              sx={{ color: 'var(--text-muted)', '&:hover': { color: 'var(--error)' } }}
+            >
+              <DeleteOutlinedIcon fontSize="small" />
+            </IconButton>
+          )}
+        </Box>
+      }
+    >
+      {children}
+    </ResumeSectionCard>
   );
 }

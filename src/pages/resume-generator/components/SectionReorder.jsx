@@ -15,23 +15,15 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { getSectionLabel } from '../resumeSectionConfig';
 
-const SECTION_LABELS = {
-  summary: 'Summary',
-  experience: 'Experience',
-  skills: 'Skills',
-  education: 'Education',
-  projects: 'Projects',
-  certifications: 'Certifications',
-  awards: 'Awards',
-};
-
-function SortableItem({ id, customSections }) {
+function SortableItem({ id, customSections, sectionLabels }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   
-  // Check if this is a custom section
   const customSection = customSections?.find(s => s.sectionId === id);
-  const label = customSection ? customSection.sectionName : (SECTION_LABELS[id] ?? id.charAt(0).toUpperCase() + id.slice(1));
+  const label = customSection
+    ? customSection.sectionName
+    : getSectionLabel(id, sectionLabels);
 
   return (
     <Box
@@ -83,7 +75,7 @@ function SortableItem({ id, customSections }) {
 
 const DEFAULT_ORDER = ['summary', 'experience', 'skills', 'education', 'projects', 'certifications'];
 
-export default function SectionReorder({ sectionsOrder, onReorder, customSections = [] }) {
+export default function SectionReorder({ sectionsOrder, onReorder, customSections = [], sectionLabels }) {
   // Merge default sections with custom section IDs
   const customSectionIds = customSections.filter(s => s.enabled !== false).map(s => s.sectionId);
   const defaultWithCustom = [...DEFAULT_ORDER, ...customSectionIds];
@@ -122,7 +114,7 @@ export default function SectionReorder({ sectionsOrder, onReorder, customSection
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
         {items.map((section) => (
-          <SortableItem key={section} id={section} customSections={customSections} />
+          <SortableItem key={section} id={section} customSections={customSections} sectionLabels={sectionLabels} />
         ))}
       </SortableContext>
     </DndContext>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import ResumeHtmlPreview from '../ResumeHtmlPreview';
@@ -19,6 +19,19 @@ export default function PreviewPanel({
   setJdDialogMode,
   setShowJdUploadDialog,
 }) {
+  const [estimatedPages, setEstimatedPages] = useState(1);
+  const handlePageCountChange = useCallback((n) => setEstimatedPages(n), []);
+
+  const targetLabel = (() => {
+    const t = designConfig?.target_page_count;
+    if (t == null || t === 'auto') return 'Auto';
+    return String(t);
+  })();
+
+  const pageCountHint = targetLabel === 'Auto'
+    ? `${estimatedPages} page${estimatedPages === 1 ? '' : 's'} (auto)`
+    : `${estimatedPages} of ${targetLabel} page${targetLabel === '1' ? '' : 's'}`;
+
   return (
     <Box
       sx={{
@@ -49,30 +62,48 @@ export default function PreviewPanel({
         <Typography sx={{ fontSize: '0.8125rem', color: T.textSecondary, fontFamily: 'var(--font-family)', fontWeight: 500 }}>
           Live preview — updates as you edit
         </Typography>
-        {jobDescription?.trim() ? (
-          <KeywordMatchCompact keywordCount={keywordMatch?.matched_count ?? 0} totalKeywords={keywordMatch?.total_keywords ?? 0} matchPct={keywordMatch?.percent ?? 0} />
-        ) : (
-          <Box
-            onClick={() => { setJdDialogMode('add'); setShowJdUploadDialog(true); }}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Typography
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.75,
-              px: 1.25,
-              py: 0.5,
+              fontSize: '0.75rem',
+              color: T.textSecondary,
+              fontFamily: 'var(--font-family)',
+              fontWeight: 600,
+              whiteSpace: 'nowrap',
+              px: 1,
+              py: 0.35,
               borderRadius: 1,
-              border: `1px dashed rgba(51, 94, 222, 0.35)`,
-              cursor: 'pointer',
-              transition: 'all 0.15s',
-              '&:hover': { bgcolor: T.primarySoft, borderColor: 'rgba(51, 94, 222, 0.55)' },
+              bgcolor: T.previewCanvas,
+              border: `1px solid ${T.border}`,
             }}
           >
-            <AutoAwesomeRoundedIcon sx={{ fontSize: 14, color: T.primary }} />
-            <Typography sx={{ fontSize: '0.8125rem', color: T.primary, fontWeight: 600, fontFamily: 'var(--font-family)', whiteSpace: 'nowrap' }}>
-              Add JD for match score
-            </Typography>
-          </Box>
-        )}
+            {pageCountHint}
+          </Typography>
+          {jobDescription?.trim() ? (
+            <KeywordMatchCompact keywordCount={keywordMatch?.matched_count ?? 0} totalKeywords={keywordMatch?.total_keywords ?? 0} matchPct={keywordMatch?.percent ?? 0} />
+          ) : (
+            <Box
+              onClick={() => { setJdDialogMode('add'); setShowJdUploadDialog(true); }}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.75,
+                px: 1.25,
+                py: 0.5,
+                borderRadius: 1,
+                border: `1px dashed rgba(51, 94, 222, 0.35)`,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                '&:hover': { bgcolor: T.primarySoft, borderColor: 'rgba(51, 94, 222, 0.55)' },
+              }}
+            >
+              <AutoAwesomeRoundedIcon sx={{ fontSize: 14, color: T.primary }} />
+              <Typography sx={{ fontSize: '0.8125rem', color: T.primary, fontWeight: 600, fontFamily: 'var(--font-family)', whiteSpace: 'nowrap' }}>
+                Add JD for match score
+              </Typography>
+            </Box>
+          )}
+        </Box>
       </Box>
       {keywordDetails && !tailoring && (
         <Box sx={{ flexShrink: 0, px: { xs: 1.5, sm: 2 }, pt: 1.5, pb: 0 }}>
@@ -132,6 +163,7 @@ export default function PreviewPanel({
             jobTitle={jobRole}
             jobDescription={jobDescription}
             designConfig={designConfig}
+            onPageCountChange={handlePageCountChange}
           />
         </Box>
       </Box>

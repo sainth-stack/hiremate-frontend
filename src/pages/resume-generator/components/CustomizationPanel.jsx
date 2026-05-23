@@ -27,6 +27,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import DiamondRoundedIcon from '@mui/icons-material/DiamondRounded';
 import SectionReorder from './SectionReorder';
+import { getSectionLabel } from '../resumeSectionConfig';
 import { RESUME_STUDIO_THEME as T } from '../../../utilities/resumeStudioTheme';
 
 const TEMPLATE_ICON_BY_NAME = {
@@ -884,6 +885,26 @@ export default function CustomizationPanel({
           </ToggleButtonGroup>
         </Box>
 
+        <Box sx={{ mb: 1.75 }}>
+          <CtrlLabel>Page Count</CtrlLabel>
+          <ToggleButtonGroup
+            value={String(designConfig.target_page_count ?? 'auto')}
+            exclusive
+            fullWidth
+            size="small"
+            onChange={(_, v) => v && onDesignChange({ target_page_count: v === 'auto' ? 'auto' : parseInt(v, 10) })}
+            sx={tgSx}
+          >
+            <ToggleButton value="auto" sx={tgBtnSx}>Auto</ToggleButton>
+            <ToggleButton value="1" sx={tgBtnSx}>1</ToggleButton>
+            <ToggleButton value="2" sx={tgBtnSx}>2</ToggleButton>
+            <ToggleButton value="3" sx={tgBtnSx}>3</ToggleButton>
+          </ToggleButtonGroup>
+          <Typography sx={{ fontSize: '0.65rem', color: T.textSecondary, mt: 0.75, fontFamily: 'var(--font-family)', lineHeight: 1.4 }}>
+            Auto includes all content and paginates naturally. Fixed counts limit sections and help Fit Page target that length.
+          </Typography>
+        </Box>
+
         <Box sx={{ mb: designConfig.template_id === 'minimalist' ? 1.75 : 0 }}>
           <CtrlLabel>Page Margins</CtrlLabel>
           <Grid container spacing={1.5}>
@@ -1043,7 +1064,7 @@ export default function CustomizationPanel({
             return (
               <Chip
                 key={section}
-                label={section.charAt(0).toUpperCase() + section.slice(1)}
+                label={getSectionLabel(section, designConfig.section_labels)}
                 onClick={() => toggleSection(section)}
                 size="small"
                 sx={{
@@ -1086,6 +1107,7 @@ export default function CustomizationPanel({
           sectionsOrder={designConfig.sections_order ?? []}
           onReorder={onSectionsOrderChange}
           customSections={customSections}
+          sectionLabels={designConfig.section_labels}
         />
 
       </PanelSection>

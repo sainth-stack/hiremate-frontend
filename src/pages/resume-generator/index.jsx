@@ -32,6 +32,7 @@ import EditorPanel from './components/EditorPanel';
 import PreviewPanel from './components/PreviewPanel';
 import PageBreadcrumb from '../../components/common/PageBreadcrumb';
 import { RESUME_STUDIO_THEME as THEME } from '../../utilities/resumeStudioTheme';
+import { getDefaultSectionLabels, migrateLegacySkillsToCategories, normalizeSkillCategories, normalizeCustomSections } from './resumeSectionConfig';
 
 const BACKEND_ORIGIN = BASE_URL.replace(/\/api\/?$/, '');
 
@@ -161,6 +162,8 @@ const DEFAULT_PROFILE = {
   techSkills: [{ ...EMPTY_TECH_SKILL }],
   softSkills: [{ ...EMPTY_SOFT_SKILL }],
   projects: [{ ...EMPTY_PROJECT }],
+  skillCategories: [],
+  customSections: [],
   links: { linkedInUrl: '', githubUrl: '', portfolioUrl: '', otherLinks: [] },
   preferences: { desiredRoles: '', employmentType: [], experienceLevel: '', openToRemote: '', willingToRelocate: '', preferredLocations: [], expectedSalaryRange: '' },
 };
@@ -207,6 +210,7 @@ export default function ResumeGenerator() {
     header_align: 'Center',
     margin_size: 'Medium',
     page_size: 'Letter',
+    target_page_count: 'auto',
     title_width: 20,
     section_separator: true,
     name_capitalize: false,
@@ -215,6 +219,7 @@ export default function ResumeGenerator() {
     section_spacing: 'normal',
     sections_visible: [],
     sections_order: [],
+    section_labels: getDefaultSectionLabels(),
   });
   const designConfigRef = useRef(null);
   const designSaveTimeoutRef = useRef(null);
@@ -406,6 +411,9 @@ export default function ResumeGenerator() {
     if (view !== 'preview') return;
 
     const applyProfile = (p) => {
+      const migratedSkills = migrateLegacySkillsToCategories(p);
+      const skillCategories = normalizeSkillCategories(p.skillCategories || p.skill_categories);
+      const finalSkills = skillCategories.length ? skillCategories : migratedSkills;
       setProfile({
         firstName: p.firstName ?? '',
         lastName: p.lastName ?? '',
@@ -420,6 +428,8 @@ export default function ResumeGenerator() {
         techSkills: Array.isArray(p.techSkills) && p.techSkills.length > 0 ? p.techSkills.map((s) => ({ name: s.name ?? '', level: s.level ?? s.proficiencyLevel ?? '', years: s.years ?? s.yearsOfExperience ?? '' })) : [{ ...EMPTY_TECH_SKILL }],
         softSkills: Array.isArray(p.softSkills) && p.softSkills.length > 0 ? p.softSkills.map((s) => ({ name: s.name ?? '' })) : [{ ...EMPTY_SOFT_SKILL }],
         projects: Array.isArray(p.projects) && p.projects.length > 0 ? p.projects : [{ ...EMPTY_PROJECT }],
+        skillCategories: finalSkills.length ? finalSkills : [{ categoryName: 'Languages', skills: [], order: 0 }],
+        customSections: normalizeCustomSections(p.customSections || p.custom_sections),
         links: p.links ? { linkedInUrl: p.links.linkedInUrl ?? '', githubUrl: p.links.githubUrl ?? '', portfolioUrl: p.links.portfolioUrl ?? '', otherLinks: p.links.otherLinks ?? [] } : { linkedInUrl: '', githubUrl: '', portfolioUrl: '', otherLinks: [] },
         preferences: p.preferences || DEFAULT_PROFILE.preferences,
       });
@@ -495,7 +505,11 @@ export default function ResumeGenerator() {
   useEffect(() => {
     const saved = selectedResume?.design_config;
     if (saved && typeof saved === 'object' && Object.keys(saved).length > 0) {
-      setDesignConfig((prev) => ({ ...prev, ...saved }));
+      setDesignConfig((prev) => ({
+        ...prev,
+        ...saved,
+        section_labels: { ...getDefaultSectionLabels(), ...(saved.section_labels || {}) },
+      }));
     }
     const savedSectionsOrder = selectedResume?.sections_order;
     if (Array.isArray(savedSectionsOrder) && savedSectionsOrder.length > 0) {
@@ -540,6 +554,8 @@ export default function ResumeGenerator() {
       techSkills: Array.isArray(currentProfile.techSkills) ? currentProfile.techSkills.map((s) => ({ name: s.name ?? '', level: s.level ?? '', years: s.years ?? '' })) : [],
       softSkills: Array.isArray(currentProfile.softSkills) ? currentProfile.softSkills.map((s) => ({ name: s.name ?? '' })) : [],
       projects: Array.isArray(currentProfile.projects) ? currentProfile.projects : [],
+      skillCategories: Array.isArray(currentProfile.skillCategories) ? currentProfile.skillCategories : [],
+      customSections: Array.isArray(currentProfile.customSections) ? currentProfile.customSections : [],
       links: currentProfile.links || DEFAULT_PROFILE.links,
       preferences: currentProfile.preferences || DEFAULT_PROFILE.preferences,
     };
@@ -736,26 +752,32 @@ export default function ResumeGenerator() {
     }
   };
 
-  // Auto-Fit: measure iframe content height and scale font+lineHeight to fill one page.
+  // Auto-Fit: measure iframe content height and scale font+lineHeight to fill target page count.
   // WeasyPrint Letter page = 11in = 1056px @ 96dpi with 0.4in margins.
-  // Screen preview body has matching 0.4in padding so scrollHeight ≈ PDF content height.
   const handleAutoFit = useCallback(() => {
-    const PAGE_H = 1056; // Letter @ 96dpi
+    const pageSize = designConfig.page_size || 'Letter';
+    const PAGE_H = pageSize === 'A4' ? 1123 : 1056;
+    const rawTarget = designConfig.target_page_count ?? 'auto';
     const iframe = document.querySelector('iframe[title="Resume Preview"]');
     const body = iframe?.contentDocument?.body;
     if (!body) return;
 
-    // getBoundingClientRect gives rendered height; fall back to scrollHeight
     const rect = body.getBoundingClientRect();
     const contentH = (rect.height > 50 ? rect.height : body.scrollHeight);
     if (contentH <= 50) return;
 
-    // Target 96% so WeasyPrint rounding never overflows to page 2
-    const ratio = (PAGE_H * 0.96) / contentH;
+    let targetPages = 1;
+    if (rawTarget === 'auto') {
+      targetPages = Math.max(1, Math.ceil(contentH / PAGE_H));
+    } else {
+      targetPages = Math.max(1, parseInt(rawTarget, 10) || 1);
+    }
+
+    // Target 96% so WeasyPrint rounding never overflows past the last page
+    const ratio = (PAGE_H * targetPages * 0.96) / contentH;
     const curPt = parseFloat(designConfig.font_size) || 11;
     const curLH = parseFloat(designConfig.line_height) || 1.2;
 
-    // Clamp to safe range and round cleanly
     const newPt = Math.min(13.5, Math.max(8, curPt * ratio));
     const newLH = Math.min(1.6, Math.max(1.0, curLH * ratio));
     handleDesignChange({
@@ -763,7 +785,7 @@ export default function ResumeGenerator() {
       line_height: `${Math.round(newLH * 20) / 20}`,
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [designConfig.font_size, designConfig.line_height]);
+  }, [designConfig.font_size, designConfig.line_height, designConfig.page_size, designConfig.target_page_count]);
 
   // Tailor More: re-run AI generation with current JD to push keyword match above 90%
   const handleTailorMore = async () => {

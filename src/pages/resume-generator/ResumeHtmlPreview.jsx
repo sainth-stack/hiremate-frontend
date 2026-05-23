@@ -14,8 +14,12 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Box, Skeleton } from '@mui/material';
 
-const LETTER_PAGE_HEIGHT = 1056; // Letter page @ 96dpi (11 inches * 96)
 import { previewResumeHtmlAPI } from '../../services';
+
+export const RESUME_PAGE_DIMS = {
+  Letter: { width: 816, height: 1056 },
+  A4: { width: 794, height: 1123 },
+};
 
 const DEBOUNCE_MS = 400;
 
@@ -28,11 +32,15 @@ export default function ResumeHtmlPreview({
   jobTitle = '',
   jobDescription = '',
   designConfig,
+  onPageCountChange,
 }) {
+  const pageSize = designConfig?.page_size || 'Letter';
+  const pageHeight = RESUME_PAGE_DIMS[pageSize]?.height ?? RESUME_PAGE_DIMS.Letter.height;
+
   const [htmlContent, setHtmlContent] = useState('');
   const [firstLoaded, setFirstLoaded] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [contentHeight, setContentHeight] = useState(LETTER_PAGE_HEIGHT);
+  const [contentHeight, setContentHeight] = useState(pageHeight);
 
   const timerRef = useRef(null);
   const abortRef = useRef(null);
@@ -45,12 +53,16 @@ export default function ResumeHtmlPreview({
       const doc = iframe.contentDocument || iframe.contentWindow?.document;
       if (!doc?.body) return;
       const h = doc.body.scrollHeight;
-      if (h > 0) setContentHeight(Math.max(LETTER_PAGE_HEIGHT, h));
+      if (h > 0) setContentHeight(Math.max(pageHeight, h));
     } catch { /* ignore */ }
-  }, []);
+  }, [pageHeight]);
+
+  useEffect(() => {
+    const estimatedPages = Math.max(1, Math.ceil(contentHeight / pageHeight));
+    onPageCountChange?.(estimatedPages);
+  }, [contentHeight, pageHeight, onPageCountChange]);
 
   const fetchHtml = useCallback(async (params) => {
-    // Cancel any in-flight request
     if (abortRef.current) abortRef.current.abort();
     const ctrl = new AbortController();
     abortRef.current = ctrl;
@@ -61,9 +73,7 @@ export default function ResumeHtmlPreview({
       setHtmlContent(typeof data === 'string' ? data : '');
       setFirstLoaded(true);
     } catch (err) {
-      // Ignore aborted requests — a newer one is already in flight
       if (err?.code === 'ERR_CANCELED' || err?.name === 'CanceledError') return;
-      // On unexpected error keep existing content visible
     } finally {
       setRefreshing(false);
     }
@@ -82,12 +92,10 @@ export default function ResumeHtmlPreview({
     };
 
     if (!firstLoaded) {
-      // First render — call immediately (no debounce) so skeleton resolves fast
       fetchHtml(params);
       return;
     }
 
-    // Subsequent changes — debounce to avoid API spam while user types
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
       timerRef.current = null;
@@ -100,7 +108,6 @@ export default function ResumeHtmlPreview({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, templateId, fontFamily, fontSize, lineHeight, jobTitle, jobDescription, designConfig]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
@@ -108,14 +115,11 @@ export default function ResumeHtmlPreview({
     };
   }, []);
 
-  // ── Skeleton: shown only until the very first HTML arrives ──────────────
   if (!firstLoaded) {
     return (
-      <Box sx={{ p: '0.5in', bgcolor: 'white', minHeight: 1056, fontFamily: 'inherit' }}>
-        {/* Name */}
+      <Box sx={{ p: '0.5in', bgcolor: 'white', minHeight: pageHeight, fontFamily: 'inherit' }}>
         <Skeleton variant="text" sx={{ mx: 'auto', mb: 0.5 }} width="55%" height={34} />
         <Skeleton variant="text" sx={{ mx: 'auto', mb: 3 }} width="72%" height={18} />
-        {/* 4 sections */}
         {[['30%', 3], ['28%', 3], ['32%', 4], ['26%', 2]].map(([titleW, lines], si) => (
           <Box key={si} sx={{ mb: 2.5 }}>
             <Skeleton variant="text" width={titleW} height={16} sx={{ mb: 0.5 }} />
@@ -129,8 +133,8 @@ export default function ResumeHtmlPreview({
     );
   }
 
-  // ── Live iframe: Render at full content height, no internal scrolling ──
-  // Parent container (in index.jsx) handles scrolling so preview matches PDF layout exactly
+  const estimatedPages = Math.max(1, Math.ceil(contentHeight / pageHeight));
+
   return (
     <Box sx={{ position: 'relative', width: '100%', bgcolor: 'white' }}>
       <iframe
@@ -150,7 +154,33 @@ export default function ResumeHtmlPreview({
           overflow: 'hidden',
         }}
       />
-      {/* Loading overlay — centered spinner + label, shown while preview is updating */}
+      {estimatedPages > 1 && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: `${contentHeight}px`,
+            pointerEvents: 'none',
+          }}
+        >
+          {Array.from({ length: estimatedPages - 1 }, (_, i) => (
+            <Box
+              key={i}
+              sx={{
+                position: 'absolute',
+                top: `${(i + 1) * pageHeight - 1}px`,
+                left: 0,
+                right: 0,
+                height: '8px',
+                bgcolor: '#e8eaed',
+                boxShadow: '0 -2px 6px rgba(15, 23, 42, 0.06)',
+              }}
+            />
+          ))}
+        </Box>
+      )}
       {refreshing && (
         <Box
           sx={{
