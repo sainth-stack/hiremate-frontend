@@ -13,6 +13,7 @@ import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import PageContainer from '../components/common/PageContainer';
+import { getRemainingTokens, isUnlimitedUser } from '../utilities/tokenUtils';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -98,9 +99,9 @@ export default function Settings() {
                     color: 'var(--text-secondary)',
                   }}
                 >
-                  {user?.token_balance === -1
-                    ? 'Unlimited tokens (Elite plan)'
-                    : `${(user?.token_balance || 0).toLocaleString()} tokens remaining`}
+                  {isUnlimitedUser(user)
+                    ? 'Unlimited tokens'
+                    : `${getRemainingTokens(user).toLocaleString()} tokens remaining`}
                 </Typography>
               </Box>
             </Box>

@@ -10,37 +10,30 @@ import {
 } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { getProfileAPI } from '../../services';
 import AccountBalanceWalletRoundedIcon from '@mui/icons-material/AccountBalanceWalletRounded';
 import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import PageContainer from '../../components/common/PageContainer';
+import {
+  getMonthlyTokenLimit,
+  getRemainingTokens,
+  isUnlimitedUser,
+} from '../../utilities/tokenUtils';
 
 export default function Usage() {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const [timeLeft, setTimeLeft] = useState('');
 
-  // Use React Query to fetch profile (deduplicates calls)
-  const { data: profileResponse } = useQuery({
-    queryKey: ['profile'],
-    queryFn: async () => {
-      const res = await getProfileAPI();
-      return res.data;
-    },
-    staleTime: 30000, // Keep data fresh for 30s
-  });
+  const activeUser = user;
 
-  // Prefer data from React Query, fall back to Redux
-  const activeUser = profileResponse?.user || profileResponse || user;
-
-  // Calculate stats
-  const isUnlimited = activeUser?.token_balance === -1;
-  const totalTokens = activeUser?.monthly_tokens || 25000;
-  const remainingTokens = activeUser?.token_balance || 0;
-  const usedTokens = isUnlimited ? activeUser?.total_tokens_consumed : (totalTokens - remainingTokens);
+  const isUnlimited = isUnlimitedUser(activeUser);
+  const totalTokens = getMonthlyTokenLimit(activeUser);
+  const remainingTokens = getRemainingTokens(activeUser);
+  const usedTokens = isUnlimited
+    ? activeUser?.total_tokens_consumed ?? 0
+    : Math.max(0, totalTokens - remainingTokens);
   const usedPercent = isUnlimited ? 0 : Math.min(100, Math.round((usedTokens / totalTokens) * 100));
 
   useEffect(() => {
@@ -106,11 +99,11 @@ export default function Usage() {
                     Monthly Token Budget
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'var(--text-secondary)' }}>
-                    Resets in {timeLeft}
+                    {isUnlimited ? 'No monthly limit' : `Resets in ${timeLeft || '—'}`}
                   </Typography>
                 </Box>
                 <Typography sx={{ fontWeight: 700, color: 'var(--primary)' }}>
-                  {usedPercent}% used
+                  {isUnlimited ? 'Unlimited' : `${usedPercent}% used`}
                 </Typography>
               </Box>
               

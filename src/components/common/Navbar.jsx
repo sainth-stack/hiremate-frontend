@@ -23,6 +23,7 @@ import AccountBalanceWalletRoundedIcon from '@mui/icons-material/AccountBalanceW
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import { Tooltip } from '@mui/material';
 import { logout } from '../../store/auth/authSlice';
+import { getRemainingTokens, isUnlimitedUser } from '../../utilities/tokenUtils';
 import SignOutConfirmDialog from './SignOutConfirmDialog';
 import logoImg from '../../assets/opsbrain-logo-full.png';
 
@@ -105,8 +106,8 @@ export default function Navbar({ showProfile = true }) {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
             {/* Token Wallet Display */}
             {(() => {
-              const isUnlimited = user?.token_balance === -1;
-              const balance = user?.token_balance || 0;
+              const isUnlimited = isUnlimitedUser(user);
+              const balance = getRemainingTokens(user);
               const isLow = !isUnlimited && balance > 0 && balance < 5000;
               const isEmpty = !isUnlimited && balance <= 0;
               const accentColor = isEmpty ? '#ef4444' : isLow ? '#f59e0b' : '#0891b2';

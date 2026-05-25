@@ -104,9 +104,14 @@ const authSlice = createSlice({
       // Patch token_balance in Redux + localStorage from X-Token-Balance header
       // without requiring a full profile re-fetch.
       if (state.user) {
-        const balance = action.payload === 'unlimited' ? -1 : Number(action.payload);
-        if (!Number.isNaN(balance)) {
-          state.user = { ...state.user, token_balance: balance };
+        const isUnlimited = action.payload === 'unlimited';
+        const balance = isUnlimited ? -1 : Number(action.payload);
+        if (isUnlimited || !Number.isNaN(balance)) {
+          state.user = {
+            ...state.user,
+            token_balance: balance,
+            ...(isUnlimited ? { monthly_tokens: -1 } : {}),
+          };
           saveUserToStorage(state.user);
         }
       }

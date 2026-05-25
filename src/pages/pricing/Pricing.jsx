@@ -38,6 +38,12 @@ const PLAN_STYLE_META = {
   },
 };
 
+const DEFAULT_MONTHLY_TOKENS = {
+  free: 25000,
+  pro: 500000,
+  elite: -1,
+};
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -229,6 +235,7 @@ export default function Pricing() {
         >
           {plans.map((plan) => {
             const meta = PLAN_STYLE_META[plan.id] || { buttonText: 'Subscribe' };
+            const monthlyTokens = plan.monthly_tokens ?? DEFAULT_MONTHLY_TOKENS[plan.id] ?? 0;
             const isFeatured = Boolean(plan.is_featured);
             const highlight = isFeatured;
             const badge = isFeatured ? 'MOST POPULAR' : null;
@@ -301,7 +308,7 @@ export default function Pricing() {
                     textAlign: 'center'
                   }}>
                     <Typography sx={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--primary)' }}>
-                      {plan.monthly_tokens === -1 ? 'Unlimited' : plan.monthly_tokens.toLocaleString()}
+                      {monthlyTokens === -1 ? 'Unlimited' : monthlyTokens.toLocaleString()}
                     </Typography>
                     <Typography variant="caption" sx={{ fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>
                       AI TOKENS / MONTH
