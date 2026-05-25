@@ -28,6 +28,7 @@ import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownR
 import ExtensionRoundedIcon from '@mui/icons-material/ExtensionRounded';
 import BoltRoundedIcon from '@mui/icons-material/BoltRounded';
 import WorkOutlineRoundedIcon from '@mui/icons-material/WorkOutlineRounded';
+import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import DataUsageRoundedIcon from '@mui/icons-material/DataUsageRounded';
 import { logout } from '../../store/auth/authSlice';
 import { toggleTheme } from '../../store/theme/themeSlice';
@@ -87,6 +88,12 @@ const NAV_CONFIG = {
       showIncompleteIndicator: true
     },
     { 
+      label: 'Usage & Limits', 
+      path: '/usage', 
+      icon: DataUsageRoundedIcon, 
+      color: BRAND_COLORS.ACCENT_CYAN 
+    },
+    { 
       label: 'Settings', 
       path: '/settings', 
       icon: SettingsRoundedIcon
@@ -116,7 +123,8 @@ const NAV_CONFIG = {
 };
 
 const USER_MENU_CONFIG = [
-  { label: 'Profile', path: '/profile', icon: PersonOutlineRoundedIcon },
+  { label: 'Profile', path: '/profile', icon: AccountCircleRoundedIcon },
+  { label: 'Usage & Limits', path: '/usage', icon: DataUsageRoundedIcon },
   { label: 'Subscription & Billing', path: '/pricing', icon: CreditCardRoundedIcon },
   { label: 'Settings', path: '/settings', icon: SettingsRoundedIcon },
   { label: 'Help & Support', path: '/help', icon: HelpOutlineRoundedIcon },

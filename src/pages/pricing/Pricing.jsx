@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { getProfile } from '../../store/auth/authSlice';
 import {
   Box,
   Typography,
@@ -12,6 +14,7 @@ import {
 } from '@mui/material';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import AccountBalanceWalletRoundedIcon from '@mui/icons-material/AccountBalanceWalletRounded';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { Link, useNavigate } from 'react-router-dom';
@@ -57,6 +60,7 @@ export default function Pricing() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { data: plans = [], isLoading, isError } = useQuery({
     queryKey: PUBLIC_PLANS_QUERY_KEY,
@@ -93,6 +97,8 @@ export default function Pricing() {
               razorpay_signature: response.razorpay_signature,
               plan_id: plan.id,
             });
+            // Refresh Redux user so Navbar shows updated token balance immediately
+            dispatch(getProfile());
             setSuccess(`Successfully subscribed to ${plan.name} plan!`);
           } catch (err) {
             setError(err.response?.data?.detail || 'Payment verification failed');
@@ -167,13 +173,38 @@ export default function Pricing() {
           sx={{
             fontSize: 'var(--font-size-body)',
             color: 'var(--text-secondary)',
-            mb: 5,
+            mb: 3,
             maxWidth: 480,
             mx: 'auto',
           }}
         >
           Join thousands of professionals landing interviews with HireMate AI.
         </Typography>
+
+        <Button
+          onClick={() => navigate('/usage')}
+          startIcon={<AccountBalanceWalletRoundedIcon />}
+          sx={{ 
+            mb: 6, 
+            textTransform: 'none', 
+            fontWeight: 700, 
+            bgcolor: 'var(--primary)',
+            color: 'white',
+            px: 4,
+            py: 1.2,
+            borderRadius: '9999px',
+            fontSize: '0.875rem',
+            boxShadow: '0 4px 15px rgba(6, 182, 212, 0.25)',
+            '&:hover': { 
+              bgcolor: 'var(--primary-dark)',
+              transform: 'translateY(-2px)',
+              boxShadow: '0 6px 20px rgba(6, 182, 212, 0.35)',
+            },
+            transition: 'all 0.2s ease'
+          }}
+        >
+          View your current usage & limits
+        </Button>
 
         {/* Alerts */}
         {(isError || error) && (
@@ -257,6 +288,23 @@ export default function Pricing() {
                     </Typography>
                     <Typography component="span" sx={{ fontSize: 'var(--font-size-helper)', color: 'var(--text-muted)' }}>
                       /{plan.amount === 0 ? 'forever' : 'month'}
+                    </Typography>
+                  </Box>
+
+                  {/* Monthly Tokens Budget Highlight */}
+                  <Box sx={{ 
+                    mb: 3, 
+                    p: 1.5, 
+                    borderRadius: 2, 
+                    bgcolor: 'rgba(6, 182, 212, 0.05)', 
+                    border: '1px solid rgba(6, 182, 212, 0.1)',
+                    textAlign: 'center'
+                  }}>
+                    <Typography sx={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--primary)' }}>
+                      {plan.monthly_tokens === -1 ? 'Unlimited' : plan.monthly_tokens.toLocaleString()}
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>
+                      AI TOKENS / MONTH
                     </Typography>
                   </Box>
 

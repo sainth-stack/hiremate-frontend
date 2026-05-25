@@ -25,25 +25,18 @@ const PLANS_QUERY_KEY = ['admin', 'plans'];
 
 const EMPTY_PLAN = {
   id: '', name: '', description: '', amount: 0,
-  resume_slots: 0, ai_tailor_credits: 0, ats_match_checks: 0,
-  job_tracking: 0, features: [], features_str: '', is_active: true, is_featured: false,
+  monthly_tokens: 25000, features: [], features_str: '', is_active: true, is_featured: false,
 };
 
 const validationSchema = Yup.object({
   name: Yup.string().required('Plan name is required').min(3, 'Min 3 characters'),
   description: Yup.string().required('Description is required'),
   amount: Yup.number().typeError('Must be a number').min(0, 'Cannot be negative').required('Required'),
-  resume_slots: Yup.number().typeError('Must be a number').min(0).required(),
-  ai_tailor_credits: Yup.number().typeError('Must be a number').min(0).required(),
-  ats_match_checks: Yup.number().typeError('Must be a number').min(0).required(),
-  job_tracking: Yup.number().typeError('Must be a number').min(0).required(),
+  monthly_tokens: Yup.number().typeError('Must be a number').min(-1).required(),
 });
 
 const QUOTA_FIELDS = [
-  { label: 'Resume Slots', name: 'resume_slots' },
-  { label: 'AI Credits', name: 'ai_tailor_credits' },
-  { label: 'ATS Checks', name: 'ats_match_checks' },
-  { label: 'Job Tracking', name: 'job_tracking' },
+  { label: 'Monthly AI Tokens', name: 'monthly_tokens', helper: 'Use -1 for unlimited' },
 ];
 
 const tableCellHeadSx = {
@@ -66,10 +59,7 @@ const PlanFormDialog = ({ open, isNewPlan, initialValues, onClose }) => {
     name: useRef(),
     description: useRef(),
     features_str: useRef(),
-    resume_slots: useRef(),
-    ai_tailor_credits: useRef(),
-    ats_match_checks: useRef(),
-    job_tracking: useRef(),
+    monthly_tokens: useRef(),
   };
 
   // Only controlled state — for live INR preview and checkboxes
@@ -104,10 +94,7 @@ const PlanFormDialog = ({ open, isNewPlan, initialValues, onClose }) => {
     amount: Number(amount),
     is_active: isActive,
     is_featured: isFeatured,
-    resume_slots: Number(refs.resume_slots.current?.value ?? 0),
-    ai_tailor_credits: Number(refs.ai_tailor_credits.current?.value ?? 0),
-    ats_match_checks: Number(refs.ats_match_checks.current?.value ?? 0),
-    job_tracking: Number(refs.job_tracking.current?.value ?? 0),
+    monthly_tokens: Number(refs.monthly_tokens.current?.value ?? 0),
   }), [amount, isActive, isFeatured, initialValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const createMutation = useMutation({
@@ -239,18 +226,18 @@ const PlanFormDialog = ({ open, isNewPlan, initialValues, onClose }) => {
 
             {/* Service Quotas */}
             <Box>
-              <Typography sx={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', mb: 0.5 }}>Service Quotas</Typography>
-              <Typography variant="caption" sx={{ color: 'var(--text-secondary)', display: 'block', mb: 2 }}>Define usage limits. Use 999999 for unlimited.</Typography>
-              <Grid container display="flex" flexWrap="nowrap" spacing={2}>
+              <Typography sx={{ fontSize: 15, fontWeight: 700, color: '#1e293b', mb: 0.5 }}>Service Quotas</Typography>
+              <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mb: 2 }}>Define usage limits. Use -1 for unlimited tokens.</Typography>
+              <Grid container spacing={2}>
                 {QUOTA_FIELDS.map((field) => (
-                  <Grid item key={field.name} sx={{ flex: 1 }}>
-                    <Typography sx={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', mb: 1 }}>{field.label}</Typography>
+                  <Grid item key={field.name} xs={12} sm={4}>
+                    <Typography sx={{ fontSize: 12, fontWeight: 700, color: '#475569', mb: 1 }}>{field.label}</Typography>
                     <TextField
                       fullWidth type="number" size="small"
                       inputRef={refs[field.name]}
-                      defaultValue={initialValues?.[field.name] ?? 0}
+                      defaultValue={initialValues?.[field.name] ?? 25000}
                       error={Boolean(errors[field.name])}
-                      helperText={errors[field.name]}
+                      helperText={errors[field.name] || field.helper}
                       sx={inputSx}
                     />
                   </Grid>
@@ -382,19 +369,17 @@ const PlanManagement = () => {
               <TableRow>
                 <TableCell sx={tableCellHeadSx}>Plan Details</TableCell>
                 <TableCell align="right" sx={tableCellHeadSx}>Price (INR)</TableCell>
-                <TableCell align="center" sx={tableCellHeadSx}>Resumes</TableCell>
-                <TableCell align="center" sx={tableCellHeadSx}>AI Credits</TableCell>
-                <TableCell align="center" sx={tableCellHeadSx}>ATS Scans</TableCell>
+                <TableCell align="center" sx={tableCellHeadSx}>Monthly Tokens</TableCell>
                 <TableCell sx={tableCellHeadSx}>Status</TableCell>
                 <TableCell width={72} sx={tableCellHeadSx} />
               </TableRow>
             </TableHead>
             <TableBody>
               {isLoading ? (
-                <TableRowsSkeleton rows={5} cols={7} />
+                <TableRowsSkeleton rows={5} cols={5} />
               ) : plans.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} sx={{ border: 'none' }}>
+                  <TableCell colSpan={5} sx={{ border: 'none' }}>
                     <EmptyState icon={InboxOutlinedIcon} title="No plans configured" description="Click 'Add New Plan' to create your first subscription tier." />
                   </TableCell>
                 </TableRow>
@@ -413,9 +398,7 @@ const PlanManagement = () => {
                       </Box>
                     </TableCell>
                     <TableCell align="right" sx={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', py: 1.5 }}>₹{plan.amount / 100}</TableCell>
-                    <TableCell align="center" sx={{ py: 1.5 }}><Typography sx={{ fontSize: 13, fontWeight: 600 }}>{plan.resume_slots >= 999999 ? '∞' : plan.resume_slots}</Typography></TableCell>
-                    <TableCell align="center" sx={{ py: 1.5 }}><Typography sx={{ fontSize: 13, fontWeight: 600 }}>{plan.ai_tailor_credits >= 999999 ? '∞' : plan.ai_tailor_credits}</Typography></TableCell>
-                    <TableCell align="center" sx={{ py: 1.5 }}><Typography sx={{ fontSize: 13, fontWeight: 600 }}>{plan.ats_match_checks >= 999999 ? '∞' : plan.ats_match_checks}</Typography></TableCell>
+                    <TableCell align="center" sx={{ py: 1.5 }}><Typography sx={{ fontSize: 13, fontWeight: 600 }}>{plan.monthly_tokens === -1 ? '∞' : (plan.monthly_tokens || 0).toLocaleString()}</Typography></TableCell>
                     <TableCell sx={{ py: 1.5 }}>
                       <Chip label={plan.is_active ? 'Active' : 'Inactive'} size="small"
                         sx={{ height: 22, fontWeight: 700, fontSize: 11, letterSpacing: '0.02em', border: 'none', borderRadius: '999px', bgcolor: plan.is_active ? 'var(--success-bg)' : 'var(--grey-4)', color: plan.is_active ? 'var(--success-dark)' : 'var(--text-secondary)' }}

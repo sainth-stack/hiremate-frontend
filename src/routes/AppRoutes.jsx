@@ -44,6 +44,7 @@ import PrivacyPolicy from '../pages/legal/PrivacyPolicy';
 import TermsOfService from '../pages/legal/TermsOfService';
 import ReportIssuePage from '../pages/report-issue/ReportIssuePage';
 import JobRecommendationPage from '../pages/job-recommendation/JobRecommendationPage';
+import Usage from '../pages/usage/Usage';
 import CompanySearch from '../pages/dashboard/CompanySearch';
 import ExtensionUninstallPage from '../pages/extension-uninstall/ExtensionUninstallPage';
 
@@ -100,6 +101,7 @@ export default function AppRoutes() {
             <Route path="/job-recommendations" element={<JobRecommendations />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/usage" element={<Usage />} />
             <Route path="/report-issue" element={<ReportIssuePage />} />
             <Route path="/job-recommendation" element={<JobRecommendationPage />} />
             <Route path="/company-search" element={<CompanySearch />} />
