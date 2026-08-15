@@ -17,11 +17,17 @@ import AdminPanelSettingsRoundedIcon from '@mui/icons-material/AdminPanelSetting
 import DataUsageRoundedIcon from '@mui/icons-material/DataUsageRounded';
 import SubscriptionsRoundedIcon from '@mui/icons-material/SubscriptionsRounded';
 import QueryStatsRoundedIcon from '@mui/icons-material/QueryStatsRounded';
+import QuizRoundedIcon from '@mui/icons-material/QuizRounded';
+import RocketLaunchRoundedIcon from '@mui/icons-material/RocketLaunchRounded';
+import InboxRoundedIcon from '@mui/icons-material/InboxRounded';
 import Navbar from '../../components/common/Navbar';
 
 const ADMIN_NAV = [
   { label: 'Overview', path: '/admin', icon: DashboardRoundedIcon },
   { label: 'Users', path: '/admin/users', icon: PeopleRoundedIcon },
+  { label: 'Interview Creation', path: '/admin/interview-creation', icon: QuizRoundedIcon },
+  { label: 'Launch Interviews', path: '/admin/launch-interviews', icon: RocketLaunchRoundedIcon },
+  { label: 'Requested Interviews', path: '/admin/requested-interviews', icon: InboxRoundedIcon },
   { label: 'Plan Management', path: '/admin/plans', icon: SubscriptionsRoundedIcon },
   { label: 'Companies Viewed', path: '/admin/companies', icon: BusinessRoundedIcon },
   { label: 'Career Page Links', path: '/admin/career-pages', icon: LinkRoundedIcon },

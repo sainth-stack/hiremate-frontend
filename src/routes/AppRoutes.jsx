@@ -32,6 +32,9 @@ import ApplicationDetail from '../pages/application-tracker/ApplicationDetail';
 import AdminLayout from '../pages/admin/AdminLayout';
 import AdminOverview from '../pages/admin/AdminOverview';
 import AdminUsers from '../pages/admin/AdminUsers';
+import LaunchInterviews from '../pages/admin/LaunchInterviews';
+import RequestedInterviews from '../pages/admin/RequestedInterviews';
+import InterviewCreation from '../pages/admin/InterviewCreation';
 import AdminUserDetail from '../pages/admin/AdminUserDetail';
 import AdminCompaniesViewed from '../pages/admin/AdminCompaniesViewed';
 import AdminCareerPages from '../pages/admin/AdminCareerPages';
@@ -47,6 +50,7 @@ import JobRecommendationPage from '../pages/job-recommendation/JobRecommendation
 import Usage from '../pages/usage/Usage';
 import CompanySearch from '../pages/dashboard/CompanySearch';
 import ExtensionUninstallPage from '../pages/extension-uninstall/ExtensionUninstallPage';
+import UserInterviewPage from '../pages/interview/UserInterviewPage';
 
 export default function AppRoutes() {
   return (
@@ -65,10 +69,14 @@ export default function AppRoutes() {
         <Route element={<ProtectedRoute />}>
           <Route path="/start" element={<StartPage />} />
           <Route path="/onboarding/profile" element={<OnboardingProfile />} />
+          <Route path="/interview/:userId" element={<UserInterviewPage />} />
           <Route path="/admin" element={<AdminRoute />}>
             <Route element={<AdminLayout />}>
               <Route index element={<AdminOverview />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route path="interview-creation" element={<InterviewCreation />} />
+              <Route path="launch-interviews" element={<LaunchInterviews />} />
+              <Route path="requested-interviews" element={<RequestedInterviews />} />
               <Route path="users/:id" element={<AdminUserDetail />} />
               <Route path="companies" element={<AdminCompaniesViewed />} />
               <Route path="career-pages" element={<AdminCareerPages />} />

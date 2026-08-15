@@ -1,11 +1,30 @@
 /**
  * Public API base for the web app (browser-safe). Do not put INGEST_SECRET or any
  * server-only secrets here — they would ship to every user. Ingestion uses
- * backend .env INGEST_SECRET + X-Ingest-Secret (scheduler / curl / server-side jobs only).
+ * backend .env INGEST_SECRET + X-Ingest-Secret (scheduler / server-side jobs only).
+ *
+ * Override via Vite env: VITE_API_URL=http://localhost:8000/api
+ * Prod example: VITE_API_URL=https://your-backend-domain/api
  */
-// export const BASE_URL = 'http://127.0.0.1:8000/api';
-export const BASE_URL = 'https://opsbrainai.com/api';
-// export const UI_URL = 'https://opsbrainai.com';
+export const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
+// export const BASE_URL = 'https://opsbrainai.com/api';
+
+/** Base URL for email links and shareable interview routes. */
+export const UI_URL = import.meta.env.VITE_UI_URL || '';
+
+/**
+ * Build the shareable interview page URL sent to users by email.
+ * @param {number|string} userId
+ * @param {number|string} [interviewId] - optional, when user has multiple assignments
+ */
+export const buildInterviewUrl = (userId, interviewId) => {
+  const base = UI_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+  const url = `${base}/interview/${encodeURIComponent(userId)}`;
+  if (interviewId != null && interviewId !== '') {
+    return `${url}?interview_id=${encodeURIComponent(interviewId)}`;
+  }
+  return url;
+};
 export const CHROME_EXTENSION_WEBSTORE_URL =
   'https://chromewebstore.google.com/detail/opsbrain-job-auto-fill/gbelhjcgamegincihdckbbhojjagfnnh';
 
