@@ -12,13 +12,17 @@ export const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/a
 /** Base URL for email links and shareable interview routes. */
 export const UI_URL = import.meta.env.VITE_UI_URL || '';
 
+/** Public site origin for interview links (env override, else current browser origin). */
+export const getFrontendBaseUrl = () =>
+  UI_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+
 /**
  * Build the shareable interview page URL sent to users by email.
  * @param {number|string} userId
  * @param {number|string} [interviewId] - optional, when user has multiple assignments
  */
 export const buildInterviewUrl = (userId, interviewId) => {
-  const base = UI_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+  const base = getFrontendBaseUrl();
   const url = `${base}/interview/${encodeURIComponent(userId)}`;
   if (interviewId != null && interviewId !== '') {
     return `${url}?interview_id=${encodeURIComponent(interviewId)}`;

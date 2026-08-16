@@ -2,6 +2,7 @@
  * Admin API - all /api/admin/* endpoints. Requires admin auth.
  */
 import axiosClient from './axiosClient';
+import { getFrontendBaseUrl } from '../utilities/const';
 
 export const getAdminOverviewAPI = () =>
   axiosClient.get('/admin/overview');
@@ -88,6 +89,7 @@ export const launchAdminInterviewsAPI = (payload) => {
     voice_id: payload.voice_id,
     voice_label: payload.voice_label || null,
     tts_language_code: payload.tts_language_code || 'en-IN',
+    frontend_url: payload.frontend_url || getFrontendBaseUrl(),
     users: users.map((u) => ({ id: u.id, email: u.email })),
     user_ids: userIds,
     user_emails: userEmails,
