@@ -26,11 +26,11 @@ import InterviewAgentOrb from '../../../components/interview/InterviewAgentOrb';
 const SESSION_LABELS = {
   ai_speaking: 'AI Speaking',
   listening: 'Your Turn',
-  processing: 'Transcribing…',
+  processing: 'Submitting answer…',
   ready: 'Answer Ready',
 };
 
-const AUTO_ADVANCE_DELAY_MS = 1200;
+const SUBMITTING_PLACEHOLDER = 'Submitting your answer…';
 
 export default function InterviewSession({ userId, interviewId, onSubmit }) {
   const {
@@ -86,6 +86,7 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
     silenceCountdown,
     startRecording,
     stopRecording,
+    resetSilenceCountdown,
   } = useInterviewMicrophone({
     enabled: true,
     onSilence: () => handleSilenceRef.current?.(),
@@ -118,7 +119,6 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
   const { submitVoiceAnswer } = useInterviewVoiceSession({
     userId,
     interviewId,
-    onTranscript: setCurrentTranscript,
     onProcessingChange: setProcessing,
     onError: (err) => toast.error(parseApiError(err, 'Voice processing failed')),
   });
@@ -179,14 +179,16 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
     setLocalSessionPhase('processing');
     setSessionPhase('processing');
     setRecording(false);
+    setCurrentTranscript(SUBMITTING_PLACEHOLDER);
 
-    const capturedTranscript = (liveTranscriptRef.current || currentTranscript || '').trim();
+    const capturedTranscript = (liveTranscriptRef.current || '').trim();
 
     const result = await stopRecording();
     if (!result?.blob || result.blob.size < 1000) {
       if (!auto) toast.error('Recording too short — please speak your answer');
       setLocalSessionPhase('listening');
       setSessionPhase('listening');
+      setCurrentTranscript('');
       beginAnswerCapture().catch(() => {});
       isFinalizingRef.current = false;
       return;
@@ -203,25 +205,24 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
         clientTranscript: capturedTranscript,
       });
       const transcript = data?.transcript || data?.answer || capturedTranscript;
-      setCurrentTranscript(transcript);
       saveAnswer(transcript, {
         audio_key: data?.audio_key,
         audio_url: data?.audio_url,
       });
+
+      if (auto) {
+        setCurrentTranscript('');
+        handleNextRef.current?.({ auto: true });
+        return;
+      }
+
       setCurrentTranscript(transcript);
       setLocalSessionPhase('ready');
       setSessionPhase('ready');
-
-      if (auto && transcript.trim()) {
-        setTimeout(() => {
-          if (useInterviewSessionStore.getState().currentQuestionIndex === currentQuestionIndex) {
-            handleNextRef.current?.({ auto: true });
-          }
-        }, AUTO_ADVANCE_DELAY_MS);
-      }
     } catch {
       setLocalSessionPhase('listening');
       setSessionPhase('listening');
+      setCurrentTranscript('');
       beginAnswerCapture().catch(() => {});
     } finally {
       isFinalizingRef.current = false;
@@ -229,6 +230,11 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
   };
 
   finalizeRecordingRef.current = finalizeRecording;
+
+  const handleRethink = () => {
+    autoAdvanceRef.current = false;
+    resetSilenceCountdown();
+  };
 
   const handleDoneSpeaking = () => {
     finalizeRecording({ auto: false });
@@ -239,14 +245,22 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
   };
 
   const handleNext = ({ auto = false } = {}) => {
-    const answer = useInterviewSessionStore.getState().currentTranscript.trim()
-      || currentTranscript.trim();
+    const state = useInterviewSessionStore.getState();
+    const q = state.questions[state.currentQuestionIndex];
+    const saved = state.answers.find((a) => a.question_id === q?.id);
+    const answer = state.currentTranscript.trim()
+      || currentTranscript.trim()
+      || saved?.answer?.trim()
+      || '';
+
     if (!answer) {
       if (!auto) toast.error('Please record or type an answer first');
       return;
     }
 
-    saveAnswer(answer);
+    if (!saved?.answer) {
+      saveAnswer(answer);
+    }
     if (isLast) {
       onSubmit();
       return;
@@ -256,11 +270,19 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
 
   handleNextRef.current = handleNext;
 
-  const canProceed = currentTranscript.trim().length > 0 && !isSpeaking && !isProcessing && !submitting;
+  const canProceed = currentTranscript.trim().length > 0
+    && !isSpeaking
+    && !isProcessing
+    && !submitting
+    && sessionPhase === 'ready'
+    && currentTranscript !== SUBMITTING_PLACEHOLDER;
   const statusLabel = SESSION_LABELS[sessionPhase] || 'Preparing…';
   const savedAnswer = answers.find((item) => item.question_id === currentQuestion?.id);
   const hasRecordedAudio = Boolean(savedAnswer?.audio_key);
-  const showPrimaryAction = sessionPhase === 'ready' || (sessionPhase === 'listening' && !isRecording);
+  const showManualControls = sessionPhase === 'ready' && !isRecording && !isProcessing;
+  const answerFieldValue = sessionPhase === 'processing'
+    ? SUBMITTING_PLACEHOLDER
+    : currentTranscript;
 
   return (
     <Box sx={{ minHeight: 'calc(100vh - 72px)', display: 'flex', flexDirection: 'column', bgcolor: '#f8fafc' }}>
@@ -373,9 +395,9 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
                   minRows={3}
                   maxRows={8}
                   placeholder={isRecording ? 'Speak now — your words will appear here live…' : 'Your answer appears here after you speak, or type manually…'}
-                  value={currentTranscript}
+                  value={answerFieldValue}
                   onChange={(e) => setCurrentTranscript(e.target.value)}
-                  disabled={isProcessing || (isRecording && Boolean(liveTranscript))}
+                  disabled={isProcessing || sessionPhase === 'processing' || (isRecording && Boolean(liveTranscript))}
                   sx={{
                     mb: hasRecordedAudio ? 1.5 : 2,
                     '& .MuiOutlinedInput-root': { borderRadius: 2, bgcolor: '#fff', fontSize: 14 },
@@ -397,7 +419,17 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
 
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                    {isRecording && (
+                    {isRecording && silenceCountdown != null && (
+                      <Button
+                        variant="outlined"
+                        onClick={handleRethink}
+                        disabled={isSpeaking || isProcessing || submitting}
+                        sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 999 }}
+                      >
+                        Keep speaking
+                      </Button>
+                    )}
+                    {isRecording && !silenceCountdown && (
                       <Button
                         variant="contained"
                         color="error"
@@ -409,7 +441,7 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
                         Done speaking
                       </Button>
                     )}
-                    {sessionPhase === 'ready' && !isRecording && (
+                    {showManualControls && (
                       <Button
                         variant="outlined"
                         onClick={() => {
@@ -426,12 +458,12 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
                     {isProcessing && (
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <CircularProgress size={18} />
-                        <Typography variant="caption">Transcribing your answer…</Typography>
+                        <Typography variant="caption">Submitting your answer…</Typography>
                       </Box>
                     )}
                   </Box>
 
-                  {(showPrimaryAction || canProceed) && (
+                  {showManualControls && (
                     <Button
                       variant="contained"
                       disabled={!canProceed}
@@ -459,10 +491,14 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
 
                 <Typography variant="caption" sx={{ display: 'block', mt: 1.5, color: 'var(--text-muted)', textAlign: 'center' }}>
                   {isRecording
-                    ? 'Pause for 5 seconds when finished — we will transcribe and move on automatically.'
-                    : sessionPhase === 'ready'
-                      ? 'Review your answer, then tap Next Question or Submit Interview.'
-                      : 'The AI will ask each question aloud, then listen for your response.'}
+                    ? silenceCountdown != null
+                      ? 'Pause detected — submitting soon. Tap Keep speaking if you want to add more.'
+                      : 'Speak naturally. After you finish, stay quiet for 5 seconds to submit automatically.'
+                    : sessionPhase === 'processing'
+                      ? 'Saving your answer and preparing the next question…'
+                      : sessionPhase === 'ready'
+                        ? 'Review your answer, then tap Next Question or Submit Interview.'
+                        : 'The AI will ask each question aloud, then listen for your response.'}
                 </Typography>
               </Box>
             </Box>

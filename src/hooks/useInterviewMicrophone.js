@@ -251,6 +251,13 @@ export function useInterviewMicrophone({ onSilence, enabled = true }) {
     stopStreamTracks();
   }, [stopLevelMonitor, stopStreamTracks]);
 
+  const resetSilenceCountdown = useCallback(() => {
+    silenceStartedAtRef.current = null;
+    silenceFiredRef.current = false;
+    lastCountdownSecondRef.current = null;
+    setSilenceCountdown(null);
+  }, []);
+
   return {
     micGranted,
     micError,
@@ -262,6 +269,7 @@ export function useInterviewMicrophone({ onSilence, enabled = true }) {
     startRecording,
     stopRecording,
     stopStreamTracks,
+    resetSilenceCountdown,
   };
 }
 

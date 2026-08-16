@@ -162,7 +162,7 @@ export default function InterviewAgentOrb({
 
       {silenceCountdown != null ? (
         <Typography sx={{ mt: 0.5, fontSize: 12, fontWeight: 700, color: 'var(--primary)' }}>
-          Moving to next step in {silenceCountdown}s…
+          Submitting in {silenceCountdown}s — tap Keep speaking to rethink
         </Typography>
       ) : subtitle ? (
         <Typography sx={{ mt: 0.5, fontSize: 12, color: 'var(--text-muted)' }}>
@@ -172,7 +172,7 @@ export default function InterviewAgentOrb({
         <Typography sx={{ mt: 0.5, fontSize: 12, color: 'var(--text-muted)' }}>
           {phase === 'ai_speaking' && 'AI is asking the question'}
           {phase === 'listening' && isRecording && 'Speak clearly — pause 5 seconds when done'}
-          {phase === 'processing' && 'Processing your answer…'}
+          {phase === 'processing' && 'Submitting your answer…'}
           {phase === 'ready' && 'Review your answer, then continue'}
           {phase === 'idle' && 'Preparing your interview…'}
         </Typography>
