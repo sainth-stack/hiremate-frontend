@@ -3,12 +3,46 @@
  * @param {import('axios').AxiosError} err
  * @param {string} [fallback]
  */
+function friendlyStatusMessage(status) {
+  if (status === 502 || status === 503 || status === 504) {
+    return 'The server took too long to respond. Your progress is saved — please try again.';
+  }
+  if (status >= 500) {
+    return 'Something went wrong on our side — please try again.';
+  }
+  return null;
+}
+
 export function parseApiError(err, fallback = 'Request failed') {
   if (err?.request && !err?.response) {
-    return 'Network error — cannot reach the API server. Check that the backend is running and VITE_API_URL points to the correct port.';
+    return 'Connection interrupted — please try again in a moment.';
   }
-  const detail = err?.response?.data?.detail;
-  if (!detail) return err?.message || fallback;
+
+  const status = err?.response?.status;
+  const statusMessage = friendlyStatusMessage(status);
+  const responseData = err?.response?.data;
+
+  if (responseData instanceof Blob) {
+    return statusMessage || fallback;
+  }
+
+  if (statusMessage && !responseData?.detail) {
+    return statusMessage;
+  }
+
+  const rawDetail = responseData?.detail;
+  if (typeof rawDetail === 'string' && rawDetail.toLowerCase().includes('cloudflare')) {
+    return 'Connection interrupted — please try again in a moment.';
+  }
+
+  const detail = rawDetail;
+  if (!detail) {
+    const message = err?.message || '';
+    if (/network error|timeout|aborted/i.test(message)) {
+      return 'Connection interrupted — please try again in a moment.';
+    }
+    return message || fallback;
+  }
   if (typeof detail === 'string') return detail;
   if (Array.isArray(detail)) {
     return detail

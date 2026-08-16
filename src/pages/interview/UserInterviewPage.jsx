@@ -247,7 +247,14 @@ export default function UserInterviewPage() {
         tts_speaker: questionsRes?.data?.tts_speaker || voiceConfig?.tts_speaker,
         tts_language_code: questionsRes?.data?.tts_language_code || voiceConfig?.tts_language_code,
         question_count: questionsRes?.data?.question_count || voiceConfig?.question_count,
+        silence_submit_seconds: progress?.silence_submit_seconds ?? voiceConfig?.silence_submit_seconds ?? 10,
+        pause_duration_seconds: progress?.pause_duration_seconds ?? voiceConfig?.pause_duration_seconds ?? 10,
+        max_pauses_per_interview: progress?.max_pauses_per_interview ?? voiceConfig?.max_pauses_per_interview ?? 3,
+        pauses_used: progress?.pauses_used ?? voiceConfig?.pauses_used ?? 0,
+        pauses_remaining: progress?.pauses_remaining ?? voiceConfig?.pauses_remaining ?? 3,
+        auto_advance_enabled: progress?.auto_advance_enabled ?? voiceConfig?.auto_advance_enabled ?? true,
       };
+      setStoreVoiceConfig(voice);
 
       if (progress?.checkpoints?.length) {
         restoreProgress({

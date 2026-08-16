@@ -6,9 +6,11 @@ import {
   CircularProgress,
   IconButton,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import MicRoundedIcon from '@mui/icons-material/MicRounded';
+import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import ReplayRoundedIcon from '@mui/icons-material/ReplayRounded';
@@ -22,15 +24,15 @@ import { useInterviewSessionStore } from '../../../store/interview/useInterviewS
 import { parseApiError } from '../../../utilities/apiErrorUtils';
 import AnswerAudioPlayer from '../../../components/interview/AnswerAudioPlayer';
 import InterviewAgentOrb from '../../../components/interview/InterviewAgentOrb';
+import { consumeInterviewPauseAPI } from '../../../services/interviewVoiceService';
 
 const SESSION_LABELS = {
   ai_speaking: 'AI Speaking',
   listening: 'Your Turn',
+  paused: 'Paused',
   processing: 'Submitting answer…',
   ready: 'Answer Ready',
 };
-
-const SUBMITTING_PLACEHOLDER = 'Submitting your answer…';
 
 export default function InterviewSession({ userId, interviewId, onSubmit }) {
   const {
@@ -57,7 +59,31 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
   const finalizeRecordingRef = useRef(null);
   const handleNextRef = useRef(null);
   const liveTranscriptRef = useRef('');
+  const pendingSubmitRef = useRef(null);
+  const pauseTimerRef = useRef(null);
   const [sessionPhase, setLocalSessionPhase] = useState('idle');
+  const [isPaused, setIsPaused] = useState(false);
+  const [pauseCountdown, setPauseCountdown] = useState(null);
+  const [submitFailed, setSubmitFailed] = useState(false);
+  const [pausesRemaining, setPausesRemaining] = useState(
+    voiceConfig?.pauses_remaining ?? voiceConfig?.max_pauses_per_interview ?? 3
+  );
+
+  const silenceSubmitSeconds = voiceConfig?.silence_submit_seconds ?? 10;
+  const pauseDurationSeconds = voiceConfig?.pause_duration_seconds ?? 10;
+  const maxPauses = voiceConfig?.max_pauses_per_interview ?? 3;
+
+  useEffect(() => {
+    if (voiceConfig?.pauses_remaining != null) {
+      setPausesRemaining(voiceConfig.pauses_remaining);
+    }
+  }, [voiceConfig?.pauses_remaining]);
+
+  useEffect(() => () => {
+    if (pauseTimerRef.current) {
+      clearInterval(pauseTimerRef.current);
+    }
+  }, []);
 
   const currentQuestion = questions[currentQuestionIndex];
   const total = questions.length;
@@ -85,10 +111,14 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
     inputLevel,
     silenceCountdown,
     startRecording,
+    resumeRecording,
+    pauseRecording,
     stopRecording,
     resetSilenceCountdown,
   } = useInterviewMicrophone({
     enabled: true,
+    silenceDurationMs: silenceSubmitSeconds * 1000,
+    monitoringEnabled: !isPaused,
     onSilence: () => handleSilenceRef.current?.(),
   });
 
@@ -100,6 +130,8 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
   }, [isRecording, liveTranscript, setCurrentTranscript]);
 
   const beginAnswerCapture = useCallback(async () => {
+    setSubmitFailed(false);
+    pendingSubmitRef.current = null;
     resetLiveTranscript();
     setCurrentTranscript('');
     await startRecording();
@@ -110,7 +142,7 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
   const handleSilence = useCallback(async () => {
     if (autoAdvanceRef.current || isFinalizingRef.current) return;
     autoAdvanceRef.current = true;
-    await finalizeRecordingRef.current?.({ auto: true });
+    await finalizeRecordingRef.current?.({ auto: true, fromSilence: true });
     autoAdvanceRef.current = false;
   }, []);
 
@@ -120,7 +152,6 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
     userId,
     interviewId,
     onProcessingChange: setProcessing,
-    onError: (err) => toast.error(parseApiError(err, 'Voice processing failed')),
   });
 
   const askQuestion = useCallback(async (text) => {
@@ -128,24 +159,26 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
     setSessionPhase('ai_speaking');
     setSpeaking(true);
     try {
-      const response = await import('../../../services/interviewVoiceService').then((m) =>
-        m.synthesizeInterviewQuestionAPI({
-          user_id: userId,
-          interview_id: Number(interviewId),
-          question_order: questionOrder,
-          text,
-        })
-      );
+      const { synthesizeInterviewQuestionAPI } = await import('../../../services/interviewVoiceService');
+      const response = await synthesizeInterviewQuestionAPI({
+        user_id: userId,
+        interview_id: Number(interviewId),
+        question_order: questionOrder,
+        text,
+      });
       const { playAudioBlob } = await import('../../../hooks/useInterviewMicrophone');
       await playAudioBlob(response.data);
-    } catch (err) {
-      toast.error(parseApiError(err, 'Failed to play question audio'));
+    } catch {
+      toast('Voice playback unavailable — read the question below and answer when ready.', {
+        id: 'voice-tts-fallback',
+        icon: '🎙️',
+      });
     } finally {
       setSpeaking(false);
       setLocalSessionPhase('listening');
       setSessionPhase('listening');
       beginAnswerCapture().catch(() => {
-        toast.error('Could not start microphone recording');
+        toast.error('Could not start microphone recording', { id: 'mic-start-error' });
       });
     }
   }, [userId, interviewId, questionOrder, setSpeaking, setSessionPhase, beginAnswerCapture]);
@@ -172,27 +205,40 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
     setRecording(isRecording);
   }, [isRecording, setRecording]);
 
-  const finalizeRecording = async ({ auto = false } = {}) => {
-    if (isFinalizingRef.current || isProcessing || isSpeaking) return;
+  const finalizeRecording = async ({ auto = false, retryPayload = null, fromSilence = false } = {}) => {
+    if (isFinalizingRef.current || isProcessing || isSpeaking || isPaused) return;
     isFinalizingRef.current = true;
     stopLiveListening();
     setLocalSessionPhase('processing');
     setSessionPhase('processing');
     setRecording(false);
-    setCurrentTranscript(SUBMITTING_PLACEHOLDER);
 
-    const capturedTranscript = (liveTranscriptRef.current || '').trim();
+    let capturedTranscript = (liveTranscriptRef.current || currentTranscript || '').trim();
+    let result = retryPayload;
 
-    const result = await stopRecording();
+    if (!result) {
+      result = await stopRecording();
+      capturedTranscript = capturedTranscript || (liveTranscriptRef.current || '').trim();
+      if (capturedTranscript) {
+        setCurrentTranscript(capturedTranscript);
+      }
+    }
+
     if (!result?.blob || result.blob.size < 1000) {
-      if (!auto) toast.error('Recording too short — please speak your answer');
+      if (!fromSilence) toast.error('Recording too short — please speak your answer');
       setLocalSessionPhase('listening');
       setSessionPhase('listening');
-      setCurrentTranscript('');
+      if (!capturedTranscript) setCurrentTranscript('');
       beginAnswerCapture().catch(() => {});
       isFinalizingRef.current = false;
       return;
     }
+
+    pendingSubmitRef.current = {
+      blob: result.blob,
+      durationMs: result.durationMs,
+      clientTranscript: capturedTranscript,
+    };
 
     try {
       const data = await submitVoiceAnswer({
@@ -205,6 +251,8 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
         clientTranscript: capturedTranscript,
       });
       const transcript = data?.transcript || data?.answer || capturedTranscript;
+      pendingSubmitRef.current = null;
+      setSubmitFailed(false);
       saveAnswer(transcript, {
         audio_key: data?.audio_key,
         audio_url: data?.audio_url,
@@ -219,11 +267,17 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
       setCurrentTranscript(transcript);
       setLocalSessionPhase('ready');
       setSessionPhase('ready');
-    } catch {
-      setLocalSessionPhase('listening');
-      setSessionPhase('listening');
-      setCurrentTranscript('');
-      beginAnswerCapture().catch(() => {});
+    } catch (err) {
+      if (capturedTranscript) {
+        setCurrentTranscript(capturedTranscript);
+      }
+      toast.error(
+        `${parseApiError(err, 'Could not save your answer')}. Tap Retry submit to try again.`,
+        { id: 'voice-answer-error' },
+      );
+      setSubmitFailed(true);
+      setLocalSessionPhase('ready');
+      setSessionPhase('ready');
     } finally {
       isFinalizingRef.current = false;
     }
@@ -238,6 +292,67 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
 
   const handleDoneSpeaking = () => {
     finalizeRecording({ auto: false });
+  };
+
+  const handleCompleteAndNext = () => {
+    autoAdvanceRef.current = true;
+    finalizeRecording({ auto: true });
+  };
+
+  const handleRetrySubmit = () => {
+    if (!pendingSubmitRef.current) return;
+    finalizeRecording({ auto: false, retryPayload: pendingSubmitRef.current });
+  };
+
+  const resumeFromPause = useCallback(async () => {
+    if (pauseTimerRef.current) {
+      clearInterval(pauseTimerRef.current);
+      pauseTimerRef.current = null;
+    }
+    setPauseCountdown(null);
+    setIsPaused(false);
+    setLocalSessionPhase('listening');
+    setSessionPhase('listening');
+    resetSilenceCountdown();
+    await resumeRecording();
+    startLiveListening();
+    setRecording(true);
+  }, [resetSilenceCountdown, resumeRecording, startLiveListening, setRecording, setSessionPhase]);
+
+  const handlePause = async () => {
+    if (isPaused || pausesRemaining <= 0 || isFinalizingRef.current || isProcessing) return;
+
+    try {
+      const res = await consumeInterviewPauseAPI({
+        user_id: userId,
+        interview_id: Number(interviewId),
+      });
+      setPausesRemaining(res?.data?.pauses_remaining ?? Math.max(0, pausesRemaining - 1));
+
+      autoAdvanceRef.current = false;
+      resetSilenceCountdown();
+      await pauseRecording();
+      stopLiveListening();
+      setRecording(false);
+      setIsPaused(true);
+      setLocalSessionPhase('paused');
+      setSessionPhase('paused');
+
+      let remaining = pauseDurationSeconds;
+      setPauseCountdown(remaining);
+      pauseTimerRef.current = setInterval(() => {
+        remaining -= 1;
+        if (remaining <= 0) {
+          clearInterval(pauseTimerRef.current);
+          pauseTimerRef.current = null;
+          resumeFromPause().catch(() => toast.error('Could not resume recording'));
+        } else {
+          setPauseCountdown(remaining);
+        }
+      }, 1000);
+    } catch (err) {
+      toast.error(parseApiError(err, 'Could not start pause'));
+    }
   };
 
   const handleReplay = () => {
@@ -270,19 +385,22 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
 
   handleNextRef.current = handleNext;
 
-  const canProceed = currentTranscript.trim().length > 0
+  const savedAnswer = answers.find((item) => item.question_id === currentQuestion?.id);
+  const hasRecordedAudio = Boolean(savedAnswer?.audio_key);
+  const canProceed = (currentTranscript.trim().length > 0 || Boolean(savedAnswer?.answer?.trim()))
     && !isSpeaking
     && !isProcessing
     && !submitting
-    && sessionPhase === 'ready'
-    && currentTranscript !== SUBMITTING_PLACEHOLDER;
+    && !isPaused
+    && sessionPhase === 'ready';
   const statusLabel = SESSION_LABELS[sessionPhase] || 'Preparing…';
-  const savedAnswer = answers.find((item) => item.question_id === currentQuestion?.id);
-  const hasRecordedAudio = Boolean(savedAnswer?.audio_key);
-  const showManualControls = sessionPhase === 'ready' && !isRecording && !isProcessing;
-  const answerFieldValue = sessionPhase === 'processing'
-    ? SUBMITTING_PLACEHOLDER
-    : currentTranscript;
+  const showManualControls = sessionPhase === 'ready' && !isRecording && !isProcessing && !isPaused;
+  const showCompleteAndNext = isRecording && !isPaused && !isProcessing && !isSpeaking;
+  const answerFieldValue = currentTranscript;
+  const pauseDisabled = pausesRemaining <= 0 || isPaused || isProcessing || isSpeaking || !isRecording;
+  const pauseTooltip = pausesRemaining <= 0
+    ? `No pauses remaining (${maxPauses} per interview)`
+    : `Pause for ${pauseDurationSeconds}s (${pausesRemaining} of ${maxPauses} left)`;
 
   return (
     <Box sx={{ minHeight: 'calc(100vh - 72px)', display: 'flex', flexDirection: 'column', bgcolor: '#f8fafc' }}>
@@ -347,8 +465,18 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
                 voiceLabel={voiceLabel}
                 inputLevel={inputLevel}
                 silenceCountdown={silenceCountdown}
+                pauseCountdown={pauseCountdown}
                 isRecording={isRecording}
+                silenceSubmitSeconds={silenceSubmitSeconds}
               />
+
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1.5 }}>
+                <Chip
+                  label={`Pauses left: ${pausesRemaining}/${maxPauses}`}
+                  size="small"
+                  sx={{ fontWeight: 700, fontSize: 11 }}
+                />
+              </Box>
 
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5, flexWrap: 'wrap', justifyContent: 'center' }}>
                 {currentQuestion?.category && (
@@ -397,7 +525,7 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
                   placeholder={isRecording ? 'Speak now — your words will appear here live…' : 'Your answer appears here after you speak, or type manually…'}
                   value={answerFieldValue}
                   onChange={(e) => setCurrentTranscript(e.target.value)}
-                  disabled={isProcessing || sessionPhase === 'processing' || (isRecording && Boolean(liveTranscript))}
+                  disabled={isProcessing || sessionPhase === 'processing' || isPaused || (isRecording && Boolean(liveTranscript))}
                   sx={{
                     mb: hasRecordedAudio ? 1.5 : 2,
                     '& .MuiOutlinedInput-root': { borderRadius: 2, bgcolor: '#fff', fontSize: 14 },
@@ -419,6 +547,21 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
 
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    {isRecording && !isPaused && (
+                      <Tooltip title={pauseTooltip} arrow>
+                        <span>
+                          <Button
+                            variant="outlined"
+                            onClick={handlePause}
+                            disabled={pauseDisabled}
+                            startIcon={<PauseRoundedIcon />}
+                            sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 999 }}
+                          >
+                            Pause ({pauseDurationSeconds}s)
+                          </Button>
+                        </span>
+                      </Tooltip>
+                    )}
                     {isRecording && silenceCountdown != null && (
                       <Button
                         variant="outlined"
@@ -429,22 +572,34 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
                         Keep speaking
                       </Button>
                     )}
-                    {isRecording && !silenceCountdown && (
+                    {isRecording && !silenceCountdown && !isPaused && (
                       <Button
-                        variant="contained"
-                        color="error"
+                        variant="outlined"
                         onClick={handleDoneSpeaking}
                         disabled={isSpeaking || isProcessing || submitting}
                         startIcon={<StopRoundedIcon />}
                         sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 999 }}
                       >
-                        Done speaking
+                        Save & review
+                      </Button>
+                    )}
+                    {submitFailed && (
+                      <Button
+                        variant="outlined"
+                        color="warning"
+                        onClick={handleRetrySubmit}
+                        disabled={isProcessing || submitting}
+                        sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 999 }}
+                      >
+                        Retry submit
                       </Button>
                     )}
                     {showManualControls && (
                       <Button
                         variant="outlined"
                         onClick={() => {
+                          setSubmitFailed(false);
+                          pendingSubmitRef.current = null;
                           setLocalSessionPhase('listening');
                           setSessionPhase('listening');
                           beginAnswerCapture().catch(() => toast.error('Could not restart microphone'));
@@ -463,37 +618,47 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
                     )}
                   </Box>
 
-                  {showManualControls && (
+                  {(showManualControls || showCompleteAndNext) && (
                     <Button
                       variant="contained"
-                      disabled={!canProceed}
-                      onClick={() => handleNext({ auto: false })}
-                      endIcon={submitting ? <CircularProgress size={18} color="inherit" /> : (isLast ? <SendRoundedIcon /> : <ArrowForwardRoundedIcon />)}
+                      disabled={showManualControls ? !canProceed : (isProcessing || submitting)}
+                      onClick={showCompleteAndNext ? handleCompleteAndNext : () => handleNext({ auto: false })}
+                      endIcon={
+                        isProcessing || submitting
+                          ? <CircularProgress size={18} color="inherit" />
+                          : (isLast ? <SendRoundedIcon /> : <ArrowForwardRoundedIcon />)
+                      }
                       sx={{
                         textTransform: 'none',
                         fontWeight: 800,
                         borderRadius: 999,
                         px: 3.5,
                         py: 1.1,
-                        bgcolor: isLast ? '#7c3aed' : 'var(--primary)',
-                        boxShadow: isLast
+                        bgcolor: isLast && !showCompleteAndNext ? '#7c3aed' : 'var(--primary)',
+                        boxShadow: isLast && !showCompleteAndNext
                           ? '0 10px 28px rgba(124,58,237,0.28)'
                           : '0 10px 28px rgba(37,99,235,0.22)',
                         '&:hover': {
-                          bgcolor: isLast ? '#6d28d9' : undefined,
+                          bgcolor: isLast && !showCompleteAndNext ? '#6d28d9' : undefined,
                         },
                       }}
                     >
-                      {submitting ? 'Submitting…' : isLast ? 'Submit Interview' : 'Next Question'}
+                      {isProcessing || submitting
+                        ? 'Submitting…'
+                        : showCompleteAndNext
+                          ? (isLast ? 'Complete & submit interview' : 'Complete & next question')
+                          : (isLast ? 'Submit Interview' : 'Next Question')}
                     </Button>
                   )}
                 </Box>
 
                 <Typography variant="caption" sx={{ display: 'block', mt: 1.5, color: 'var(--text-muted)', textAlign: 'center' }}>
                   {isRecording
-                    ? silenceCountdown != null
-                      ? 'Pause detected — submitting soon. Tap Keep speaking if you want to add more.'
-                      : 'Speak naturally. After you finish, stay quiet for 5 seconds to submit automatically.'
+                    ? isPaused
+                      ? `Paused — recording resumes automatically in ${pauseCountdown ?? pauseDurationSeconds}s.`
+                      : silenceCountdown != null
+                        ? 'Pause detected — submitting soon. Tap Keep speaking or Complete & next question.'
+                        : `Speak naturally, or tap Complete & next question when finished. Auto-submit after ${silenceSubmitSeconds}s of silence.`
                     : sessionPhase === 'processing'
                       ? 'Saving your answer and preparing the next question…'
                       : sessionPhase === 'ready'

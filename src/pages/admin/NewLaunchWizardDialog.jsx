@@ -81,6 +81,9 @@ export default function NewLaunchWizardDialog({ open, onClose, onLaunched }) {
   const [voiceLanguages, setVoiceLanguages] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState(null);
   const [voiceLanguageCode, setVoiceLanguageCode] = useState('en-IN');
+  const [silenceSubmitSeconds, setSilenceSubmitSeconds] = useState(10);
+  const [pauseDurationSeconds, setPauseDurationSeconds] = useState(10);
+  const [maxPausesPerInterview, setMaxPausesPerInterview] = useState(3);
   const [voicesLoading, setVoicesLoading] = useState(false);
 
   const refreshVoices = useCallback(async (createdVoice) => {
@@ -122,6 +125,9 @@ export default function NewLaunchWizardDialog({ open, onClose, onLaunched }) {
     setError(null);
     setSelectedVoice(null);
     setVoiceLanguageCode('en-IN');
+    setSilenceSubmitSeconds(10);
+    setPauseDurationSeconds(10);
+    setMaxPausesPerInterview(3);
     setTemplatesLoading(true);
     setVoicesLoading(true);
     Promise.all([
@@ -211,6 +217,9 @@ export default function NewLaunchWizardDialog({ open, onClose, onLaunched }) {
       voice_id: selectedVoice.id,
       voice_label: selectedVoice.label,
       tts_language_code: voiceLanguageCode,
+      silence_submit_seconds: silenceSubmitSeconds,
+      pause_duration_seconds: pauseDurationSeconds,
+      max_pauses_per_interview: maxPausesPerInterview,
       users: launchUsers,
     })
       .then(() => {
@@ -421,6 +430,38 @@ export default function NewLaunchWizardDialog({ open, onClose, onLaunched }) {
                       onVoicesChanged={refreshVoices}
                     />
                   )}
+                  <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid var(--divider)' }}>
+                    <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 0.5 }}>Session rules</Typography>
+                    <Typography sx={{ fontSize: 12, color: 'var(--text-muted)', mb: 2 }}>
+                      Silence auto-submit, thinking pauses, and limits apply to the whole interview for each candidate.
+                    </Typography>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' }, gap: 2 }}>
+                      <TextField
+                        label="Silence before submit (sec)"
+                        type="number"
+                        size="small"
+                        value={silenceSubmitSeconds}
+                        onChange={(e) => setSilenceSubmitSeconds(Math.min(30, Math.max(5, Number(e.target.value) || 10)))}
+                        inputProps={{ min: 5, max: 30 }}
+                      />
+                      <TextField
+                        label="Pause duration (sec)"
+                        type="number"
+                        size="small"
+                        value={pauseDurationSeconds}
+                        onChange={(e) => setPauseDurationSeconds(Math.min(60, Math.max(5, Number(e.target.value) || 10)))}
+                        inputProps={{ min: 5, max: 60 }}
+                      />
+                      <TextField
+                        label="Max pauses per interview"
+                        type="number"
+                        size="small"
+                        value={maxPausesPerInterview}
+                        onChange={(e) => setMaxPausesPerInterview(Math.min(10, Math.max(0, Number(e.target.value) || 3)))}
+                        inputProps={{ min: 0, max: 10 }}
+                      />
+                    </Box>
+                  </Box>
                 </Box>
               )}
             </Box>

@@ -23,12 +23,20 @@ export default function InterviewAgentOrb({
   silenceCountdown = null,
   isRecording = false,
   subtitle = null,
+  silenceSubmitSeconds = 10,
+  pauseCountdown = null,
+  phaseOverride = null,
 }) {
-  const isSpeaking = phase === 'ai_speaking';
-  const isListening = phase === 'listening' && isRecording;
-  const pulseScale = isSpeaking ? 1.06 : 1 + Math.min(inputLevel * 0.18, 0.14);
-  const glowOpacity = isSpeaking ? 0.55 : isListening ? 0.35 + inputLevel * 0.25 : 0.28;
-  const ringProgress = silenceCountdown != null ? (5 - silenceCountdown) / 5 : 0;
+  const displayPhase = phaseOverride || phase;
+  const isSpeaking = displayPhase === 'ai_speaking';
+  const isListening = displayPhase === 'listening' && isRecording;
+  const isPaused = displayPhase === 'paused';
+  const pulseScale = isSpeaking ? 1.06 : isPaused ? 1 : 1 + Math.min(inputLevel * 0.18, 0.14);
+  const glowOpacity = isSpeaking ? 0.55 : isListening ? 0.35 + inputLevel * 0.25 : isPaused ? 0.2 : 0.28;
+  const totalSilenceSeconds = Math.max(1, Number(silenceSubmitSeconds) || 10);
+  const ringProgress = silenceCountdown != null
+    ? (totalSilenceSeconds - silenceCountdown) / totalSilenceSeconds
+    : 0;
 
   return (
     <Box
@@ -100,7 +108,7 @@ export default function InterviewAgentOrb({
             height: ORB_SIZE,
             borderRadius: '50%',
             position: 'relative',
-            background: orbGradient(phase),
+            background: orbGradient(displayPhase),
             boxShadow: `0 0 ${28 + glowOpacity * 40}px rgba(37, 99, 235, ${glowOpacity}), inset 0 -12px 24px rgba(15, 23, 42, 0.18), inset 0 16px 28px rgba(255,255,255,0.35)`,
           }}
         >
@@ -162,7 +170,11 @@ export default function InterviewAgentOrb({
 
       {silenceCountdown != null ? (
         <Typography sx={{ mt: 0.5, fontSize: 12, fontWeight: 700, color: 'var(--primary)' }}>
-          Submitting in {silenceCountdown}s — tap Keep speaking to rethink
+          Submitting in {silenceCountdown}s — tap Keep speaking to add more
+        </Typography>
+      ) : pauseCountdown != null ? (
+        <Typography sx={{ mt: 0.5, fontSize: 12, fontWeight: 700, color: 'var(--warning-dark)' }}>
+          Paused — resuming in {pauseCountdown}s
         </Typography>
       ) : subtitle ? (
         <Typography sx={{ mt: 0.5, fontSize: 12, color: 'var(--text-muted)' }}>
@@ -170,11 +182,12 @@ export default function InterviewAgentOrb({
         </Typography>
       ) : (
         <Typography sx={{ mt: 0.5, fontSize: 12, color: 'var(--text-muted)' }}>
-          {phase === 'ai_speaking' && 'AI is asking the question'}
-          {phase === 'listening' && isRecording && 'Speak clearly — pause 5 seconds when done'}
-          {phase === 'processing' && 'Submitting your answer…'}
-          {phase === 'ready' && 'Review your answer, then continue'}
-          {phase === 'idle' && 'Preparing your interview…'}
+          {displayPhase === 'ai_speaking' && 'AI is asking the question'}
+          {displayPhase === 'listening' && isRecording && `Speak clearly — stay quiet for ${totalSilenceSeconds}s when done`}
+          {displayPhase === 'paused' && 'Take a moment — recording will resume automatically'}
+          {displayPhase === 'processing' && 'Submitting your answer…'}
+          {displayPhase === 'ready' && 'Review your answer, then continue'}
+          {displayPhase === 'idle' && 'Preparing your interview…'}
         </Typography>
       )}
     </Box>

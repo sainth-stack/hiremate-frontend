@@ -28,37 +28,32 @@ export function useInterviewVoiceSession({
     await playAudioBlob(response.data);
   }, [userId, interviewId]);
 
-  const submitVoiceAnswer = useCallback(async ({
-    questionId,
-    questionOrder,
-    questionText,
-    blob,
-    durationMs,
-    currentQuestionIndex,
-    clientTranscript,
-  }) => {
+  const submitVoiceAnswer = useCallback(async (payload) => {
     if (processingRef.current) return null;
     processingRef.current = true;
     onProcessingChange?.(true);
 
-    try {
+    const buildFormData = () => {
       const formData = new FormData();
       formData.append('user_id', String(userId));
       formData.append('interview_id', String(interviewId));
-      if (questionId != null) formData.append('question_id', String(questionId));
-      formData.append('question_order', String(questionOrder));
-      formData.append('question_text', questionText);
-      formData.append('duration_ms', String(durationMs || 0));
-      if (currentQuestionIndex != null) {
-        formData.append('current_question_index', String(currentQuestionIndex));
+      if (payload.questionId != null) formData.append('question_id', String(payload.questionId));
+      formData.append('question_order', String(payload.questionOrder));
+      formData.append('question_text', payload.questionText);
+      formData.append('duration_ms', String(payload.durationMs || 0));
+      if (payload.currentQuestionIndex != null) {
+        formData.append('current_question_index', String(payload.currentQuestionIndex));
       }
-      if (clientTranscript?.trim()) {
-        formData.append('client_transcript', clientTranscript.trim());
+      if (payload.clientTranscript?.trim()) {
+        formData.append('client_transcript', payload.clientTranscript.trim());
       }
-      formData.append('audio', blob, `answer_q${questionOrder}.webm`);
+      formData.append('audio', payload.blob, `answer_q${payload.questionOrder}.webm`);
+      return formData;
+    };
 
-      const response = await submitInterviewVoiceAnswerAPI(formData);
-      const transcript = response?.data?.transcript || response?.data?.answer || '';
+    try {
+      const response = await submitInterviewVoiceAnswerAPI(buildFormData());
+      const transcript = response?.data?.transcript || response?.data?.answer || payload.clientTranscript || '';
       onTranscript?.(transcript, response?.data);
       return response?.data;
     } catch (err) {

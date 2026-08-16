@@ -103,21 +103,17 @@ axiosClient.interceptors.response.use(
       }
     }
 
-    // Global Error Toasting
-    if (error.response) {
+    // Global Error Toasting (skip for flows that handle errors locally, e.g. live interview)
+    if (!originalRequest?.skipGlobalErrorToast && error.response) {
       const { status, data } = error.response;
-      
-      // Handle Forbidden (Insufficient Tokens or Admin required)
+
       if (status === 403) {
         toast.error(data.detail || 'Access Denied: Insufficient tokens or permissions.');
-      } 
-      // Handle other critical errors (except 401 which is handled above)
-      else if (status >= 500) {
-        toast.error('Server error. Please try again later.');
+      } else if (status >= 500) {
+        toast.error('Something went wrong. Please try again.');
       }
-    } else if (error.request) {
-      // Network error (no response received)
-      toast.error('Network error. Please check your connection.');
+    } else if (!originalRequest?.skipGlobalErrorToast && error.request && !error.response) {
+      toast.error('Connection lost. Please check your network and try again.');
     }
 
     return Promise.reject(error);

@@ -14,7 +14,7 @@ const DIFFICULTY_COLORS = {
 const TIPS = [
   { icon: RecordVoiceOverRoundedIcon, text: 'AI interviewer reads each question in a natural voice' },
   { icon: MicRoundedIcon, text: 'Speak your answer — auto-transcribed via Sarvam AI' },
-  { icon: PsychologyRoundedIcon, text: 'Pause for 5 seconds when done — the interview moves on automatically' },
+  { icon: PsychologyRoundedIcon, text: 'Stay quiet for 10 seconds when done — the interview moves on automatically' },
 ];
 
 export default function InterviewIntro({ meta, starting, onStart }) {
