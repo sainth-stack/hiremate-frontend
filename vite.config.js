@@ -7,6 +7,9 @@ export default defineConfig({
   // Expose Cartesia / voice vars from .env to the client (no secrets in source code)
   envPrefix: ['VITE_', 'CARTESIA_', 'LANDING_'],
   server: {
+    host: '0.0.0.0',
+    port: 5173,
+    allowedHosts: true,
     proxy: {
       // Optional dev proxy — set VITE_API_URL=/api to avoid CORS in local dev
       '/api': {

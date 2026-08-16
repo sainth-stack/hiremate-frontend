@@ -5,9 +5,11 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  LinearProgress,
 } from '@mui/material';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import AnswerAudioPlayer from '../../interview/AnswerAudioPlayer';
+import { getOverallScore, getScoreStatus, scoreStatusStyles, scoreValueStyles } from '../../../utilities/interviewReportUtils';
 
 export const STATUS_CONFIG = {
   pending: { label: 'Not started', color: 'var(--text-muted)', bgcolor: 'var(--grey-4)' },
@@ -42,6 +44,9 @@ export default function AssigneeResultPanel({ assignee, interviewId }) {
   const reviews = assignee.question_reviews || [];
   const answers = assignee.answers || [];
   const audioByOrder = buildAnswerAudioMap(answers);
+  const overallScore = getOverallScore(report || {});
+  const scoreStatus = getScoreStatus(report || {});
+  const hiring = report?.hiring_recommendation;
 
   if (assignee.status === 'pending') {
     return (
@@ -104,12 +109,52 @@ export default function AssigneeResultPanel({ assignee, interviewId }) {
     <Box>
       {report && assignee.status === 'completed' && (
         <Box sx={{ mb: 2.5, p: 2.5, borderRadius: '12px', bgcolor: 'var(--light-blue-bg-04)', border: '1px solid var(--border-color)' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1, gap: 2, flexWrap: 'wrap' }}>
             <Typography sx={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Overall score</Typography>
-            <Typography sx={{ fontSize: 32, fontWeight: 800, color: 'var(--primary)', letterSpacing: '-0.02em' }}>
-              {report.score ?? report.overall_score ?? '—'}%
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography sx={{ fontSize: 32, fontWeight: 800, letterSpacing: '-0.02em', ...scoreValueStyles(overallScore) }}>
+                {overallScore}/100
+              </Typography>
+              <Chip label={scoreStatus} size="small" sx={{ fontWeight: 800, ...scoreStatusStyles(scoreStatus) }} />
+            </Box>
           </Box>
+
+          {hiring?.recommendation && (
+            <Box sx={{ mb: 1.5, p: 1.5, borderRadius: 2, bgcolor: '#fff', border: '1px solid var(--border-color)' }}>
+              <Typography sx={{ fontSize: 11, fontWeight: 800, color: 'var(--text-label)', textTransform: 'uppercase', mb: 0.75 }}>
+                AI Hiring Recommendation
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 0.75 }}>
+                <Chip label={hiring.recommendation} size="small" sx={{ fontWeight: 800, bgcolor: 'var(--light-blue-bg-08)', color: 'var(--primary)' }} />
+                {hiring.confidence != null && (
+                  <Chip label={`Confidence: ${hiring.confidence}%`} size="small" variant="outlined" sx={{ fontWeight: 700 }} />
+                )}
+              </Box>
+              {hiring.reason && (
+                <Typography sx={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.65 }}>
+                  {hiring.reason}
+                </Typography>
+              )}
+            </Box>
+          )}
+
+          {report.categories?.length > 0 && (
+            <Box sx={{ mb: 1.5 }}>
+              <Typography sx={{ fontSize: 11, fontWeight: 800, color: 'var(--text-label)', textTransform: 'uppercase', mb: 1 }}>
+                Category Scores
+              </Typography>
+              {report.categories.map((item) => (
+                <Box key={item.name} sx={{ mb: 1 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                    <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{item.name}</Typography>
+                    <Typography sx={{ fontSize: 13, fontWeight: 800 }}>{item.score}</Typography>
+                  </Box>
+                  <LinearProgress variant="determinate" value={item.score} sx={{ height: 6, borderRadius: 999 }} />
+                </Box>
+              ))}
+            </Box>
+          )}
+
           {(report.evaluation_summary || report.summary) && (
             <Typography sx={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.65, mb: 1.5 }}>
               {report.evaluation_summary || report.summary}
@@ -179,7 +224,7 @@ export default function AssigneeResultPanel({ assignee, interviewId }) {
                   <Chip label="Audio" size="small" sx={{ height: 20, fontSize: 10, fontWeight: 700, bgcolor: 'var(--light-blue-bg-08)', color: 'var(--primary)' }} />
                 )}
                 {item.score != null && (
-                  <Chip label={`${item.score}%`} size="small" sx={{ ml: 'auto', mr: 1, height: 20, fontSize: 10, fontWeight: 700 }} />
+                  <Chip label={`${item.score}/100`} size="small" sx={{ ml: 'auto', mr: 1, height: 20, fontSize: 10, fontWeight: 700 }} />
                 )}
               </Box>
             </AccordionSummary>
@@ -199,10 +244,24 @@ export default function AssigneeResultPanel({ assignee, interviewId }) {
               <Typography sx={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.65, whiteSpace: 'pre-wrap', mb: 1.5 }}>
                 {userAnswer || '—'}
               </Typography>
-              {item.how_to_answer && (
+              {item.what_went_well && (
                 <>
-                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: 'var(--primary)', mb: 0.5 }}>Coaching tip</Typography>
-                  <Typography sx={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.65, mb: 1 }}>{item.how_to_answer}</Typography>
+                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: 'var(--success-dark)', mb: 0.5 }}>What went well</Typography>
+                  <Typography sx={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.65, mb: 1 }}>{item.what_went_well}</Typography>
+                </>
+              )}
+              {item.what_was_missing && (
+                <>
+                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: 'var(--warning-dark)', mb: 0.5 }}>What was missing</Typography>
+                  <Typography sx={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.65, mb: 1 }}>{item.what_was_missing}</Typography>
+                </>
+              )}
+              {(item.better_answer || item.how_to_answer) && (
+                <>
+                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: 'var(--primary)', mb: 0.5 }}>Better answer</Typography>
+                  <Typography sx={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.65, mb: 1 }}>
+                    {item.better_answer || item.how_to_answer}
+                  </Typography>
                 </>
               )}
               {item.feedback && (
