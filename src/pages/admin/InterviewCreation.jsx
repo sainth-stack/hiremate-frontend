@@ -22,15 +22,7 @@ export default function InterviewCreation() {
         `,
       }}
     >
-      <Box
-        sx={{
-          flexShrink: 0,
-          mb: 2.5,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-        }}
-      >
+      <Box sx={{ flexShrink: 0, mb: 2.5, display: 'flex', alignItems: 'center', gap: 2 }}>
         <Box
           sx={{
             width: 48,
@@ -58,10 +50,10 @@ export default function InterviewCreation() {
               lineHeight: 1.2,
             }}
           >
-            Interview Creation
+            Interview Studio
           </Typography>
-          <Typography variant="body2" sx={{ color: 'var(--text-secondary)', mt: 0.35, fontSize: 13 }}>
-            Create and manage interview templates with title and difficulty level
+          <Typography variant="body2" sx={{ color: 'var(--text-secondary)', mt: 0.35, fontSize: 13, maxWidth: 560 }}>
+            Define the role, generate tailored questions, refine wording, then launch mock interviews to candidates.
           </Typography>
         </Box>
       </Box>

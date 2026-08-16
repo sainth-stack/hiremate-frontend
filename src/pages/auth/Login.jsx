@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Box, Typography, Checkbox, FormControlLabel,
@@ -67,7 +67,9 @@ function InputField({ icon: Icon, placeholder, value, onChange, onBlur, type = '
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, loading, error } = useSelector((state) => state.auth);
+  const redirectTo = location.state?.from || '/';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -75,8 +77,8 @@ export default function Login() {
   const [touched, setTouched] = useState({ email: false, password: false });
 
   useEffect(() => {
-    if (isAuthenticated) navigate('/', { replace: true });
-  }, [isAuthenticated, navigate]);
+    if (isAuthenticated) navigate(redirectTo, { replace: true });
+  }, [isAuthenticated, navigate, redirectTo]);
 
   useEffect(() => {
     return () => dispatch(clearError());

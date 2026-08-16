@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 
-export default function EmptyState({ icon: Icon, title, description }) {
+export default function EmptyState({ icon: Icon, title, description, action }) {
   return (
     <Box
       sx={{
@@ -54,6 +54,7 @@ export default function EmptyState({ icon: Icon, title, description }) {
           {description}
         </Typography>
       )}
+      {action}
     </Box>
   );
 }

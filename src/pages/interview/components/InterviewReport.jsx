@@ -1,5 +1,6 @@
 import { Box, Button, Card, CardContent, CircularProgress, Typography } from '@mui/material';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import EmojiEventsRoundedIcon from '@mui/icons-material/EmojiEventsRounded';
 import { Link as RouterLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -40,7 +41,7 @@ function ScoreRing({ score }) {
   );
 }
 
-export default function InterviewReport({ report, interviewTitle, userId, interviewId }) {
+export default function InterviewReport({ report, interviewTitle, userId, interviewId, onRetest, retesting = false }) {
   const score = report?.score ?? report?.overall_score ?? report?.final_score;
   const briefSummary = report?.summary || report?.feedback;
   const detailedSummary = report?.evaluation_summary;
@@ -143,15 +144,28 @@ export default function InterviewReport({ report, interviewTitle, userId, interv
             averageScore={averageQuestionScore}
           />
 
-          <Button
-            component={RouterLink}
-            to="/"
-            variant="contained"
-            disableElevation
-            sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2, px: 4, mt: 1 }}
-          >
-            Go to Dashboard
-          </Button>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'center', mt: 1 }}>
+            {onRetest && (
+              <Button
+                variant="outlined"
+                startIcon={retesting ? <CircularProgress size={16} /> : <RefreshRoundedIcon />}
+                onClick={onRetest}
+                disabled={retesting}
+                sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2, px: 3 }}
+              >
+                {retesting ? 'Resetting…' : 'Retake interview'}
+              </Button>
+            )}
+            <Button
+              component={RouterLink}
+              to="/"
+              variant="contained"
+              disableElevation
+              sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2, px: 4 }}
+            >
+              Go to Dashboard
+            </Button>
+          </Box>
         </CardContent>
       </Card>
     </motion.div>

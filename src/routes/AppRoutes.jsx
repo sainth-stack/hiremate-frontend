@@ -33,6 +33,7 @@ import AdminLayout from '../pages/admin/AdminLayout';
 import AdminOverview from '../pages/admin/AdminOverview';
 import AdminUsers from '../pages/admin/AdminUsers';
 import LaunchInterviews from '../pages/admin/LaunchInterviews';
+import LaunchCampaignDetailPage from '../pages/admin/LaunchCampaignDetailPage';
 import RequestedInterviews from '../pages/admin/RequestedInterviews';
 import InterviewCreation from '../pages/admin/InterviewCreation';
 import AdminUserDetail from '../pages/admin/AdminUserDetail';
@@ -66,16 +67,17 @@ export default function AppRoutes() {
           <Route path="/register" element={<Register />} />
         </Route>
         <Route path="/auth/google/callback" element={<GoogleCallback />} />
+        <Route path="/interview/:userId" element={<UserInterviewPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/start" element={<StartPage />} />
           <Route path="/onboarding/profile" element={<OnboardingProfile />} />
-          <Route path="/interview/:userId" element={<UserInterviewPage />} />
           <Route path="/admin" element={<AdminRoute />}>
             <Route element={<AdminLayout />}>
               <Route index element={<AdminOverview />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="interview-creation" element={<InterviewCreation />} />
               <Route path="launch-interviews" element={<LaunchInterviews />} />
+              <Route path="launch-interviews/:launchId" element={<LaunchCampaignDetailPage />} />
               <Route path="requested-interviews" element={<RequestedInterviews />} />
               <Route path="users/:id" element={<AdminUserDetail />} />
               <Route path="companies" element={<AdminCompaniesViewed />} />

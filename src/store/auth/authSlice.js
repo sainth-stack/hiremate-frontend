@@ -100,6 +100,15 @@ const authSlice = createSlice({
       localStorage.setItem(TOKEN_KEY, token);
       saveUserToStorage(user);
     },
+    setAuthSession(state, action) {
+      const { token, user } = action.payload;
+      state.token = token;
+      state.user = user;
+      state.isAuthenticated = true;
+      state.error = null;
+      localStorage.setItem(TOKEN_KEY, token);
+      saveUserToStorage(user);
+    },
     updateTokenBalance(state, action) {
       // Patch token_balance in Redux + localStorage from X-Token-Balance header
       // without requiring a full profile re-fetch.
@@ -178,5 +187,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearError, loginWithGoogle, updateTokenBalance } = authSlice.actions;
+export const { logout, clearError, loginWithGoogle, setAuthSession, updateTokenBalance } = authSlice.actions;
 export default authSlice.reducer;

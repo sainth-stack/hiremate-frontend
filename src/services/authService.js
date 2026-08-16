@@ -13,6 +13,10 @@ export const registerAPI = (data) =>
 export const getProfileAPI = () =>
   axiosClient.get('/auth/profile');
 
+/** Exchange interview link token for candidate session JWT */
+export const interviewSessionAPI = (data) =>
+  axiosClient.post('/auth/interview-session', data);
+
 // Redirect to Google OAuth
 export const startGoogleLogin = () => {
   window.location.href = `${BASE_URL}/auth/google`;

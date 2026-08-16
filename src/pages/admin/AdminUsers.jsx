@@ -21,8 +21,9 @@ import {
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
+import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded';
 import PageContainer from '../../components/common/PageContainer';
-import { EmptyState, TableRowsSkeleton } from '../../components/admin';
+import { EmptyState, TableRowsSkeleton, AddUserDialog } from '../../components/admin';
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
 import { getAdminUsersAPI } from '../../services';
 
@@ -76,6 +77,7 @@ export default function AdminUsers() {
   const [searchDebounced, setSearchDebounced] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [addUserOpen, setAddUserOpen] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setSearchDebounced(search.trim()), 300);
@@ -164,6 +166,21 @@ export default function AdminUsers() {
               },
             }}
           />
+          <Button
+            variant="contained"
+            startIcon={<PersonAddRoundedIcon />}
+            onClick={() => setAddUserOpen(true)}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 700,
+              borderRadius: '10px',
+              px: 2,
+              boxShadow: 'none',
+              '&:hover': { boxShadow: 'none' },
+            }}
+          >
+            Add user
+          </Button>
           <Button
             size="small"
             startIcon={<DownloadRoundedIcon />}
@@ -354,6 +371,16 @@ export default function AdminUsers() {
           }}
         />
       </Paper>
+
+      <AddUserDialog
+        open={addUserOpen}
+        onClose={() => setAddUserOpen(false)}
+        showAdminToggle
+        onCreated={() => {
+          setPage(1);
+          fetchUsers();
+        }}
+      />
     </PageContainer>
   );
 }

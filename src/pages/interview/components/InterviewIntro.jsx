@@ -12,9 +12,9 @@ const DIFFICULTY_COLORS = {
 };
 
 const TIPS = [
-  { icon: RecordVoiceOverRoundedIcon, text: 'AI will read each question aloud' },
-  { icon: MicRoundedIcon, text: 'Speak your answer clearly — or type if needed' },
-  { icon: PsychologyRoundedIcon, text: 'All answers are evaluated together at the end' },
+  { icon: RecordVoiceOverRoundedIcon, text: 'AI interviewer reads each question in a natural voice' },
+  { icon: MicRoundedIcon, text: 'Speak your answer — auto-transcribed via Sarvam AI' },
+  { icon: PsychologyRoundedIcon, text: 'Pause for 5 seconds when done — the interview moves on automatically' },
 ];
 
 export default function InterviewIntro({ meta, starting, onStart }) {
@@ -83,13 +83,13 @@ export default function InterviewIntro({ meta, starting, onStart }) {
         </Box>
 
         <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
-          {interview.description && (
+          {(interview.summary || interview.description) && (
             <Box sx={{ mb: 3 }}>
               <Typography sx={{ fontSize: 13, fontWeight: 700, color: 'var(--text-label)', mb: 1 }}>
-                Job Description
+                About this interview
               </Typography>
               <Typography sx={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.75 }}>
-                {interview.description}
+                {interview.summary || interview.description}
               </Typography>
             </Box>
           )}

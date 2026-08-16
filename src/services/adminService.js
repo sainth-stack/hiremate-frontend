@@ -9,6 +9,16 @@ export const getAdminOverviewAPI = () =>
 export const getAdminUsersAPI = (params = {}) =>
   axiosClient.get('/admin/users', { params });
 
+/** Create user (admin). POST /admin/users */
+export const createAdminUserAPI = (data) =>
+  axiosClient.post('/admin/users', {
+    first_name: data.first_name,
+    last_name: data.last_name,
+    email: data.email,
+    password: data.password,
+    is_admin: Boolean(data.is_admin),
+  });
+
 export const getAdminUserUsageAPI = (userId) =>
   axiosClient.get(`/admin/users/${userId}/usage`);
 
@@ -69,15 +79,32 @@ export const launchAdminInterviewsAPI = (payload) => {
 
   return axiosClient.post('/admin/launch-interviews', {
     interview_id: payload.interview_id,
+    launch_name: payload.launch_name || payload.title,
     title: payload.title,
     difficulty: String(payload.difficulty).toLowerCase(),
     description: payload.description,
     created_at: payload.created_at,
+    voice_provider: payload.voice_provider || 'cartesia',
+    voice_id: payload.voice_id,
+    voice_label: payload.voice_label || null,
+    tts_language_code: payload.tts_language_code || 'en-IN',
     users: users.map((u) => ({ id: u.id, email: u.email })),
     user_ids: userIds,
     user_emails: userEmails,
   });
 };
+
+/** List launched interview campaigns. GET /admin/launches */
+export const getAdminLaunchesAPI = (params = {}) =>
+  axiosClient.get('/admin/launches', { params });
+
+/** Launch campaign detail with assignees, transcripts, results. GET /admin/launches/{id} */
+export const getAdminLaunchDetailAPI = (launchId) =>
+  axiosClient.get(`/admin/launches/${launchId}`);
+
+/** Delete a launch campaign. DELETE /admin/launches/{id} → 204 */
+export const deleteAdminLaunchAPI = (id) =>
+  axiosClient.delete(`/admin/launches/${id}`);
 
 /**
  * @typedef {'easy' | 'medium' | 'hard'} InterviewDifficulty
@@ -93,6 +120,7 @@ export const launchAdminInterviewsAPI = (payload) => {
  *   title: string,
  *   difficulty: InterviewDifficulty,
  *   description: string,
+ *   question_count?: number,
  * }} CreateInterviewRequest
  */
 
@@ -113,6 +141,7 @@ export const createAdminInterviewAPI = (data) =>
     title: data.title,
     difficulty: String(data.difficulty).toLowerCase(),
     description: data.description,
+    question_count: Number(data.question_count) || 15,
   });
 
 /**
@@ -125,8 +154,21 @@ export const updateAdminInterviewAPI = (id, data) =>
     title: data.title,
     difficulty: String(data.difficulty).toLowerCase(),
     description: data.description,
+    question_count: Number(data.question_count) || 15,
   });
 
 /** Delete interview template (admin). DELETE /admin/interviews/{id} → 204 */
 export const deleteAdminInterviewAPI = (id) =>
   axiosClient.delete(`/admin/interviews/${id}`);
+
+/** Update question wording (admin). PATCH /admin/interviews/{id}/questions */
+export const updateAdminInterviewQuestionsAPI = (id, questions) =>
+  axiosClient.patch(`/admin/interviews/${id}/questions`, {
+    questions: questions.map((q) => ({ id: q.id, question_text: q.question_text })),
+  });
+
+/** Regenerate all questions from description. POST /admin/interviews/{id}/regenerate-questions */
+export const regenerateAdminInterviewQuestionsAPI = (id, data = {}) =>
+  axiosClient.post(`/admin/interviews/${id}/regenerate-questions`, {
+    question_count: Number(data.question_count) || 15,
+  });

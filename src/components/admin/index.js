@@ -1,3 +1,4 @@
+export { default as AddUserDialog } from './AddUserDialog';
 export { default as StatCard } from './StatCard';
 export { default as SectionCard } from './SectionCard';
 export { default as EmptyState } from './EmptyState';

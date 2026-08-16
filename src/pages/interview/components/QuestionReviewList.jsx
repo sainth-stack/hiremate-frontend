@@ -19,6 +19,7 @@ import LightbulbRoundedIcon from '@mui/icons-material/LightbulbRounded';
 import AnalyticsRoundedIcon from '@mui/icons-material/AnalyticsRounded';
 import { getInterviewQuestionAnalysisAPI } from '../../../services/interviewService';
 import { parseApiError } from '../../../utilities/apiErrorUtils';
+import AnswerAudioPlayer from '../../../components/interview/AnswerAudioPlayer';
 
 function scoreColor(score) {
   const value = Number(score) || 0;
@@ -206,6 +207,15 @@ function QuestionSummaryItem({ summary, userId, interviewId, expanded, onToggle,
           <>
             <ReviewField icon={QuizRoundedIcon} label="Question Asked" value={analysis.question || question} accent />
             <ReviewField icon={RecordVoiceOverRoundedIcon} label="Your Answer" value={analysis.user_answer} />
+            {analysis.has_audio && (
+              <AnswerAudioPlayer
+                userId={userId}
+                interviewId={interviewId}
+                order={order}
+                hasAudio={analysis.has_audio}
+                label="Play your recorded answer"
+              />
+            )}
             <ReviewField icon={LightbulbRoundedIcon} label="What You Said" value={analysis.what_you_said} accent />
             <ReviewField icon={TipsAndUpdatesRoundedIcon} label="How to Answer" value={analysis.how_to_answer} accent />
             <ReviewField icon={FeedbackRoundedIcon} label="Feedback" value={analysis.feedback} />

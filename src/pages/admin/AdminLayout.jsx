@@ -25,7 +25,7 @@ import Navbar from '../../components/common/Navbar';
 const ADMIN_NAV = [
   { label: 'Overview', path: '/admin', icon: DashboardRoundedIcon },
   { label: 'Users', path: '/admin/users', icon: PeopleRoundedIcon },
-  { label: 'Interview Creation', path: '/admin/interview-creation', icon: QuizRoundedIcon },
+  { label: 'Interview Studio', path: '/admin/interview-creation', icon: QuizRoundedIcon },
   { label: 'Launch Interviews', path: '/admin/launch-interviews', icon: RocketLaunchRoundedIcon },
   { label: 'Requested Interviews', path: '/admin/requested-interviews', icon: InboxRoundedIcon },
   { label: 'Plan Management', path: '/admin/plans', icon: SubscriptionsRoundedIcon },

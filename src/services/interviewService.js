@@ -83,6 +83,10 @@ export const getUserInterviewQuestionsAPI = (userId, params = {}) =>
 export const submitUserInterviewAPI = (payload) =>
   axiosClient.post('/interview/submit', payload);
 
+/** Reset completed interview so candidate can retake. POST /interview/retest */
+export const retestInterviewAPI = (payload) =>
+  axiosClient.post('/interview/retest', payload);
+
 /**
  * Fetches completed interview performance (same shape as submit response).
  * Backend: GET /interview/performance?user_id=&interview_id=
