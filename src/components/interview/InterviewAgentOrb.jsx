@@ -31,8 +31,14 @@ export default function InterviewAgentOrb({
   const isSpeaking = displayPhase === 'ai_speaking';
   const isListening = displayPhase === 'listening' && isRecording;
   const isPaused = displayPhase === 'paused';
-  const pulseScale = isSpeaking ? 1.06 : isPaused ? 1 : 1 + Math.min(inputLevel * 0.18, 0.14);
-  const glowOpacity = isSpeaking ? 0.55 : isListening ? 0.35 + inputLevel * 0.25 : isPaused ? 0.2 : 0.28;
+  const pulseScale = isSpeaking ? 1.04 : 1;
+  const glowOpacity = isSpeaking
+    ? 0.55
+    : isListening
+      ? 0.32 + Math.min(inputLevel * 0.15, 0.12)
+      : isPaused
+        ? 0.2
+        : 0.28;
   const totalSilenceSeconds = Math.max(1, Number(silenceSubmitSeconds) || 10);
   const ringProgress = silenceCountdown != null
     ? (totalSilenceSeconds - silenceCountdown) / totalSilenceSeconds
@@ -66,6 +72,8 @@ export default function InterviewAgentOrb({
               alignItems: 'center',
               justifyContent: 'center',
               pointerEvents: 'none',
+              opacity: 1,
+              transition: 'opacity 0.2s ease',
             }}
           >
             <svg width={ORB_SIZE + 56} height={ORB_SIZE + 56} viewBox="0 0 204 204">
@@ -99,9 +107,9 @@ export default function InterviewAgentOrb({
             opacity: 1,
           }}
           transition={{
-            type: 'spring',
-            stiffness: isSpeaking ? 120 : 180,
-            damping: 18,
+            type: 'tween',
+            duration: isSpeaking ? 0.45 : 0.2,
+            ease: 'easeOut',
           }}
           style={{
             width: ORB_SIZE,
@@ -168,28 +176,54 @@ export default function InterviewAgentOrb({
         {voiceLabel}
       </Typography>
 
-      {silenceCountdown != null ? (
-        <Typography sx={{ mt: 0.5, fontSize: 12, fontWeight: 700, color: 'var(--primary)' }}>
-          Submitting in {silenceCountdown}s — tap Keep speaking to add more
-        </Typography>
-      ) : pauseCountdown != null ? (
-        <Typography sx={{ mt: 0.5, fontSize: 12, fontWeight: 700, color: 'var(--warning-dark)' }}>
-          Paused — resuming in {pauseCountdown}s
-        </Typography>
-      ) : subtitle ? (
-        <Typography sx={{ mt: 0.5, fontSize: 12, color: 'var(--text-muted)' }}>
-          {subtitle}
-        </Typography>
-      ) : (
-        <Typography sx={{ mt: 0.5, fontSize: 12, color: 'var(--text-muted)' }}>
-          {displayPhase === 'ai_speaking' && 'AI is asking the question'}
-          {displayPhase === 'listening' && isRecording && `Speak clearly — stay quiet for ${totalSilenceSeconds}s when done`}
-          {displayPhase === 'paused' && 'Take a moment — recording will resume automatically'}
-          {displayPhase === 'processing' && 'Submitting your answer…'}
-          {displayPhase === 'ready' && 'Review your answer, then continue'}
-          {displayPhase === 'idle' && 'Preparing your interview…'}
-        </Typography>
-      )}
+      <Box
+        sx={{
+          mt: 0.5,
+          minHeight: 44,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          px: 2,
+          textAlign: 'center',
+        }}
+      >
+        {silenceCountdown != null ? (
+          <Typography
+            sx={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: 'var(--primary)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            Submitting in {silenceCountdown}s — tap Keep speaking to add more
+          </Typography>
+        ) : pauseCountdown != null ? (
+          <Typography
+            sx={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: 'var(--warning-dark)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            Paused — resuming in {pauseCountdown}s
+          </Typography>
+        ) : subtitle ? (
+          <Typography sx={{ fontSize: 12, color: 'var(--text-muted)' }}>
+            {subtitle}
+          </Typography>
+        ) : (
+          <Typography sx={{ fontSize: 12, color: 'var(--text-muted)' }}>
+            {displayPhase === 'ai_speaking' && 'AI is asking the question'}
+            {displayPhase === 'listening' && isRecording && `Speak clearly — stay quiet for ${totalSilenceSeconds}s when done`}
+            {displayPhase === 'paused' && 'Take a moment — recording will resume automatically'}
+            {displayPhase === 'processing' && 'Submitting your answer…'}
+            {displayPhase === 'ready' && 'Review your answer, then continue'}
+            {displayPhase === 'idle' && 'Preparing your interview…'}
+          </Typography>
+        )}
+      </Box>
     </Box>
   );
 }

@@ -47,6 +47,7 @@ export default function UserInterviewPage() {
   const [retesting, setRetesting] = useState(false);
   const [voiceConfig, setVoiceConfig] = useState(null);
   const [showDeviceCheck, setShowDeviceCheck] = useState(false);
+  const [mediaStream, setMediaStream] = useState(null);
 
   const {
     phase,
@@ -222,7 +223,10 @@ export default function UserInterviewPage() {
     }
   };
 
-  const handleDeviceCheckReady = async () => {
+  const handleDeviceCheckReady = async (stream) => {
+    if (stream) {
+      setMediaStream(stream);
+    }
     setStarting(true);
     setError(null);
 
@@ -418,6 +422,7 @@ export default function UserInterviewPage() {
         <InterviewSession
           userId={apiUserId}
           interviewId={interviewId ? Number(interviewId) : undefined}
+          mediaStream={mediaStream}
           onSubmit={handleSubmitInterview}
         />
       </PageShell>

@@ -22,8 +22,9 @@ import { useLiveSpeechRecognition } from '../../../hooks/useLiveSpeechRecognitio
 import { useInterviewVoiceSession } from '../../../hooks/useInterviewVoiceSession';
 import { useInterviewSessionStore } from '../../../store/interview/useInterviewSessionStore';
 import { parseApiError } from '../../../utilities/apiErrorUtils';
-import AnswerAudioPlayer from '../../../components/interview/AnswerAudioPlayer';
+import AnswerMediaPlayer from '../../../components/interview/AnswerMediaPlayer';
 import InterviewAgentOrb from '../../../components/interview/InterviewAgentOrb';
+import InterviewCameraPreview from '../../../components/interview/InterviewCameraPreview';
 import { consumeInterviewPauseAPI } from '../../../services/interviewVoiceService';
 
 const SESSION_LABELS = {
@@ -34,7 +35,7 @@ const SESSION_LABELS = {
   ready: 'Answer Ready',
 };
 
-export default function InterviewSession({ userId, interviewId, onSubmit }) {
+export default function InterviewSession({ userId, interviewId, mediaStream, onSubmit }) {
   const {
     questions,
     currentQuestionIndex,
@@ -115,8 +116,13 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
     pauseRecording,
     stopRecording,
     resetSilenceCountdown,
+    previewStream,
+    micError,
+    requestMicAccess,
   } = useInterviewMicrophone({
     enabled: true,
+    recordVideo: true,
+    initialStream: mediaStream,
     silenceDurationMs: silenceSubmitSeconds * 1000,
     monitoringEnabled: !isPaused,
     onSilence: () => handleSilenceRef.current?.(),
@@ -134,10 +140,32 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
     pendingSubmitRef.current = null;
     resetLiveTranscript();
     setCurrentTranscript('');
-    await startRecording();
-    startLiveListening();
-    setRecording(true);
-  }, [resetLiveTranscript, setCurrentTranscript, startRecording, startLiveListening, setRecording]);
+    try {
+      if (!mediaStream && !previewStream) {
+        await requestMicAccess();
+      }
+      await startRecording();
+      startLiveListening();
+      setRecording(true);
+      setLocalSessionPhase('listening');
+      setSessionPhase('listening');
+    } catch (err) {
+      const message = err?.message || micError || 'Could not start microphone recording';
+      toast.error(message, { id: 'mic-start-error' });
+      throw err;
+    }
+  }, [
+    mediaStream,
+    micError,
+    previewStream,
+    requestMicAccess,
+    resetLiveTranscript,
+    setCurrentTranscript,
+    setRecording,
+    setSessionPhase,
+    startLiveListening,
+    startRecording,
+  ]);
 
   const handleSilence = useCallback(async () => {
     if (autoAdvanceRef.current || isFinalizingRef.current) return;
@@ -178,7 +206,8 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
       setLocalSessionPhase('listening');
       setSessionPhase('listening');
       beginAnswerCapture().catch(() => {
-        toast.error('Could not start microphone recording', { id: 'mic-start-error' });
+        setLocalSessionPhase('listening');
+        setSessionPhase('listening');
       });
     }
   }, [userId, interviewId, questionOrder, setSpeaking, setSessionPhase, beginAnswerCapture]);
@@ -237,6 +266,8 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
     pendingSubmitRef.current = {
       blob: result.blob,
       durationMs: result.durationMs,
+      videoBlob: result.videoBlob,
+      videoDurationMs: result.videoDurationMs,
       clientTranscript: capturedTranscript,
     };
 
@@ -247,6 +278,8 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
         questionText,
         blob: result.blob,
         durationMs: result.durationMs,
+        videoBlob: result.videoBlob,
+        videoDurationMs: result.videoDurationMs,
         currentQuestionIndex,
         clientTranscript: capturedTranscript,
       });
@@ -256,6 +289,10 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
       saveAnswer(transcript, {
         audio_key: data?.audio_key,
         audio_url: data?.audio_url,
+        audio_playback_key: data?.audio_playback_key,
+        video_key: data?.video_key,
+        video_url: data?.video_url,
+        video_playback_key: data?.video_playback_key,
       });
 
       if (auto) {
@@ -368,11 +405,6 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
       || saved?.answer?.trim()
       || '';
 
-    if (!answer) {
-      if (!auto) toast.error('Please record or type an answer first');
-      return;
-    }
-
     if (!saved?.answer) {
       saveAnswer(answer);
     }
@@ -386,9 +418,9 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
   handleNextRef.current = handleNext;
 
   const savedAnswer = answers.find((item) => item.question_id === currentQuestion?.id);
-  const hasRecordedAudio = Boolean(savedAnswer?.audio_key);
-  const canProceed = (currentTranscript.trim().length > 0 || Boolean(savedAnswer?.answer?.trim()))
-    && !isSpeaking
+  const hasRecordedAudio = Boolean(savedAnswer?.audio_key || savedAnswer?.audio_playback_key);
+  const hasRecordedVideo = Boolean(savedAnswer?.video_key || savedAnswer?.video_playback_key);
+  const canProceed = !isSpeaking
     && !isProcessing
     && !submitting
     && !isPaused
@@ -401,6 +433,7 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
   const pauseTooltip = pausesRemaining <= 0
     ? `No pauses remaining (${maxPauses} per interview)`
     : `Pause for ${pauseDurationSeconds}s (${pausesRemaining} of ${maxPauses} left)`;
+  const showLiveCamera = ['listening', 'paused', 'ai_speaking'].includes(sessionPhase);
 
   return (
     <Box sx={{ minHeight: 'calc(100vh - 72px)', display: 'flex', flexDirection: 'column', bgcolor: '#f8fafc' }}>
@@ -445,10 +478,10 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentQuestionIndex}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.35 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
             style={{ width: '100%', maxWidth: 760 }}
           >
             <Box
@@ -503,14 +536,19 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
                 {questionText}
               </Typography>
 
+              {showLiveCamera && (
+                <InterviewCameraPreview stream={previewStream || mediaStream} />
+              )}
+
               <Box
                 sx={{
                   p: { xs: 2, sm: 2.5 },
                   borderRadius: 3,
                   bgcolor: '#f8fafc',
-                  border: isRecording ? '2px solid rgba(37,99,235,0.45)' : '1px solid rgba(226,232,240,0.95)',
-                  boxShadow: isRecording ? '0 0 0 4px rgba(37,99,235,0.08)' : 'none',
-                  transition: 'all 0.25s ease',
+                  border: '2px solid',
+                  borderColor: isRecording ? 'rgba(37,99,235,0.45)' : 'rgba(226,232,240,0.95)',
+                  boxShadow: isRecording ? '0 0 0 4px rgba(37,99,235,0.08)' : '0 0 0 4px transparent',
+                  transition: 'border-color 0.25s ease, box-shadow 0.25s ease',
                 }}
               >
                 <Typography sx={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', mb: 1.5 }}>
@@ -533,55 +571,86 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
                 />
 
                 {hasRecordedAudio && (
-                  <Box sx={{ mb: 2 }}>
-                    <AnswerAudioPlayer
+                  <Box sx={{ mb: hasRecordedVideo ? 1.5 : 2 }}>
+                    <AnswerMediaPlayer
                       userId={userId}
                       interviewId={interviewId}
                       order={questionOrder}
-                      hasAudio={hasRecordedAudio}
-                      label="Play your recording"
+                      kind="audio"
+                      hasMedia={hasRecordedAudio}
+                      label="Your voice answer"
                       compact
                     />
                   </Box>
                 )}
 
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                {hasRecordedVideo && (
+                  <Box sx={{ mb: 2 }}>
+                    <AnswerMediaPlayer
+                      userId={userId}
+                      interviewId={interviewId}
+                      order={questionOrder}
+                      kind="video"
+                      hasMedia={hasRecordedVideo}
+                      label="Your video answer"
+                    />
+                  </Box>
+                )}
+
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    flexWrap: 'wrap',
+                    minHeight: 48,
+                  }}
+                >
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', minHeight: 40, alignItems: 'center' }}>
                     {isRecording && !isPaused && (
-                      <Tooltip title={pauseTooltip} arrow>
-                        <span>
-                          <Button
-                            variant="outlined"
-                            onClick={handlePause}
-                            disabled={pauseDisabled}
-                            startIcon={<PauseRoundedIcon />}
-                            sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 999 }}
-                          >
-                            Pause ({pauseDurationSeconds}s)
-                          </Button>
-                        </span>
-                      </Tooltip>
-                    )}
-                    {isRecording && silenceCountdown != null && (
-                      <Button
-                        variant="outlined"
-                        onClick={handleRethink}
-                        disabled={isSpeaking || isProcessing || submitting}
-                        sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 999 }}
-                      >
-                        Keep speaking
-                      </Button>
-                    )}
-                    {isRecording && !silenceCountdown && !isPaused && (
-                      <Button
-                        variant="outlined"
-                        onClick={handleDoneSpeaking}
-                        disabled={isSpeaking || isProcessing || submitting}
-                        startIcon={<StopRoundedIcon />}
-                        sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 999 }}
-                      >
-                        Save & review
-                      </Button>
+                      <>
+                        <Tooltip title={pauseTooltip} arrow>
+                          <span>
+                            <Button
+                              variant="outlined"
+                              onClick={handlePause}
+                              disabled={pauseDisabled}
+                              startIcon={<PauseRoundedIcon />}
+                              sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 999 }}
+                            >
+                              Pause ({pauseDurationSeconds}s)
+                            </Button>
+                          </span>
+                        </Tooltip>
+                        <Button
+                          variant="outlined"
+                          onClick={handleRethink}
+                          disabled={isSpeaking || isProcessing || submitting || silenceCountdown == null}
+                          sx={{
+                            textTransform: 'none',
+                            fontWeight: 700,
+                            borderRadius: 999,
+                            visibility: silenceCountdown != null ? 'visible' : 'hidden',
+                          }}
+                        >
+                          Keep speaking
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          onClick={handleDoneSpeaking}
+                          disabled={isSpeaking || isProcessing || submitting || silenceCountdown != null}
+                          startIcon={<StopRoundedIcon />}
+                          sx={{
+                            textTransform: 'none',
+                            fontWeight: 700,
+                            borderRadius: 999,
+                            visibility: silenceCountdown == null ? 'visible' : 'hidden',
+                          }}
+                        >
+                          Save & review
+                        </Button>
+                      </>
                     )}
                     {submitFailed && (
                       <Button
@@ -652,7 +721,16 @@ export default function InterviewSession({ userId, interviewId, onSubmit }) {
                   )}
                 </Box>
 
-                <Typography variant="caption" sx={{ display: 'block', mt: 1.5, color: 'var(--text-muted)', textAlign: 'center' }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: 'block',
+                    mt: 1.5,
+                    minHeight: 32,
+                    color: 'var(--text-muted)',
+                    textAlign: 'center',
+                  }}
+                >
                   {isRecording
                     ? isPaused
                       ? `Paused — recording resumes automatically in ${pauseCountdown ?? pauseDurationSeconds}s.`

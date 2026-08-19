@@ -22,7 +22,7 @@ import AnalyticsRoundedIcon from '@mui/icons-material/AnalyticsRounded';
 import { getInterviewQuestionAnalysisAPI } from '../../../services/interviewService';
 import { parseApiError } from '../../../utilities/apiErrorUtils';
 import { DIMENSION_LABELS, scoreValueStyles } from '../../../utilities/interviewReportUtils';
-import AnswerAudioPlayer from '../../../components/interview/AnswerAudioPlayer';
+import AnswerMediaPlayer from '../../../components/interview/AnswerMediaPlayer';
 
 function scoreChipStyle(score) {
   const value = Number(score) || 0;
@@ -245,12 +245,23 @@ function QuestionSummaryItem({ summary, userId, interviewId, expanded, onToggle,
             <ReviewField icon={QuizRoundedIcon} label="Question" value={analysis.question || question} accent />
             <ReviewField icon={RecordVoiceOverRoundedIcon} label="Your Answer" value={analysis.user_answer} />
             {analysis.has_audio && (
-              <AnswerAudioPlayer
+              <AnswerMediaPlayer
                 userId={userId}
                 interviewId={interviewId}
                 order={order}
-                hasAudio={analysis.has_audio}
-                label="Play your recorded answer"
+                kind="audio"
+                hasMedia={analysis.has_audio}
+                label="Your voice answer"
+              />
+            )}
+            {analysis.has_video && (
+              <AnswerMediaPlayer
+                userId={userId}
+                interviewId={interviewId}
+                order={order}
+                kind="video"
+                hasMedia={analysis.has_video}
+                label="Your video answer"
               />
             )}
 

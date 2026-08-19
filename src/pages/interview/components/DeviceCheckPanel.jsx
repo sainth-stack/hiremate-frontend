@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -6,12 +6,14 @@ import {
   Typography,
 } from '@mui/material';
 import MicRoundedIcon from '@mui/icons-material/MicRounded';
+import VideocamRoundedIcon from '@mui/icons-material/VideocamRounded';
 import VolumeUpRoundedIcon from '@mui/icons-material/VolumeUpRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import { motion } from 'framer-motion';
 import { playAudioBlob } from '../../../hooks/useInterviewMicrophone';
 import { synthesizeInterviewQuestionAPI } from '../../../services/interviewVoiceService';
 import InterviewAgentOrb from '../../../components/interview/InterviewAgentOrb';
+import InterviewCameraPreview from '../../../components/interview/InterviewCameraPreview';
 
 export default function DeviceCheckPanel({
   userId,
@@ -20,19 +22,47 @@ export default function DeviceCheckPanel({
   onReady,
   onBack,
 }) {
+  const streamRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const monitorFrameRef = useRef(null);
+  const [previewStream, setPreviewStream] = useState(null);
   const [micGranted, setMicGranted] = useState(false);
+  const [cameraGranted, setCameraGranted] = useState(false);
   const [speakerOk, setSpeakerOk] = useState(false);
   const [inputLevel, setInputLevel] = useState(0);
   const [error, setError] = useState(null);
   const [testingSpeaker, setTestingSpeaker] = useState(false);
-  const [testingMic, setTestingMic] = useState(false);
+  const [testingDevices, setTestingDevices] = useState(false);
 
-  const canStart = micGranted;
+  const canStart = micGranted && cameraGranted;
   const voiceLabel = voiceConfig?.voice_label || voiceConfig?.tts_speaker || 'AI Interviewer';
 
-  const testMicrophone = async () => {
+  const stopLevelMonitor = useCallback(() => {
+    if (monitorFrameRef.current) {
+      cancelAnimationFrame(monitorFrameRef.current);
+      monitorFrameRef.current = null;
+    }
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(() => {});
+      audioContextRef.current = null;
+    }
+  }, []);
+
+  const stopPreviewStream = useCallback(() => {
+    stopLevelMonitor();
+    streamRef.current?.getTracks?.().forEach((track) => track.stop());
+    streamRef.current = null;
+    setPreviewStream(null);
+    setMicGranted(false);
+    setCameraGranted(false);
+    setInputLevel(0);
+  }, [stopLevelMonitor]);
+
+  const testDevices = useCallback(async () => {
     setError(null);
-    setTestingMic(true);
+    setTestingDevices(true);
+    stopPreviewStream();
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -40,12 +70,27 @@ export default function DeviceCheckPanel({
           noiseSuppression: true,
           autoGainControl: true,
         },
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: 'user',
+        },
       });
+
+      streamRef.current = stream;
+      setPreviewStream(stream);
+      setMicGranted(stream.getAudioTracks().length > 0);
+      setCameraGranted(stream.getVideoTracks().length > 0);
+
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      audioContextRef.current = audioContext;
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+
       const source = audioContext.createMediaStreamSource(stream);
       const analyser = audioContext.createAnalyser();
       source.connect(analyser);
-      setMicGranted(true);
 
       const data = new Uint8Array(analyser.frequencyBinCount);
       let frames = 0;
@@ -58,21 +103,27 @@ export default function DeviceCheckPanel({
         }
         setInputLevel(Math.min(1, Math.sqrt(sum / data.length) * 4));
         frames += 1;
-        if (frames < 180) {
-          requestAnimationFrame(monitor);
+        if (frames < 240) {
+          monitorFrameRef.current = requestAnimationFrame(monitor);
         } else {
-          stream.getTracks().forEach((t) => t.stop());
-          audioContext.close().catch(() => {});
+          stopLevelMonitor();
         }
       };
       monitor();
     } catch (err) {
-      setMicGranted(false);
-      setError(err?.message || 'Microphone access denied');
+      stopPreviewStream();
+      setError(err?.message || 'Camera and microphone access are required for this interview.');
     } finally {
-      setTestingMic(false);
+      setTestingDevices(false);
     }
-  };
+  }, [stopLevelMonitor, stopPreviewStream]);
+
+  useEffect(() => {
+    testDevices();
+    return () => stopPreviewStream();
+    // Request devices once when the panel opens.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const testSpeaker = async () => {
     setTestingSpeaker(true);
@@ -87,15 +138,25 @@ export default function DeviceCheckPanel({
       });
       await playAudioBlob(response.data);
       setSpeakerOk(true);
-    } catch (err) {
-      setError('Speaker test failed. Check your volume and try again — you can still start if your microphone works.');
+    } catch {
+      setError('Speaker test failed. Check your volume and try again — you can still start if your microphone and camera work.');
     } finally {
       setTestingSpeaker(false);
     }
   };
 
+  const handleStart = () => {
+    const stream = streamRef.current;
+    if (!stream) {
+      setError('Allow camera and microphone before starting the interview.');
+      return;
+    }
+    stopLevelMonitor();
+    onReady?.(stream);
+  };
+
   return (
-    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.25 }}>
       <Box
         sx={{
           p: { xs: 3, sm: 4 },
@@ -111,12 +172,9 @@ export default function DeviceCheckPanel({
           Device check
         </Typography>
         <Typography sx={{ fontSize: 14, color: 'var(--text-secondary)', mb: 2, lineHeight: 1.6 }}>
-          We use Sarvam AI voice for questions and speech recognition for your answers.
+          We record your voice and video for each answer. Allow camera and microphone access to continue.
           {voiceConfig?.voice_label && (
             <> Interviewer voice: <strong>{voiceConfig.voice_label}</strong>.</>
-          )}
-          {!voiceConfig?.voice_label && voiceConfig?.tts_speaker && (
-            <> Interviewer voice: <strong>{voiceConfig.tts_speaker}</strong>.</>
           )}
         </Typography>
 
@@ -126,10 +184,17 @@ export default function DeviceCheckPanel({
           inputLevel={inputLevel}
           isRecording={micGranted}
           subtitle={
-            micGranted
-              ? (speakerOk ? 'Devices ready — start when you are.' : 'Microphone working — test speaker, then start.')
-              : 'Allow microphone access to continue.'
+            testingDevices
+              ? 'Requesting camera and microphone access…'
+              : canStart
+                ? (speakerOk ? 'Devices ready — start when you are.' : 'Camera and mic ready — test speaker, then start.')
+                : 'Allow camera and microphone to continue.'
           }
+        />
+
+        <InterviewCameraPreview
+          stream={previewStream}
+          placeholder={testingDevices ? 'Waiting for camera access…' : 'Camera preview will appear here'}
         />
 
         {error && (
@@ -142,8 +207,9 @@ export default function DeviceCheckPanel({
           <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'var(--bg-light)', border: '1px solid var(--border-color)' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <MicRoundedIcon color={micGranted ? 'success' : 'action'} />
-              <Typography sx={{ fontWeight: 700 }}>Microphone</Typography>
-              {micGranted && <CheckCircleRoundedIcon sx={{ color: 'var(--success)', fontSize: 18 }} />}
+              <VideocamRoundedIcon color={cameraGranted ? 'success' : 'action'} />
+              <Typography sx={{ fontWeight: 700 }}>Camera & microphone</Typography>
+              {canStart && <CheckCircleRoundedIcon sx={{ color: 'var(--success)', fontSize: 18 }} />}
             </Box>
             {micGranted && (
               <LinearProgress
@@ -153,12 +219,12 @@ export default function DeviceCheckPanel({
               />
             )}
             <Button
-              variant={micGranted ? 'outlined' : 'contained'}
-              disabled={testingMic}
-              onClick={testMicrophone}
+              variant={canStart ? 'outlined' : 'contained'}
+              disabled={testingDevices}
+              onClick={testDevices}
               sx={{ textTransform: 'none', fontWeight: 700 }}
             >
-              {testingMic ? 'Checking microphone…' : (micGranted ? 'Re-test microphone' : 'Allow microphone')}
+              {testingDevices ? 'Checking devices…' : (canStart ? 'Re-test devices' : 'Allow camera & microphone')}
             </Button>
           </Box>
 
@@ -170,7 +236,7 @@ export default function DeviceCheckPanel({
             </Box>
             <Button
               variant="outlined"
-              disabled={!micGranted || testingSpeaker}
+              disabled={!canStart || testingSpeaker}
               onClick={testSpeaker}
               sx={{ textTransform: 'none', fontWeight: 700 }}
             >
@@ -180,9 +246,9 @@ export default function DeviceCheckPanel({
         </Box>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', mt: 3, gap: 1 }}>
-          {micGranted && !speakerOk && (
+          {canStart && !speakerOk && (
             <Typography variant="caption" sx={{ color: 'var(--text-muted)', textAlign: 'right' }}>
-              Microphone ready. Test your speaker if you can, then start the interview.
+              Camera and microphone are ready. Test your speaker if you can, then start.
             </Typography>
           )}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: 2 }}>
@@ -193,8 +259,8 @@ export default function DeviceCheckPanel({
             )}
             <Button
               variant="contained"
-              disabled={!canStart}
-              onClick={onReady}
+              disabled={!canStart || testingDevices}
+              onClick={handleStart}
               sx={{
                 ml: 'auto',
                 textTransform: 'none',

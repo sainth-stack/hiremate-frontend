@@ -8,7 +8,7 @@ import {
   LinearProgress,
 } from '@mui/material';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
-import AnswerAudioPlayer from '../../interview/AnswerAudioPlayer';
+import AnswerMediaPlayer from '../../interview/AnswerMediaPlayer';
 import { getOverallScore, getScoreStatus, scoreStatusStyles, scoreValueStyles } from '../../../utilities/interviewReportUtils';
 
 export const STATUS_CONFIG = {
@@ -28,11 +28,11 @@ export function StatusChip({ status }) {
   );
 }
 
-function buildAnswerAudioMap(answers) {
+function buildAnswerMediaMap(answers) {
   const map = {};
   (answers || []).forEach((item, index) => {
     const order = item.order ?? index + 1;
-    if (item.has_audio || item.audio_key) {
+    if (item.has_audio || item.audio_key || item.has_video || item.video_key) {
       map[order] = item;
     }
   });
@@ -43,7 +43,7 @@ export default function AssigneeResultPanel({ assignee, interviewId }) {
   const report = assignee.report;
   const reviews = assignee.question_reviews || [];
   const answers = assignee.answers || [];
-  const audioByOrder = buildAnswerAudioMap(answers);
+  const mediaByOrder = buildAnswerMediaMap(answers);
   const overallScore = getOverallScore(report || {});
   const scoreStatus = getScoreStatus(report || {});
   const hiring = report?.hiring_recommendation;
@@ -73,14 +73,16 @@ export default function AssigneeResultPanel({ assignee, interviewId }) {
   const items = reviews.length
     ? reviews.map((review) => ({
         ...review,
-        user_answer: review.user_answer || audioByOrder[review.order]?.answer,
-        has_audio: review.has_audio || Boolean(audioByOrder[review.order]?.has_audio || audioByOrder[review.order]?.audio_key),
+        user_answer: review.user_answer || mediaByOrder[review.order]?.answer,
+        has_audio: review.has_audio || Boolean(mediaByOrder[review.order]?.has_audio || mediaByOrder[review.order]?.audio_key),
+        has_video: review.has_video || Boolean(mediaByOrder[review.order]?.has_video || mediaByOrder[review.order]?.video_key),
       }))
     : answers.map((a, i) => ({
         order: a.order ?? i + 1,
         question: a.question,
         user_answer: a.answer,
         has_audio: a.has_audio || Boolean(a.audio_key),
+        has_video: a.has_video || Boolean(a.video_key),
       }));
 
   if (assignee.status === 'in_progress' && !items.length) {
@@ -199,7 +201,8 @@ export default function AssigneeResultPanel({ assignee, interviewId }) {
         const order = item.order ?? index + 1;
         const question = item.question || `Question ${order}`;
         const userAnswer = item.user_answer || '';
-        const hasAudio = item.has_audio || Boolean(audioByOrder[order]?.has_audio || audioByOrder[order]?.audio_key);
+        const hasAudio = item.has_audio || Boolean(mediaByOrder[order]?.has_audio || mediaByOrder[order]?.audio_key);
+        const hasVideo = item.has_video || Boolean(mediaByOrder[order]?.has_video || mediaByOrder[order]?.video_key);
         return (
           <Accordion
             key={order}
@@ -223,6 +226,9 @@ export default function AssigneeResultPanel({ assignee, interviewId }) {
                 {hasAudio && (
                   <Chip label="Audio" size="small" sx={{ height: 20, fontSize: 10, fontWeight: 700, bgcolor: 'var(--light-blue-bg-08)', color: 'var(--primary)' }} />
                 )}
+                {hasVideo && (
+                  <Chip label="Video" size="small" sx={{ height: 20, fontSize: 10, fontWeight: 700, bgcolor: '#fef3c7', color: '#92400e' }} />
+                )}
                 {item.score != null && (
                   <Chip label={`${item.score}/100`} size="small" sx={{ ml: 'auto', mr: 1, height: 20, fontSize: 10, fontWeight: 700 }} />
                 )}
@@ -231,12 +237,26 @@ export default function AssigneeResultPanel({ assignee, interviewId }) {
             <AccordionDetails sx={{ px: 1.5, pb: 1.5, pt: 0, bgcolor: 'rgba(248,250,252,0.8)' }}>
               {hasAudio && (
                 <Box sx={{ mb: 1.5 }}>
-                  <AnswerAudioPlayer
+                  <AnswerMediaPlayer
                     userId={assignee.user_id}
                     interviewId={interviewId}
                     order={order}
-                    hasAudio={hasAudio}
-                    label="Listen to candidate recording"
+                    kind="audio"
+                    hasMedia={hasAudio}
+                    label="Listen to candidate voice"
+                    compact
+                  />
+                </Box>
+              )}
+              {hasVideo && (
+                <Box sx={{ mb: 1.5 }}>
+                  <AnswerMediaPlayer
+                    userId={assignee.user_id}
+                    interviewId={interviewId}
+                    order={order}
+                    kind="video"
+                    hasMedia={hasVideo}
+                    label="Watch candidate video"
                   />
                 </Box>
               )}

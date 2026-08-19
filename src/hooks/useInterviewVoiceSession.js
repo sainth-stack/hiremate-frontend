@@ -47,6 +47,16 @@ export function useInterviewVoiceSession({
       if (payload.clientTranscript?.trim()) {
         formData.append('client_transcript', payload.clientTranscript.trim());
       }
+      if (payload.videoBlob && payload.videoBlob.size > 1000) {
+        formData.append(
+          'video',
+          payload.videoBlob,
+          `answer_q${payload.questionOrder}.webm`,
+        );
+        if (payload.videoDurationMs != null) {
+          formData.append('video_duration_ms', String(payload.videoDurationMs));
+        }
+      }
       formData.append('audio', payload.blob, `answer_q${payload.questionOrder}.webm`);
       return formData;
     };

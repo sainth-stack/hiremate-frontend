@@ -11,8 +11,12 @@ export function useInterviewMicrophone({
   enabled = true,
   silenceDurationMs = DEFAULT_SILENCE_DURATION_MS,
   monitoringEnabled = true,
+  recordVideo = true,
+  initialStream = null,
 }) {
   const [micGranted, setMicGranted] = useState(false);
+  const [cameraGranted, setCameraGranted] = useState(false);
+  const [previewStream, setPreviewStream] = useState(null);
   const [micError, setMicError] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [inputLevel, setInputLevel] = useState(0);
@@ -21,6 +25,9 @@ export function useInterviewMicrophone({
 
   const streamRef = useRef(null);
   const recorderRef = useRef(null);
+  const videoRecorderRef = useRef(null);
+  const videoChunksRef = useRef([]);
+  const videoStopResolveRef = useRef(null);
   const chunksRef = useRef([]);
   const analyserRef = useRef(null);
   const audioContextRef = useRef(null);
@@ -40,6 +47,13 @@ export function useInterviewMicrophone({
   const monitoringEnabledRef = useRef(monitoringEnabled);
   const silenceDurationMsRef = useRef(silenceDurationMs);
 
+  const levelEmitRef = useRef(0);
+  const recordVideoRef = useRef(recordVideo);
+
+  useEffect(() => {
+    recordVideoRef.current = recordVideo;
+  }, [recordVideo]);
+
   useEffect(() => {
     onSilenceRef.current = onSilence;
   }, [onSilence]);
@@ -56,9 +70,89 @@ export function useInterviewMicrophone({
     silenceDurationMsRef.current = silenceDurationMs;
   }, [silenceDurationMs]);
 
+  useEffect(() => {
+    if (!initialStream) return undefined;
+
+    if (streamRef.current && streamRef.current !== initialStream) {
+      streamRef.current.getTracks?.().forEach((track) => track.stop());
+    }
+
+    streamRef.current = initialStream;
+    setPreviewStream(initialStream);
+    setMicGranted(initialStream.getAudioTracks().some((track) => track.readyState === 'live'));
+    setCameraGranted(
+      !recordVideoRef.current
+      || initialStream.getVideoTracks().some((track) => track.readyState === 'live'),
+    );
+    setMicError(null);
+
+    return undefined;
+  }, [initialStream]);
+
+  const getAudioStream = useCallback((stream) => {
+    const audioTracks = stream?.getAudioTracks?.() || [];
+    if (!audioTracks.length) {
+      throw new Error('No microphone track available');
+    }
+    return new MediaStream(audioTracks);
+  }, []);
+
   const stopStreamTracks = useCallback(() => {
     streamRef.current?.getTracks?.().forEach((track) => track.stop());
     streamRef.current = null;
+    setPreviewStream(null);
+  }, []);
+
+  const pickVideoMimeType = () => {
+    const candidates = [
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
+      'video/webm',
+    ];
+    return candidates.find((type) => MediaRecorder.isTypeSupported(type)) || '';
+  };
+
+  const stopVideoRecorder = useCallback(() => new Promise((resolve) => {
+    const recorder = videoRecorderRef.current;
+    if (!recorder || recorder.state === 'inactive') {
+      if (videoChunksRef.current.length) {
+        resolve({
+          blob: new Blob(videoChunksRef.current, { type: 'video/webm' }),
+          mimeType: 'video/webm',
+        });
+        return;
+      }
+      resolve(null);
+      return;
+    }
+    videoStopResolveRef.current = resolve;
+    recorder.stop();
+  }), []);
+
+  const startVideoRecorder = useCallback((stream) => {
+    if (!recordVideoRef.current || !stream?.getVideoTracks?.().length) return;
+    const mimeType = pickVideoMimeType();
+    if (!mimeType) return;
+    try {
+      videoChunksRef.current = [];
+      const recorder = new MediaRecorder(stream, { mimeType });
+      videoRecorderRef.current = recorder;
+      recorder.ondataavailable = (event) => {
+        if (event.data?.size > 0) videoChunksRef.current.push(event.data);
+      };
+      recorder.onstop = () => {
+        const blob = new Blob(videoChunksRef.current, { type: recorder.mimeType || 'video/webm' });
+        videoStopResolveRef.current?.({
+          blob,
+          mimeType: blob.type || 'video/webm',
+        });
+        videoStopResolveRef.current = null;
+      };
+      recorder.start(500);
+    } catch (err) {
+      videoRecorderRef.current = null;
+      console.warn('[Interview] Video recorder failed to start:', err);
+    }
   }, []);
 
   const stopLevelMonitor = useCallback(({ clearCountdown = true } = {}) => {
@@ -102,15 +196,25 @@ export function useInterviewMicrophone({
           noiseSuppression: true,
           autoGainControl: true,
         },
+        video: recordVideoRef.current
+          ? {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            facingMode: 'user',
+          }
+          : false,
       });
       stopStreamTracks();
       streamRef.current = stream;
+      setPreviewStream(stream);
       setMicGranted(true);
+      setCameraGranted(!recordVideoRef.current || stream.getVideoTracks().length > 0);
       return stream;
     } catch (err) {
       const message = err?.message || 'Microphone access denied';
       setMicError(message);
       setMicGranted(false);
+      setCameraGranted(false);
       throw err;
     }
   }, [stopStreamTracks]);
@@ -120,13 +224,35 @@ export function useInterviewMicrophone({
       chunksRef.current = [];
     }
 
-    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-      ? 'audio/webm;codecs=opus'
-      : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '');
+    const mimeCandidates = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'video/webm;codecs=vp8,opus',
+      'video/webm',
+    ];
 
-    const recorder = mimeType
-      ? new MediaRecorder(stream, { mimeType })
-      : new MediaRecorder(stream);
+    let recorder = null;
+    let selectedMime = '';
+
+    for (const candidate of mimeCandidates) {
+      if (candidate.includes('codecs=') && !MediaRecorder.isTypeSupported(candidate)) {
+        continue;
+      }
+      try {
+        recorder = candidate
+          ? new MediaRecorder(stream, { mimeType: candidate })
+          : new MediaRecorder(stream);
+        selectedMime = recorder.mimeType || candidate || 'audio/webm';
+        break;
+      } catch {
+        recorder = null;
+      }
+    }
+
+    if (!recorder) {
+      recorder = new MediaRecorder(stream);
+      selectedMime = recorder.mimeType || 'audio/webm';
+    }
 
     recorderRef.current = recorder;
 
@@ -136,15 +262,16 @@ export function useInterviewMicrophone({
       }
     };
 
-    recorder.onstop = () => {
+    recorder.onstop = async () => {
       if (pauseStopRef.current) {
         pauseStopRef.current();
         pauseStopRef.current = null;
         return;
       }
 
-      const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' });
+      const blob = new Blob(chunksRef.current, { type: recorder.mimeType || selectedMime || 'audio/webm' });
       const durationMs = Date.now() - recordingStartRef.current;
+      const videoResult = await stopVideoRecorder();
       setIsRecording(false);
       isRecordingRef.current = false;
       stopLevelMonitor();
@@ -153,19 +280,31 @@ export function useInterviewMicrophone({
         blob,
         durationMs,
         mimeType: blob.type || 'audio/webm',
+        videoBlob: videoResult?.blob || null,
+        videoMimeType: videoResult?.mimeType || null,
+        videoDurationMs: videoResult ? durationMs : null,
       });
       resolveStopRef.current = null;
     };
 
-    recorder.start(250);
+    try {
+      recorder.start(250);
+    } catch (err) {
+      recorderRef.current = null;
+      throw new Error(err?.message || 'Could not start audio recorder');
+    }
+
     setIsRecording(true);
     isRecordingRef.current = true;
     return recorder;
-  }, [stopLevelMonitor]);
+  }, [stopLevelMonitor, stopVideoRecorder]);
 
-  const startLevelMonitor = useCallback((stream) => {
+  const startLevelMonitor = useCallback(async (stream) => {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     audioContextRef.current = audioContext;
+    if (audioContext.state === 'suspended') {
+      await audioContext.resume();
+    }
     const source = audioContext.createMediaStreamSource(stream);
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 512;
@@ -185,7 +324,11 @@ export function useInterviewMicrophone({
       const rms = Math.sqrt(sum / data.length);
       levelSmoothRef.current = levelSmoothRef.current * 0.8 + rms * 0.2;
       const smoothRms = levelSmoothRef.current;
-      setInputLevel(Math.min(1, smoothRms * 4));
+      const now = Date.now();
+      if (now - levelEmitRef.current >= 120) {
+        levelEmitRef.current = now;
+        setInputLevel(Math.min(1, smoothRms * 4));
+      }
 
       const elapsed = Date.now() - recordingStartRef.current;
       const silenceDuration = silenceDurationMsRef.current;
@@ -260,6 +403,9 @@ export function useInterviewMicrophone({
       }
 
       stopLevelMonitor();
+      if (videoRecorderRef.current?.state === 'recording') {
+        videoRecorderRef.current.stop();
+      }
       pauseStopRef.current = () => {
         setIsRecording(false);
         isRecordingRef.current = false;
@@ -273,9 +419,11 @@ export function useInterviewMicrophone({
     if (!enabled) return null;
 
     let stream = streamRef.current;
-    if (!stream) {
+    if (!stream || !stream.getAudioTracks?.().some((track) => track.readyState === 'live')) {
       stream = await requestMicAccess();
     }
+
+    const audioStream = getAudioStream(stream);
 
     speechStartedRef.current = false;
     silenceStartedAtRef.current = null;
@@ -290,10 +438,11 @@ export function useInterviewMicrophone({
     }
     setSilenceCountdown(null);
 
-    startRecorderSegment(stream, { resetChunks });
+    startRecorderSegment(audioStream, { resetChunks });
+    startVideoRecorder(stream);
 
     if (monitoringEnabledRef.current) {
-      startLevelMonitor(stream);
+      await startLevelMonitor(audioStream);
     }
 
     durationTimerRef.current = setInterval(() => {
@@ -308,7 +457,7 @@ export function useInterviewMicrophone({
     }, MAX_RECORDING_MS);
 
     return recorderRef.current;
-  }, [enabled, requestMicAccess, startLevelMonitor, startRecorderSegment]);
+  }, [enabled, getAudioStream, requestMicAccess, startLevelMonitor, startRecorderSegment, startVideoRecorder]);
 
   const resumeRecording = useCallback(async () => {
     speechStartedRef.current = false;
@@ -337,6 +486,8 @@ export function useInterviewMicrophone({
 
   return {
     micGranted,
+    cameraGranted,
+    previewStream,
     micError,
     isRecording,
     inputLevel,
